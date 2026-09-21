@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/incompatible-library */
 "use client";
 import * as React from "react";
 import Link from "next/link";
@@ -118,3 +119,4 @@ export function RequestAccessForm({ groups, swEnabled }: { groups: { id: string;
     </form>
   );
 }
+

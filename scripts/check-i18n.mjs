@@ -55,6 +55,7 @@ const families = {
   "errors.": ["invalid", "unknown", "summaryTitle"],
 };
 for (const [ns, list] of Object.entries(families)) for (const k of list) if (!enKeys.has(ns + k)) fail(`missing runtime key ${ns}${k}`);
-if (process.argv.includes("--list")) console.log([...used].sort().join("\n"));
-console.log(`i18n: ${enKeys.size} keys, ${used.size} static usages checked, ${problems} problem(s)`);
+if (process.argv.includes("--list")) console.error([...used].sort().join("\n"));
+console.error(`i18n: ${enKeys.size} keys, ${used.size} static usages checked, ${problems} problem(s)`);
 process.exit(problems ? 1 : 0);
+

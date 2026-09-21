@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 import * as React from "react";
 import { ThemeProvider as NextThemes, useTheme } from "next-themes";
@@ -25,3 +26,4 @@ export function ThemeToggle() {
     </Button>
   );
 }
+

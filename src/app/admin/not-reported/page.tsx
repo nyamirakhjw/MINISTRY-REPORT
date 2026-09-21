@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/purity */
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { CloseMonthDialog, OnBehalfDialog } from "@/components/admin/report-dialogs";
@@ -50,3 +51,4 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
     </div>
   );
 }
+

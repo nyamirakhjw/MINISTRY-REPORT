@@ -18,7 +18,8 @@ const sizes = [];
   }
 })(dir);
 sizes.sort((a, b) => b[0] - a[0]);
-console.log("bundles: largest chunks (gzip KB)");
-for (const [s, n] of sizes.slice(0, 8)) console.log(`  ${(s / 1024).toFixed(1).padStart(7)}  ${n}`);
-console.log(`bundles: total ${(total / 1024).toFixed(0)} KB gzip across all chunks (budget ${BUDGET_KB} KB), ${maps} source map(s)`);
+console.error("bundles: largest chunks (gzip KB)");
+for (const [s, n] of sizes.slice(0, 8)) console.error(`  ${(s / 1024).toFixed(1).padStart(7)}  ${n}`);
+console.error(`bundles: total ${(total / 1024).toFixed(0)} KB gzip across all chunks (budget ${BUDGET_KB} KB), ${maps} source map(s)`);
 process.exit(maps > 0 || total / 1024 > BUDGET_KB ? 1 : 0);
+
