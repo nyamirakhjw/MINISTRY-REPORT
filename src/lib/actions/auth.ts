@@ -70,8 +70,14 @@ export async function checkUsernameAction(username: string): Promise<boolean> {
   return data === true;
 }
 
-/** AUTH-01 step 1. The photo comes after email confirmation, because uploads need a signed-in session. */
-export async function requestAccessAction(input: RequestAccessInput): Promise<ActionResult> {
+/**
+ * AUTH-01 step 1. The photo comes after email confirmation, because uploads need a signed-in session.
+ * If the project has "Confirm email" turned OFF (e.g. while no SMTP provider is configured), Supabase
+ * returns a session immediately instead of requiring a click-through link. `emailConfirmed` tells the
+ * form which case happened, so it can send the person straight to the photo step instead of showing
+ * "check your email" forever.
+ */
+export async function requestAccessAction(input: RequestAccessInput): Promise<ActionResult<{ emailConfirmed: boolean }>> {
   const parsed = requestAccessSchema.safeParse(input);
   if (!parsed.success) return invalid(parsed.error);
   const v = parsed.data;
@@ -86,7 +92,7 @@ export async function requestAccessAction(input: RequestAccessInput): Promise<Ac
   if (!(await checkUsernameAction(v.username))) return { ok: false, code: "invalid", fields: { username: "username_taken" } };
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email: v.email,
     password: v.password,
     options: {
@@ -100,7 +106,8 @@ export async function requestAccessAction(input: RequestAccessInput): Promise<Ac
     },
   });
   if (error) return { ok: false, code: error.code === "weak_password" ? "invalid" : "signup_failed", fields: error.code === "weak_password" ? { password: "password_common" } : undefined };
-  return { ok: true };
+  // A session on the response means email confirmation is off and sign-up already signed them in.
+  return { ok: true, data: { emailConfirmed: !!data.session } };
 }
 
 export async function requestPasswordResetAction(input: { email: string }): Promise<ActionResult> {

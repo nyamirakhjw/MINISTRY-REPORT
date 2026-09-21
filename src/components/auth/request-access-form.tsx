@@ -1,7 +1,7 @@
-/* eslint-disable react-hooks/incompatible-library */
 "use client";
 import * as React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MailCheck } from "lucide-react";
@@ -21,6 +21,7 @@ export function RequestAccessForm({ groups, swEnabled }: { groups: { id: string;
   const t = useTranslations("requestAccess");
   const cat = useTranslations("categories");
   const c = useTranslations("common");
+  const router = useRouter();
   const [done, setDone] = React.useState<string | null>(null);
   const [serverError, setServerError] = React.useState<string | null>(null);
   const [pending, start] = React.useTransition();
@@ -43,7 +44,11 @@ export function RequestAccessForm({ groups, swEnabled }: { groups: { id: string;
     setServerError(null);
     start(async () => {
       const r = await requestAccessAction(v);
-      if (r.ok) return setDone(v.email);
+      if (r.ok) {
+        // Email confirmation off (no SMTP configured yet): sign-up already signed them in, so skip straight to the photo step.
+        if (r.data?.emailConfirmed) { router.push("/pending"); router.refresh(); return; }
+        return setDone(v.email);
+      }
       if (r.fields) {
         for (const [k, m] of Object.entries(r.fields)) setError(k as keyof RequestAccessInput, { message: m });
         return;
@@ -119,4 +124,3 @@ export function RequestAccessForm({ groups, swEnabled }: { groups: { id: string;
     </form>
   );
 }
-

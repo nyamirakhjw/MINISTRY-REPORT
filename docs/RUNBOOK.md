@@ -9,6 +9,8 @@
 | A month is stuck ("can no longer be sent by you") | Reports, open the person, **Submit for them** or **Close month** |
 | Someone has no phone or email | Members, **Add a member without a phone**, then submit for them each month |
 | A report is wrong | **Known gap in this release.** The correction flow is Phase 2, and submit-on-behalf deliberately cannot overwrite a submitted report. Until Phase 2 the Owner can fix a single row in the Supabase SQL editor; the audit trigger records the change. Do not pilot at scale before Phase 2 corrections exist, or accept this manual step |
+| Someone asks "forgot password" and nothing arrives (running without SMTP) | Expected: self-service reset depends on Supabase's own email, which is not set up. Use **One-time recovery link** from Members and send it to them yourself |
+| Someone was approved but hasn't come back | Expected: with no email provider configured, approval notifications sit in-app only. Tell them directly that they're approved |
 
 ## Backups (free plan has none, risk R-03)
 
