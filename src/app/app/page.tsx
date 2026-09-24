@@ -2,6 +2,7 @@
 import { redirect } from "next/navigation";
 import { StatusCard } from "@/components/report/status-card";
 import { HoursRibbon } from "@/components/report/hours-ribbon";
+import { monthOf } from "@/lib/domain/time";
 
 export default async function PublisherHomePage() {
   const supabase = await createClient();
@@ -14,10 +15,9 @@ export default async function PublisherHomePage() {
     redirect("/signin");
   }
 
-  // Fetch current member details
   const { data: member } = await supabase
     .from("members")
-    .select("id, full_name, role")
+    .select("id, full_name")
     .eq("user_id", user.id)
     .single();
 
@@ -25,36 +25,16 @@ export default async function PublisherHomePage() {
     redirect("/signin");
   }
 
-  // Check if user has an approved pioneer arrangement for the current month
-  const currentMonth = new Date().toISOString().slice(0, 8) + "01";
-  const { data: arrangement } = await supabase
-    .from("service_arrangements")
-    .select("kind, aux_goal_hours")
-    .eq("member_id", member.id)
-    .eq("status", "approved")
-    .lte("start_month", currentMonth)
-    .or(`end_month.is.null,end_month.gte.${currentMonth}`)
-    .maybeSingle();
+  const month = monthOf(new Date());
 
-  let goalHours: number | null = null;
-  if (arrangement) {
-    if (arrangement.kind === "regular_pioneer") goalHours = 50;
-    else if (arrangement.kind === "special_pioneer") goalHours = 70;
-    else if (arrangement.kind === "auxiliary_pioneer") goalHours = arrangement.aux_goal_hours || 15;
-  }
+  // Use the database RPC functions exactly like the log page does
+  const { data: goal } = await supabase.rpc("my_month_goal", { p_month: month });
+  const goalData = goal as { category?: string; goal_hours?: number | null } | null;
+  const category = goalData?.category ?? "publisher";
+  const goalHours = goalData?.goal_hours ?? null;
 
-  // Fetch sum of daily log seconds for the current month
-  const startDate = currentMonth;
-  const endDate = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toISOString().slice(0, 10);
-  
-  const { data: logs } = await supabase
-    .from("daily_log_entries")
-    .select("duration_seconds")
-    .eq("member_id", member.id)
-    .gte("service_date", startDate)
-    .lt("service_date", endDate);
-
-  const currentSeconds = logs?.reduce((acc, curr) => acc + curr.duration_seconds, 0) || 0;
+  const { data: secondsData } = await supabase.rpc("my_log_seconds", { p_month: month });
+  const currentSeconds = Number(secondsData ?? 0);
 
   return (
     <div className="space-y-6 pb-12">
@@ -71,7 +51,7 @@ export default async function PublisherHomePage() {
       <StatusCard />
 
       {/* Hours Ribbon Integration for Pioneers */}
-      {goalHours !== null && (
+      {category !== "publisher" && goalHours !== null && (
         <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold tracking-tight text-[var(--foreground)]">
             Service Progress
