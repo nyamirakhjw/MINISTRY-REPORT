@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { ReportStatusCard } from "@/components/report/status-card";
 import { HoursRibbon } from "@/components/report/hours-ribbon";
 import { monthOf } from "@/lib/domain/time";
+import type { ReportState } from "@/lib/types";
 
 export default async function PublisherHomePage() {
   const supabase = await createClient();
@@ -17,7 +18,7 @@ export default async function PublisherHomePage() {
 
   const { data: member } = await supabase
     .from("members")
-    .select("id, full_name")
+    .select("id, full_name, congregation_id")
     .eq("user_id", user.id)
     .single();
 
@@ -26,6 +27,23 @@ export default async function PublisherHomePage() {
   }
 
   const month = monthOf(new Date());
+
+  // Fetch report state for the status card
+  // We can query the existing reports for this member and month
+  const { data: existingReport } = await supabase
+    .from("reports")
+    .select("status, month, is_late")
+    .eq("member_id", member.id)
+    .eq("month", month)
+    .maybeSingle();
+
+  // Construct report state object matching ReportState type
+  let reportState: ReportState;
+  if (existingReport) {
+    reportState = { state: existingReport.status === "reopened" ? "reopened" : "submitted", month };
+  } else {
+    reportState = { state: "open", month };
+  }
 
   const { data: goal } = await supabase.rpc("my_month_goal", { p_month: month });
   const goalData = goal as { category?: string; goal_hours?: number | null } | null;
@@ -46,8 +64,8 @@ export default async function PublisherHomePage() {
         </p>
       </div>
 
-      {/* Main Report Status Card */}
-      <ReportStatusCard />
+      {/* Main Report Status Card with required state prop */}
+      <ReportStatusCard state={reportState} />
 
       {/* Hours Ribbon Integration for Pioneers */}
       {category !== "publisher" && goalHours !== null && (
