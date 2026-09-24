@@ -1,6 +1,6 @@
 ﻿import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { StatusCard } from "@/components/report/status-card";
+import { ReportStatusCard } from "@/components/report/status-card";
 import { HoursRibbon } from "@/components/report/hours-ribbon";
 import { monthOf } from "@/lib/domain/time";
 
@@ -27,7 +27,6 @@ export default async function PublisherHomePage() {
 
   const month = monthOf(new Date());
 
-  // Use the database RPC functions exactly like the log page does
   const { data: goal } = await supabase.rpc("my_month_goal", { p_month: month });
   const goalData = goal as { category?: string; goal_hours?: number | null } | null;
   const category = goalData?.category ?? "publisher";
@@ -48,7 +47,7 @@ export default async function PublisherHomePage() {
       </div>
 
       {/* Main Report Status Card */}
-      <StatusCard />
+      <ReportStatusCard />
 
       {/* Hours Ribbon Integration for Pioneers */}
       {category !== "publisher" && goalHours !== null && (
