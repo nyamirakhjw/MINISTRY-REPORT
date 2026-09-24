@@ -1,79 +1,42 @@
-﻿import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import { Badge } from "@/components/ui/badge";
+import { InstallCard } from "@/components/shell/install-card";
 import { ReportStatusCard } from "@/components/report/status-card";
-import { HoursRibbon } from "@/components/report/hours-ribbon";
-import { monthOf } from "@/lib/domain/time";
-import type { ReportState } from "@/lib/types";
+import { requireMember } from "@/lib/auth/session";
+import { createClient } from "@/lib/supabase/server";
+import type { Arrangement, ReportState } from "@/lib/types";
 
-export default async function PublisherHomePage() {
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("nav");
+  return { title: t("home") };
+}
+
+export default async function Page() {
+  const { member } = await requireMember("/app");
+  const t = await getTranslations("home");
+  const cat = await getTranslations("categories");
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/signin");
-  }
-
-  const { data: member } = await supabase
-    .from("members")
-    .select("id, full_name, congregation_id")
-    .eq("user_id", user.id)
-    .single();
-
-  if (!member) {
-    redirect("/signin");
-  }
-
-  const month = monthOf(new Date());
-
-  const { data: existingReport } = await supabase
-    .from("reports")
-    .select("status, month, is_late")
-    .eq("member_id", member.id)
-    .eq("month", month)
-    .maybeSingle();
-
-  // Construct report state object matching ReportState type exactly
-  let reportState: ReportState;
-  if (existingReport) {
-    reportState = { state: existingReport.status === "reopened" ? "reopened" : "up_to_date", month };
-  } else {
-    reportState = { state: "open", month };
-  }
-
-  const { data: goal } = await supabase.rpc("my_month_goal", { p_month: month });
-  const goalData = goal as { category?: string; goal_hours?: number | null } | null;
-  const category = goalData?.category ?? "publisher";
-  const goalHours = goalData?.goal_hours ?? null;
-
-  const { data: secondsData } = await supabase.rpc("my_log_seconds", { p_month: month });
-  const currentSeconds = Number(secondsData ?? 0);
-
+  const [{ data: state }, { data: arrangements }] = await Promise.all([
+    supabase.rpc("my_report_state"),
+    supabase.from("service_arrangements").select("*").in("status", ["pending", "rejected"]).order("requested_at", { ascending: false }).limit(3),
+  ]);
+  const pendingArr = ((arrangements ?? []) as Arrangement[]).filter((a) => a.status === "pending");
   return (
-    <div className="space-y-6 pb-12">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-[var(--foreground)]">
-          Hello, {member.full_name.split(" ")[0]}
-        </h1>
-        <p className="text-sm text-[var(--muted-foreground)]">
-          Manage your ministry reports and service progress.
-        </p>
-      </div>
-
-      {/* Main Report Status Card */}
-      <ReportStatusCard state={reportState} />
-
-      {/* Hours Ribbon Integration for Pioneers */}
-      {category !== "publisher" && goalHours !== null && (
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-sm">
-          <h2 className="mb-4 text-lg font-semibold tracking-tight text-[var(--foreground)]">
-            Service Progress
-          </h2>
-          <HoursRibbon currentSeconds={currentSeconds} goalHours={goalHours} />
-        </div>
+    <div className="flex flex-col gap-6">
+      <h1>{t("greeting", { name: member.full_name.split(" ")[0] ?? member.full_name })}</h1>
+      <ReportStatusCard state={(state ?? { state: "not_active" }) as ReportState} />
+      {pendingArr.length > 0 && (
+        <section aria-labelledby="arr-title" className="rounded-lg border border-border bg-surface p-5">
+          <h2 id="arr-title" className="text-lg">{t("arrangementsTitle")}</h2>
+          <ul className="mt-2 space-y-2">
+            {pendingArr.map((a) => <li key={a.id} className="flex items-center justify-between gap-3"><span>{cat(a.kind)}</span><Badge tone="warning">{t("awaitingElder")}</Badge></li>)}
+          </ul>
+        </section>
       )}
+      <InstallCard compact />
+      <p><Link href="/app/history" className="inline-flex min-h-11 items-center underline underline-offset-4">{t("seeHistory")}</Link></p>
     </div>
   );
 }
