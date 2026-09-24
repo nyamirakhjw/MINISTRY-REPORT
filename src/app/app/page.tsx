@@ -28,8 +28,6 @@ export default async function PublisherHomePage() {
 
   const month = monthOf(new Date());
 
-  // Fetch report state for the status card
-  // We can query the existing reports for this member and month
   const { data: existingReport } = await supabase
     .from("reports")
     .select("status, month, is_late")
@@ -37,10 +35,10 @@ export default async function PublisherHomePage() {
     .eq("month", month)
     .maybeSingle();
 
-  // Construct report state object matching ReportState type
+  // Construct report state object matching ReportState type exactly
   let reportState: ReportState;
   if (existingReport) {
-    reportState = { state: existingReport.status === "reopened" ? "reopened" : "submitted", month };
+    reportState = { state: existingReport.status === "reopened" ? "reopened" : "up_to_date", month };
   } else {
     reportState = { state: "open", month };
   }
@@ -64,7 +62,7 @@ export default async function PublisherHomePage() {
         </p>
       </div>
 
-      {/* Main Report Status Card with required state prop */}
+      {/* Main Report Status Card */}
       <ReportStatusCard state={reportState} />
 
       {/* Hours Ribbon Integration for Pioneers */}
