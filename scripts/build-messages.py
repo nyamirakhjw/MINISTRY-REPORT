@@ -40,7 +40,7 @@ T = {
   "notifications": ("Messages", "Ujumbe"), "settings": ("Settings", "Mipangilio"), "admin": ("Elder console", "Kiweko cha wazee"),
   "main": ("Main", "Kuu"), "adminMenu": ("Admin", "Usimamizi"), "backToApp": ("Back to my app", "Rudi kwenye programu yangu"),
   "overview": ("Overview", "Muhtasari"), "reports": ("Reports", "Ripoti"), "notReported": ("Not reported", "Hazijaripotiwa"),
-  "approvals": ("Approvals", "Idhini"), "arrangements": ("Service requests", "Maombi ya huduma"), "corrections": ("Corrections", "Marekebisho"), "members": ("Members", "Washiriki"), "audit": ("Audit log", "Kumbukumbu ya ukaguzi"),
+  "approvals": ("Approvals", "Idhini"), "arrangements": ("Service requests", "Maombi ya huduma"), "corrections": ("Corrections", "Marekebisho"), "members": ("Members", "Washiriki"), "audit": ("Audit log", "Kumbukumbu ya ukaguzi"), "platform": ("Platform", "Jukwaa"),
   "pendingCount": ("{count} waiting", "{count} zinasubiri"), "photoOf": ("Photo of {name}", "Picha ya {name}"),
 },
 "landing": {

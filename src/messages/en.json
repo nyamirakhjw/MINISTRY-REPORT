@@ -80,6 +80,7 @@
     "corrections": "Corrections",
     "members": "Members",
     "audit": "Audit log",
+    "platform": "Platform",
     "pendingCount": "{count} waiting",
     "photoOf": "Photo of {name}"
   },

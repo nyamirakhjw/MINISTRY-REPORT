@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+- Fixed: the Elder console had no visible link to `/platform`, so the Platform Owner's own account had to type the
+  URL from memory to grant or remove the Elder role. Added a "Platform" link (desktop sidebar and phone header),
+  shown only when the signed-in account is actually the Platform Owner.
+
 ## 0.2.0
 
 - **Daily log** (LOG-01 to 08, PRO-06): quick-add hours that works fully offline via IndexedDB (Dexie), the hours

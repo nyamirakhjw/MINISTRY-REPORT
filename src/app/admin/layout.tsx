@@ -14,7 +14,7 @@ export const metadata: Metadata = { robots: PRIVATE_ROBOTS };
 
 /** Elders see everything; Ministerial Servants see only the Approvals queue (D-13). Enforced again in the database. */
 export default async function Layout({ children }: { children: React.ReactNode }) {
-  const { member } = await requireRole("ministerial_servant", "/admin");
+  const { member, isPlatformAdmin } = await requireRole("ministerial_servant", "/admin");
   const t = await getTranslations("nav");
   const counts = await getCounts();
   const elder = member.role === "elder";
@@ -36,6 +36,9 @@ export default async function Layout({ children }: { children: React.ReactNode }
         <div className="sticky top-0 flex h-dvh flex-col gap-6 p-4 pt-safe">
           <Link href="/admin" className="rounded-md"><Logo /></Link>
           <NavLinks items={items} label={t("adminMenu")} orientation="side" />
+          {/* Platform is a separate, wholly hidden area (only the account bootstrap-owner.sql was run against can open it) —
+              still worth a visible link, since "type the URL from memory" is not real discoverability. */}
+          {isPlatformAdmin ? <Link href="/platform" className="inline-flex min-h-12 items-center rounded-md px-3 font-semibold text-primary hover:bg-tint">{t("platform")}</Link> : null}
           <Link href="/app" className="mt-auto inline-flex min-h-12 items-center rounded-md px-3 font-semibold hover:bg-tint">{t("backToApp")}</Link>
           <div><ThemeToggle /></div>
         </div>
@@ -43,7 +46,10 @@ export default async function Layout({ children }: { children: React.ReactNode }
       <div className="flex min-w-0 flex-col">
         <header className="flex items-center justify-between border-b border-border bg-surface px-4 py-2 pt-safe md:hidden">
           <Link href="/app" className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4">{t("backToApp")}</Link>
-          <ThemeToggle />
+          <div className="flex items-center gap-1">
+            {isPlatformAdmin ? <Link href="/platform" className="inline-flex min-h-11 items-center font-semibold text-primary underline underline-offset-4">{t("platform")}</Link> : null}
+            <ThemeToggle />
+          </div>
         </header>
         <AdminTabs items={items} label={t("adminMenu")} />
         <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-12">
