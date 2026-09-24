@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/refs, react-hooks/incompatible-library */
 "use client";
 import * as React from "react";
 import { useForm } from "react-hook-form";
@@ -53,4 +52,3 @@ export function NewPasswordForm() {
     </form>
   );
 }
-

@@ -8,19 +8,21 @@ Built from [`docs/PRD.md`](docs/PRD.md) (v1.0). Launch bar: [`docs/PRE_LAUNCH_CH
 
 ## What this release contains
 
-This is **Phase 0 (foundations) plus Phase 1 (core)** from PRD §17, plus a few small items from later phases that came almost free (see the traceability table). It is a complete vertical slice, not a set of stubs: nothing in the app is a placeholder.
+This is **Phase 0 (foundations) and Phase 1 (core)** from PRD §17, plus two full Phase 2 slices — **daily log with the hours ribbon** and the **corrections flow** — brought forward because they're foundational to everything else in Phase 2. It is a complete vertical slice, not a set of stubs: nothing in the app is a placeholder.
 
 | Area | Included |
 |---|---|
 | Accounts | Request access (two steps), email confirmation, username-or-email sign-in with throttling, password reset, mandatory cropped photo, approval queue, roles, two-factor for Elders and Ministerial Servants with recovery codes |
 | Reporting | Publisher and pioneer forms, submission window and order rules enforced in the database, locking, late flag, idempotent submit, review step, history |
-| Elder console | Overview and category totals, reports table (filter, search, sort), not-reported list with WhatsApp click-to-chat, submit on behalf, close month, arrangements queue, members, managed profiles, audit log, live updates |
+| Daily log | Quick-add hours (works fully offline via IndexedDB), the hours ribbon with a service-year mini chart, personal goals, leftover-minute carry-over |
+| Corrections | Publisher requests a correction on a locked report; Elder approves (reopens for resubmission, no extra deadline), edits directly, or declines; console flags for zero-hours, self-edited and corrected reports |
+| Elder console | Overview and category totals, reports table (filter, search, sort), not-reported list with WhatsApp click-to-chat, submit on behalf, close month, arrangements queue, corrections queue, members, managed profiles, audit log, live updates |
 | Platform | Create congregations, grant or remove the Elder role |
 | Public | Landing, privacy notice, terms, install help, offline and 404 pages, sitemap, robots, llms.txt, security.txt, Open Graph images, PWA manifest and service worker, English and Kiswahili (draft, hidden by default) |
 | Database | 11 migrations, row-level security everywhere, audit trail, private avatar storage, realtime, scheduled email dispatch, pgTAP tests |
 | Edge Functions | `dispatch-notifications`, `issue-recovery-codes`, `use-recovery-code`, `create-recovery-link` |
 
-Not in this release (later phases): daily log and hours ribbon, report card, corrections flow, reminders and push, offline queue, return visits, exports and backup export, congregation settings screen, deletion workflow. See [`docs/TRACEABILITY.md`](docs/TRACEABILITY.md).
+Not in this release (later phases): report card, reminders and push, generalized offline queue (drafts, visits, editing/deleting log entries offline), return visits, exports and backup export, congregation settings screen, deletion workflow. See [`docs/TRACEABILITY.md`](docs/TRACEABILITY.md).
 
 ## Quick start
 

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CheckCircle2, Clock, Lock } from "lucide-react";
+import { CheckCircle2, Clock, Lock, RotateCcw } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { buttonVariants } from "@/components/ui/button";
 import { formatDate, formatEnd, formatMonth } from "@/lib/format";
@@ -11,6 +11,15 @@ export async function ReportStatusCard({ state, action = true }: { state: Report
   const locale = await getLocale();
   const month = state.month ? formatMonth(state.month, locale) : "";
 
+  if (state.state === "reopened") {
+    return (
+      <section aria-labelledby="status-title" className="rounded-lg border-2 border-warning bg-surface p-5">
+        <h2 id="status-title" className="flex items-center gap-2 text-xl"><RotateCcw className="size-5" aria-hidden="true" />{t("reopenedTitle", { month })}</h2>
+        <p className="mt-2">{t("reopenedBody")}</p>
+        {action ? <Link href="/app/report" className={`${buttonVariants()} mt-4`}>{t("fixItNow")}</Link> : null}
+      </section>
+    );
+  }
   if (state.state === "open") {
     return (
       <section aria-labelledby="status-title" className="rounded-lg border border-border bg-surface p-5">

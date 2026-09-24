@@ -38,11 +38,11 @@ enable_confirmations = true
 
 [auth.email.template.confirmation]
 subject = "Confirm your email / Thibitisha barua pepe yako"
-content_path = "././supabase/templates/confirmation.html"
+content_path = "./templates/confirmation.html"
 
 [auth.email.template.recovery]
 subject = "Reset your password / Weka upya nenosiri lako"
-content_path = "././supabase/templates/recovery.html"
+content_path = "./templates/recovery.html"
 
 [auth.mfa.totp]
 enroll_enabled = true
@@ -67,8 +67,3 @@ verify_jwt = false   # verifies the caller's JWT in code (works with any JWT sig
 verify_jwt = false
 [functions.create-recovery-link]
 verify_jwt = false
-
-[studio]
-enabled = false
-[analytics]
-enabled = false

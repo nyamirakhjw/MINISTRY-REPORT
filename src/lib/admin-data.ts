@@ -19,6 +19,8 @@ export interface AdminRow extends MonthRow {
   time_adjusted: boolean;
   zero_hours: boolean;
   self_edited: boolean;
+  was_corrected: boolean;
+  report_id: string | null;
   category: Category | null;
 }
 
@@ -49,8 +51,8 @@ export async function getGroups(): Promise<{ id: string; name: string }[]> {
   return data ?? [];
 }
 
-export async function getCounts(): Promise<{ approvals: number; arrangements: number; changes: number }> {
+export async function getCounts(): Promise<{ approvals: number; arrangements: number; changes: number; corrections: number }> {
   const supabase = await createClient();
   const { data } = await supabase.rpc("admin_queue_counts");
-  return { approvals: 0, arrangements: 0, changes: 0, ...((data as object | null) ?? {}) };
+  return { approvals: 0, arrangements: 0, changes: 0, corrections: 0, ...((data as object | null) ?? {}) };
 }

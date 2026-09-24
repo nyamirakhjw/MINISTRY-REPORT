@@ -38,13 +38,20 @@ export interface ReportRow {
 }
 
 export interface ReportState {
-  state: "not_active" | "up_to_date" | "open" | "blocked";
+  state: "not_active" | "up_to_date" | "open" | "blocked" | "reopened";
   month?: string;
   opens_at?: string;
   on_time_until?: string;
   late_until?: string;
   is_late?: boolean;
   options?: Category[];
+  // Present only when state = "reopened" (COR-03): the report to fix and resubmit.
+  report_id?: string;
+  category?: Category;
+  participated?: boolean | null;
+  hours?: number | null;
+  studies?: number | null;
+  comment?: string | null;
 }
 
 export interface Arrangement {

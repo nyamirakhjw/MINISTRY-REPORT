@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 import * as React from "react";
 import { Download, Share } from "lucide-react";
@@ -41,4 +40,3 @@ export function InstallCard({ compact = false }: { compact?: boolean }) {
     </section>
   );
 }
-

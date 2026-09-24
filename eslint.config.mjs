@@ -8,13 +8,10 @@ export default defineConfig([
   globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", "supabase/functions/**", "node_modules/**"]),
   {
     rules: {
-      // "Ship it clean. No half-finished items, no RULE left in." (pre-launch checklist)
-      "no-warning-comments": ["error", { terms: ["RULE", "fixme", "xxx", "hack"], location: "anywhere" }],
+      // "Ship it clean. No half-finished items, no TODO left in." (pre-launch checklist)
+      "no-warning-comments": ["error", { terms: ["todo", "fixme", "xxx", "hack"], location: "anywhere" }],
       "no-console": ["error", { allow: ["error"] }],
       "@typescript-eslint/no-explicit-any": "error",
     },
   },
 ]);
-
-
-

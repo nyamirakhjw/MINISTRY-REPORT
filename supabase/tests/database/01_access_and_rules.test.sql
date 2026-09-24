@@ -63,7 +63,7 @@ reset role;
 select pg_temp.as_user('a0000000-0000-0000-0000-00000000000b');
 select is((select count(*)::int from public.reports), 0, 'ministerial servant cannot read reports');
 select is((select count(*)::int from public.members where status = 'pending'), 1, 'ministerial servant sees the complete pending request');
-select throws_ok($$select public.set_member_role((select id from public.members where username = 'pub1.a'), 'ministerial_servant')$$, 'P0001', 'not_found', 'ministerial servant cannot grant roles');
+select throws_ok($$select public.set_member_role((select id from public.members where username = 'pub1.a'), 'ministerial_servant')$$, 'P0001', 'forbidden', 'ministerial servant cannot grant roles');
 
 -- Elder ------------------------------------------------------------------------------------
 reset role;
@@ -72,7 +72,7 @@ select is((select count(*)::int from public.reports), 0, 'elder without a verifi
 reset role;
 select pg_temp.as_user('a0000000-0000-0000-0000-00000000000a');
 select is((select count(*)::int from public.reports), 1, 'elder reads congregation A reports only (not congregation B)');
-select throws_ok($$select public.set_member_role((select id from public.members where username = 'pub1.a'), 'elder')$$, 'P0001', 'not_found_platform_only', 'elder cannot grant the Elder role');
+select throws_ok($$select public.set_member_role((select id from public.members where username = 'pub1.a'), 'elder')$$, 'P0001', 'forbidden_platform_only', 'elder cannot grant the Elder role');
 select lives_ok($$select public.set_member_role((select id from public.members where username = 'pub1.a'), 'ministerial_servant')$$, 'elder can grant ministerial servant');
 select throws_ok($$select public.approve_member((select id from public.members where username = 'pend.a'), 'Person pend.a', 'bbbbbbbb-1111-0000-0000-000000000001')$$, 'P0001', 'invalid_group', 'elder cannot use a group from another congregation');
 select lives_ok($$select public.approve_member((select id from public.members where username = 'pend.a'), 'Person Pending', 'aaaaaaaa-1111-0000-0000-000000000001', '2026-01-01')$$, 'elder approves a complete request');
@@ -87,4 +87,3 @@ select is((select on_time_until from public.report_window('aaaaaaaa-0000-0000-00
 
 select * from finish();
 rollback;
-

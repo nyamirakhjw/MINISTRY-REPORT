@@ -8,15 +8,16 @@ import { Input, Select, Textarea } from "@/components/ui/input";
 import { Segmented } from "@/components/ui/segmented";
 import { Field } from "@/components/forms/field";
 import { Stepper } from "@/components/forms/stepper";
-import { submitReportAction } from "@/lib/actions/report";
+import { applyLogCarryoverAction, submitReportAction } from "@/lib/actions/report";
 import { COMMENT_WORD_LIMIT, countWords } from "@/lib/domain/words";
 import { isPioneer, type Category } from "@/lib/domain/categories";
+import { floorHours, formatHMS } from "@/lib/domain/log";
 import { formatDateTime, formatMonth } from "@/lib/format";
 
-interface Props { month: string; options: Category[]; windowNote: string }
+interface Props { month: string; options: Category[]; windowNote: string; logSeconds?: number }
 type Step = "edit" | "review" | "done";
 
-export function ReportForm({ month, options, windowNote }: Props) {
+export function ReportForm({ month, options, windowNote, logSeconds = 0 }: Props) {
   const t = useTranslations("report");
   const cat = useTranslations("categories");
   const te = useTranslations("errors");
@@ -27,7 +28,8 @@ export function ReportForm({ month, options, windowNote }: Props) {
   const [step, setStep] = React.useState<Step>("edit");
   const [category, setCategory] = React.useState<Category>(options.find((o) => o !== "publisher") ?? "publisher");
   const [participated, setParticipated] = React.useState<"yes" | "no" | "">("");
-  const [hours, setHours] = React.useState("");
+  // Pre-filled from the daily log (REP-04); still editable, and editing it is exactly what skips the carry-over (§6.5).
+  const [hours, setHours] = React.useState(logSeconds > 0 ? String(floorHours(logSeconds)) : "");
   const [studies, setStudies] = React.useState(0);
   const [comment, setComment] = React.useState("");
   const [errors, setErrors] = React.useState<Record<string, string>>({});
@@ -61,7 +63,10 @@ export function ReportForm({ month, options, windowNote }: Props) {
         studies: saidNo ? 0 : studies,
         comment: saidNo ? "" : comment.trim(),
       });
-      if (r.ok) { setDoneAt(new Date().toISOString()); setStep("done"); router.refresh(); return; }
+      if (r.ok) {
+        if (pioneer && r.data) void applyLogCarryoverAction(r.data); // best-effort; a failure here never blocks the confirmation
+        setDoneAt(new Date().toISOString()); setStep("done"); router.refresh(); return;
+      }
       setServerError(r.code === "earlier_month_pending" ? (r.hint ? te("earlier_month_pending", { month: formatMonth(r.hint, locale) }) : te("unknown")) : te.has(r.code) ? te(r.code) : te("unknown"));
       setStep("edit");
     });
@@ -126,7 +131,7 @@ export function ReportForm({ month, options, windowNote }: Props) {
           {errors.participated ? <p role="alert" className="text-sm font-semibold text-danger">{errors.participated}</p> : null}
         </div>
       ) : (
-        <Field id="hours" label={t("hours")} hint={t("hoursHint")} error={errors.hours}>
+        <Field id="hours" label={t("hours")} hint={logSeconds > 0 ? t("hoursFromLog", { time: formatHMS(logSeconds) }) : t("hoursHint")} error={errors.hours}>
           <Input id="hours" inputMode="numeric" pattern="[0-9]*" value={hours} aria-invalid={!!errors.hours} onChange={(e) => setHours(e.target.value.replace(/\D/g, ""))} className="text-xl font-semibold tabular" />
         </Field>
       )}

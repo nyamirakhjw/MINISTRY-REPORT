@@ -23,6 +23,20 @@ export async function decideArrangementAction(input: unknown): Promise<ActionRes
   if (!p.success) return invalid(p.error);
   return callRpc("decide_arrangement", { p_id: p.data.id, p_approve: p.data.approve, p_note: p.data.note ?? null });
 }
+export async function decideCorrectionAction(input: unknown): Promise<ActionResult> {
+  const p = s.decideSchema.safeParse(input);
+  if (!p.success) return invalid(p.error);
+  return callRpc("decide_correction", { p_id: p.data.id, p_approve: p.data.approve, p_note: p.data.note ?? null });
+}
+export async function elderEditReportAction(input: unknown): Promise<ActionResult> {
+  const p = s.elderEditSchema.safeParse(input);
+  if (!p.success) return invalid(p.error);
+  const v = p.data;
+  return callRpc("elder_edit_report", {
+    p_correction_id: v.correction_id, p_category: v.category, p_participated: v.participated,
+    p_hours: v.hours, p_studies: v.studies, p_comment: v.comment, p_reason: v.reason,
+  });
+}
 export async function endArrangementAction(input: unknown): Promise<ActionResult> {
   const p = s.endArrangementSchema.safeParse(input);
   if (!p.success) return invalid(p.error);

@@ -34,6 +34,5 @@ for (const file of files) {
 }
 const hits = walk(path.join(root, "src")).filter((f) => /"use client"/.test(fs.readFileSync(f, "utf8")) && /supabase\/admin|supabase\/server/.test(fs.readFileSync(f, "utf8")));
 for (const f of hits) fail(`${path.relative(root, f)} is a client file importing a server Supabase client`);
-console.error(`content: ${problems} problem(s)`);
+console.log(`content: ${problems} problem(s)`);
 process.exit(problems ? 1 : 0);
-

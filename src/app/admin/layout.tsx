@@ -25,6 +25,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
         { key: "notReported", href: "/admin/not-reported" },
         { key: "approvals", href: "/admin/approvals", badge: counts.approvals + counts.changes || undefined },
         { key: "arrangements", href: "/admin/arrangements", badge: counts.arrangements || undefined },
+        { key: "corrections", href: "/admin/corrections", badge: counts.corrections || undefined },
         { key: "members", href: "/admin/members" },
         { key: "audit", href: "/admin/audit" },
       ]

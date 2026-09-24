@@ -13,15 +13,15 @@
 | PRO-01 to 03 Photo, crop, private storage | Built | Cropper with slider and arrow buttons, 512 px, 120 KB, signed URLs |
 | PRO-04 Name and username change requests | Built | Elder decision in Approvals |
 | PRO-05 Arrangements | Built | Request, approve, decline, end. Elder direct-create function exists; no screen yet |
-| PRO-06 Personal goal | Phase 2 | Table and snapshot logic exist |
+| PRO-06 Personal goal | Built | `member_goals` read by `my_month_goal`; a settings screen to edit it is still pending (with SET-*) |
 | PRO-07 Data controls | Phase 3 |  |
 | REP-01 to 06 Report form and confirmation | Built | Card button arrives with Phase 2 |
 | REP-07, 08 Drafts, offline submit | Phase 2 |  |
 | REP-09, 10, 11 Rules in the database, idempotency, zero hours | Built |  |
-| LOG-01 to 08 Daily log, hours ribbon | Phase 2 |  |
+| LOG-01 to 08 Daily log, hours ribbon | Built | Offline add via IndexedDB (Dexie); edit/delete need a connection (documented simplification, ADR-14) |
 | DSH-01 (status), 02, 05, 06 Home and history | Built |  |
-| DSH-01 (rest), 03, 04, 07 Trends, sync status | Phase 2 |  |
-| COR-01 to 03, 06 Correction flow | Phase 2 |  |
+| DSH-01 (rest, hours ribbon), 04 (this month's mini chart) | Built | Service-year totals card and sync-status text (DSH-03, 07) still pending |
+| COR-01 to 03, 06 Correction flow | Built | Publisher requests, Elder approves (reopens) / edits directly / declines, publisher resubmits with no extra deadline; flags for zero-hours, self-edited and corrected-after-submission |
 | COR-04, 05 Submit on behalf, close month | Built | Reversible by submitting on behalf |
 | CARD-01 to 06 Report card | Phase 2 |  |
 | RV-01 to 08 Return visits | Phase 3 | Owner-only by design |

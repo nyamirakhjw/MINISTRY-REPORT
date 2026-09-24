@@ -15,7 +15,7 @@ test.describe("public pages", () => {
       const title = await page.title();
       expect(title.length).toBeGreaterThan(3);
       expect(title).not.toMatch(/Next|React|Vite|Create/);
-      // expect(problems).toEqual([]);
+      expect(problems).toEqual([]);
     });
 
     test(`${path}: no serious accessibility violations`, async ({ page }) => {
@@ -38,21 +38,21 @@ test.describe("public pages", () => {
     }
   });
 
-  test.skip("sign-in shows an error summary that links to the field", async ({ page }) => {
+  test("sign-in shows an error summary that links to the field", async ({ page }) => {
     await page.goto("/signin");
     await page.getByRole("button", { name: /^sign in$/i }).click();
     const summary = page.getByRole("alert").first();
-    // await expect(summary).toBeFocused();
+    await expect(summary).toBeFocused();
     await expect(summary.getByRole("link").first()).toHaveAttribute("href", "#identifier");
   });
 
-  test.skip("request access blocks weak passwords and requires consent", async ({ page }) => {
+  test("request access blocks weak passwords and requires consent", async ({ page }) => {
     await page.goto("/request-access");
     await page.getByLabel(/official full name/i).fill("Test Person");
     await page.getByLabel(/^password/i).fill("1234567890");
     await page.getByRole("button", { name: /send request/i }).click();
     await expect(page.getByRole("alert").first()).toBeVisible();
-    await expect(page.getByText(/too common/i).first()).toBeVisible();
+    await expect(page.getByText(/too common/i)).toBeVisible();
   });
 
   test("discovery files exist and the temporary address is not indexable", async ({ request }) => {
@@ -69,6 +69,3 @@ test.describe("public pages", () => {
     for (const src of scripts.slice(0, 5)) expect((await request.get(`${src}.map`)).status()).toBe(404);
   });
 });
-
-
-

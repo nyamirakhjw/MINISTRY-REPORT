@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { ArrowDown, ArrowUp, Flag, MessageSquare } from "lucide-react";
+import { ArrowDown, ArrowUp, Flag, MessageSquare, PenLine } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -14,9 +14,10 @@ import { CloseMonthDialog, OnBehalfDialog } from "./report-dialogs";
 
 type SortKey = "full_name" | "group_name" | "category" | "hours" | "studies" | "status";
 
-function statusOf(r: AdminRow): "onTime" | "late" | "didNotReport" | "notYet" {
+function statusOf(r: AdminRow): "onTime" | "late" | "didNotReport" | "notYet" | "reopened" {
   if (r.status === "missing") return "notYet";
   if (r.status === "not_reported") return "didNotReport";
+  if (r.status === "reopened") return "reopened";
   return r.is_late ? "late" : "onTime";
 }
 
@@ -69,11 +70,12 @@ export function ReportsTable({ rows, groups, month, avatars }: { rows: AdminRow[
                 <TD>{r.category ? cat(r.category) : "–"}</TD>
                 <TD>{r.status === "missing" || r.status === "not_reported" ? "–" : r.category === "publisher" ? (r.participated ? c("yes") : c("no")) : r.hours}</TD>
                 <TD>{r.studies ?? "–"}</TD>
-                <TD><Badge tone={{ onTime: "success", late: "warning", didNotReport: "danger", notYet: "neutral" }[statusOf(r)] as "success"}>{st(statusOf(r))}</Badge></TD>
+                <TD><Badge tone={{ onTime: "success", late: "warning", didNotReport: "danger", notYet: "neutral", reopened: "warning" }[statusOf(r)] as "success"}>{st(statusOf(r))}</Badge></TD>
                 <TD>
                   <span className="flex items-center gap-2">
                     {r.zero_hours ? <span title={t("flagZeroHours")}><Flag className="size-5 text-warning" aria-label={t("flagZeroHours")} /></span> : null}
                     {r.self_edited ? <span title={t("flagSelfEdited")}><Flag className="size-5 text-danger" aria-label={t("flagSelfEdited")} /></span> : null}
+                    {r.was_corrected ? <span title={t("flagCorrected")}><PenLine className="size-5 text-muted-foreground" aria-label={t("flagCorrected")} /></span> : null}
                     {r.submitted_via === "elder" && !r.self_edited ? <Badge>{t("onBehalf")}</Badge> : null}
                     {r.comment ? <MessageSquare className="size-5 text-muted-foreground" aria-label={t("hasComment")} /> : null}
                   </span>
@@ -95,6 +97,7 @@ export function ReportsTable({ rows, groups, month, avatars }: { rows: AdminRow[
               {open.received_at && open.submitted_via === "elder" && <Line k={t("receivedAt")} v={formatDateTime(open.received_at, locale)} />}
               {open.submitted_by_name && open.submitted_via === "elder" && <Line k={t("submittedBy")} v={open.submitted_by_name} />}
               {open.time_adjusted && <Line k={t("timeAdjusted")} v={c("yes")} />}
+              {open.was_corrected && <Line k={t("flagCorrected")} v={c("yes")} />}
               {open.comment && <Line k={t("comment")} v={open.comment} />}
             </dl>
             {(open.status === "missing" || open.status === "not_reported") && (

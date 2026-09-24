@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/refs */
 "use client";
 import * as React from "react";
 import Link from "next/link";
@@ -48,4 +47,3 @@ export function SignInForm({ next }: { next?: string }) {
     </form>
   );
 }
-

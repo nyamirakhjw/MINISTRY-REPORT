@@ -9,6 +9,11 @@ export const approveSchema = z.object({
 });
 export const reasonSchema = z.object({ member_id: uuid, reason });
 export const decideSchema = z.object({ id: uuid, approve: z.boolean(), note: z.string().trim().max(300).optional() });
+export const elderEditSchema = z.object({
+  correction_id: uuid, category: z.enum(["publisher", "auxiliary_pioneer", "regular_pioneer", "special_pioneer"]),
+  participated: z.boolean().nullable(), hours: z.number().int().min(0).max(744).nullable(), studies: z.number().int().min(0).max(99),
+  comment: z.string().max(600), reason,
+});
 export const onBehalfSchema = z.object({
   member_id: uuid, month, category: z.enum(["publisher", "auxiliary_pioneer", "regular_pioneer", "special_pioneer"]),
   participated: z.boolean().nullable(), hours: z.number().int().min(0).max(744).nullable(), studies: z.number().int().min(0).max(99),

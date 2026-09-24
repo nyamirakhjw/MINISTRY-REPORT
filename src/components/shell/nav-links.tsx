@@ -1,11 +1,11 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, FileText, History, Menu, Bell, LayoutDashboard, Users, ClipboardList, ShieldCheck, UserPlus, Briefcase, UserX } from "lucide-react";
+import { Home, FileText, History, Menu, Bell, Clock, LayoutDashboard, Users, ClipboardList, ShieldCheck, UserPlus, Briefcase, UserX, PenLine } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
-const ICONS = { notifications: Bell, home: Home, report: FileText, history: History, more: Menu, overview: LayoutDashboard, reports: ClipboardList, notReported: UserX, approvals: UserPlus, arrangements: Briefcase, members: Users, audit: ShieldCheck } as const;
+const ICONS = { notifications: Bell, home: Home, log: Clock, report: FileText, history: History, more: Menu, overview: LayoutDashboard, reports: ClipboardList, notReported: UserX, approvals: UserPlus, arrangements: Briefcase, corrections: PenLine, members: Users, audit: ShieldCheck } as const;
 export type NavKey = keyof typeof ICONS;
 export interface NavItem { key: NavKey; href: string; badge?: number; exact?: boolean }
 
