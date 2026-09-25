@@ -16,8 +16,10 @@ export default async function Page() {
   const { member } = await requireMember("/app/log");
   const supabase = await createClient();
   const month = monthOf(new Date());
-  const { data: goal } = await supabase.rpc("my_month_goal", { p_month: month });
-  const category = (goal as { category: string } | null)?.category ?? "publisher";
+  const { data: goal, error: goalError } = await supabase.rpc("my_month_goal", { p_month: month });
+  if (goalError) console.error("my_month_goal failed:", goalError.message);
+  // Fail safe toward showing the page: only redirect on a confirmed "publisher", never on an error or missing data.
+  const category = !goalError && (goal as { category?: string } | null)?.category === "publisher" ? "publisher" : null;
   if (category === "publisher") redirect("/app");
 
   const year = serviceYearOf(month);

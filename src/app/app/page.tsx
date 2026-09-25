@@ -21,14 +21,18 @@ export default async function Page() {
   const cat = await getTranslations("categories");
   const supabase = await createClient();
   const month = monthOf(new Date());
-  const [{ data: state }, { data: arrangements }, { data: goal }, { data: logSeconds }] = await Promise.all([
+  const [reportStateRes, arrangementsRes, goalRes, logSecondsRes] = await Promise.all([
     supabase.rpc("my_report_state"),
     supabase.from("service_arrangements").select("*").in("status", ["pending", "rejected"]).order("requested_at", { ascending: false }).limit(3),
     supabase.rpc("my_month_goal", { p_month: month }),
     supabase.rpc("my_log_seconds", { p_month: month }),
   ]);
-  const pendingArr = ((arrangements ?? []) as Arrangement[]).filter((a) => a.status === "pending");
-  const isPioneer = (goal as { category?: string } | null)?.category !== "publisher";
+  if (goalRes.error) console.error("my_month_goal failed:", goalRes.error.message);
+  const state = reportStateRes.data;
+  const pendingArr = ((arrangementsRes.data ?? []) as Arrangement[]).filter((a) => a.status === "pending");
+  // Fail safe toward NOT showing the ribbon: only render it on a confirmed, non-"publisher" category.
+  const goalCategory = goalRes.error ? undefined : (goalRes.data as { category?: string } | null)?.category;
+  const isPioneer = !!goalCategory && goalCategory !== "publisher";
   return (
     <div className="flex flex-col gap-6">
       <h1>{t("greeting", { name: member.full_name.split(" ")[0] ?? member.full_name })}</h1>
@@ -37,7 +41,7 @@ export default async function Page() {
         // DSH-01: the monthly hours ribbon belongs on Home, not only on the Log page.
         <section aria-labelledby="home-hours">
           <h2 id="home-hours" className="mb-2 text-lg">{t("hoursThisMonth")}</h2>
-          <HoursRibbon currentSeconds={Number(logSeconds ?? 0)} goalHours={(goal as { goal_hours: number | null } | null)?.goal_hours ?? null} />
+          <HoursRibbon currentSeconds={Number(logSecondsRes.data ?? 0)} goalHours={(goalRes.data as { goal_hours: number | null } | null)?.goal_hours ?? null} />
           <p className="mt-2"><Link href="/app/log" className="inline-flex min-h-11 items-center underline underline-offset-4">{t("addHoursLink")}</Link></p>
         </section>
       )}
