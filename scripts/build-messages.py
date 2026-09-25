@@ -126,6 +126,7 @@ T = {
 "home": {
   "greeting": ("Hello, {name}", "Habari, {name}"), "seeHistory": ("See my past reports", "Ona ripoti zangu zilizopita"),
   "arrangementsTitle": ("Service requests", "Maombi ya huduma"), "awaitingElder": ("Waiting for an Elder", "Inasubiri mzee"),
+  "hoursThisMonth": ("Hours this month", "Saa za mwezi huu"), "addHoursLink": ("Add hours", "Ongeza saa"),
 },
 "report": {
   "pageTitle": ("Monthly report", "Ripoti ya kila mwezi"), "reportFor": ("Report for {month}", "Ripoti ya {month}"), "reportNow": ("Report now", "Ripoti sasa"),

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.2
+
+- Fixed: the hours ribbon (DSH-01) was built for the Log page but never actually added to Home, despite the PRD
+  requiring it there and my own traceability doc incorrectly marking it done. Home now shows the monthly ribbon
+  for pioneers, with a link into the Log page to add hours.
+
 ## 0.2.1
 
 - Fixed: the Elder console had no visible link to `/platform`, so the Platform Owner's own account had to type the

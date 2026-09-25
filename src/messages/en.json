@@ -241,7 +241,9 @@
     "greeting": "Hello, {name}",
     "seeHistory": "See my past reports",
     "arrangementsTitle": "Service requests",
-    "awaitingElder": "Waiting for an Elder"
+    "awaitingElder": "Waiting for an Elder",
+    "hoursThisMonth": "Hours this month",
+    "addHoursLink": "Add hours"
   },
   "report": {
     "pageTitle": "Monthly report",

@@ -241,7 +241,9 @@
     "greeting": "Habari, {name}",
     "seeHistory": "Ona ripoti zangu zilizopita",
     "arrangementsTitle": "Maombi ya huduma",
-    "awaitingElder": "Inasubiri mzee"
+    "awaitingElder": "Inasubiri mzee",
+    "hoursThisMonth": "Saa za mwezi huu",
+    "addHoursLink": "Ongeza saa"
   },
   "report": {
     "pageTitle": "Ripoti ya kila mwezi",

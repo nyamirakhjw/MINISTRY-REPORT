@@ -20,7 +20,7 @@
 | REP-09, 10, 11 Rules in the database, idempotency, zero hours | Built |  |
 | LOG-01 to 08 Daily log, hours ribbon | Built | Offline add via IndexedDB (Dexie); edit/delete need a connection (documented simplification, ADR-14) |
 | DSH-01 (status), 02, 05, 06 Home and history | Built |  |
-| DSH-01 (rest, hours ribbon), 04 (this month's mini chart) | Built | Service-year totals card and sync-status text (DSH-03, 07) still pending |
+| DSH-01 (rest, hours ribbon), 04 (this month's mini chart) | Built | Fixed in 0.2.2: the ribbon existed on `/app/log` but was missing from Home itself until then. Service-year totals card and sync-status text (DSH-03, 07) still pending |
 | COR-01 to 03, 06 Correction flow | Built | Publisher requests, Elder approves (reopens) / edits directly / declines, publisher resubmits with no extra deadline; flags for zero-hours, self-edited and corrected-after-submission |
 | COR-04, 05 Submit on behalf, close month | Built | Reversible by submitting on behalf |
 | CARD-01 to 06 Report card | Phase 2 |  |
