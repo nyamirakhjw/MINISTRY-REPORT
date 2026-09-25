@@ -1,70 +1,82 @@
-# Ministry Report
+# Fix: hours ribbon missing + "Waiting to send" stuck (v0.2.4)
 
-Private, mobile-first web app for monthly ministry reporting. First congregation: **Nyamira**. Multi-congregation by design.
+## What this contains
+- `src/lib/offline/log-store.ts` — full corrected file (offline sync no longer swallows errors)
+- `src/components/report/log-client.tsx` — full corrected file (shows a sync-error banner)
+- `add_translation_key.py` — adds the one new translation key (`log.syncError`) to
+  `scripts/build-messages.py` in the project's existing EN/SW format
+- `daily-log-sync-fix.patch` — unified diff for the two TSX/TS files, `git apply`-ready
+- `sql/diagnose-delmus-goal.sql` — read-only diagnostic query for the ribbon issue
 
-Built from [`docs/PRD.md`](docs/PRD.md) (v1.0). Launch bar: [`docs/PRE_LAUNCH_CHECKLIST.md`](docs/PRE_LAUNCH_CHECKLIST.md).
+## Issue 1: "Waiting to send" never clears — FIXED
 
-> **Start here:** [`docs/PROFESSIONAL-BUILD.md`](docs/PROFESSIONAL-BUILD.md) explains how we keep this build professional, what is verified, and what to do first.
+### Root cause
+`log-store.ts`'s `sync()` destructured `{ error }` from every Supabase call and never
+checked it. If a write was rejected for *any* reason, the entry just sat in IndexedDB
+forever marked unsynced, with nothing anywhere explaining why.
 
-## What this release contains
+### Fix
+- Every sync attempt is now wrapped in `try/catch`, and every failure is logged to the
+  console with its code and message.
+- A failed sync is exposed as `syncError` from the hook, and `log-client.tsx` now shows
+  a visible banner when that happens (§8.5's rule: never a silent stuck state).
+- Added a 30-second retry loop, so a transient failure (network blip, a brief session
+  hiccup) clears itself without the person needing to reload.
 
-This is **Phase 0 (foundations) and Phase 1 (core)** from PRD §17, plus two full Phase 2 slices — **daily log with the hours ribbon** and the **corrections flow** — brought forward because they're foundational to everything else in Phase 2. It is a complete vertical slice, not a set of stubs: nothing in the app is a placeholder.
-
-| Area | Included |
-|---|---|
-| Accounts | Request access (two steps), email confirmation, username-or-email sign-in with throttling, password reset, mandatory cropped photo, approval queue, roles, two-factor for Elders and Ministerial Servants with recovery codes |
-| Reporting | Publisher and pioneer forms, submission window and order rules enforced in the database, locking, late flag, idempotent submit, review step, history |
-| Daily log | Quick-add hours (works fully offline via IndexedDB), the hours ribbon with a service-year mini chart, personal goals, leftover-minute carry-over |
-| Corrections | Publisher requests a correction on a locked report; Elder approves (reopens for resubmission, no extra deadline), edits directly, or declines; console flags for zero-hours, self-edited and corrected reports |
-| Elder console | Overview and category totals, reports table (filter, search, sort), not-reported list with WhatsApp click-to-chat, submit on behalf, close month, arrangements queue, corrections queue, members, managed profiles, audit log, live updates |
-| Platform | Create congregations, grant or remove the Elder role |
-| Public | Landing, privacy notice, terms, install help, offline and 404 pages, sitemap, robots, llms.txt, security.txt, Open Graph images, PWA manifest and service worker, English and Kiswahili (draft, hidden by default) |
-| Database | 11 migrations, row-level security everywhere, audit trail, private avatar storage, realtime, scheduled email dispatch, pgTAP tests |
-| Edge Functions | `dispatch-notifications`, `issue-recovery-codes`, `use-recovery-code`, `create-recovery-link` |
-
-Not in this release (later phases): report card, reminders and push, generalized offline queue (drafts, visits, editing/deleting log entries offline), return visits, exports and backup export, congregation settings screen, deletion workflow. See [`docs/TRACEABILITY.md`](docs/TRACEABILITY.md).
-
-## Quick start
-
-Requires Node 22, Docker (for the local Supabase stack).
-
+### Apply
 ```bash
-npm install
-cp .env.example .env.local           # fill in after `npm run db:start`
-npm run db:start                     # local Supabase; prints the URL and keys
-npm run db:reset                     # applies migrations and seed
-npm run dev
+cd /path/to/ministry-report
+git apply daily-log-sync-fix.patch
+python3 add_translation_key.py        # adds log.syncError to both EN and SW catalogues
+python3 scripts/build-messages.py     # regenerate messages/en.json and messages/sw.json
+git add -A
+git commit -m "fix: surface daily-log sync failures instead of a silent stuck state (v0.2.4)"
+git push
 ```
+If `git apply` fails on context, or `add_translation_key.py`'s assertion fails, your
+`log-store.ts` / `build-messages.py` have drifted from what's described above — paste
+me their current contents and I'll re-diff against reality.
 
-Put the printed `API URL`, `anon key` and `service_role key` in `.env.local`, and set `RATE_LIMIT_SALT` to a random 32+ character string.
+### After deploying
+Add hours again. If it still gets stuck, the browser console (not just the server logs)
+will now show `daily_log_entries sync failed: <code> <message>` — send me that exact line.
 
-## Scripts
+## Issue 2: Hours ribbon missing on Home, no goal shown on Log — NOT YET FIXED, needs your data
 
-| Command | What it does |
-|---|---|
-| `npm run verify` | Everything CI runs: lint, types, unit tests, content and i18n checks, build, bundle check |
-| `npm test` | Vitest unit tests (domain rules: windows, words, passwords, totals) |
-| `npm run test:db` | pgTAP: access rules, window boundaries, sign-up trigger |
-| `npm run test:e2e` | Playwright: public pages, accessibility (axe), console errors, redirects |
-| `npm run check:i18n` | English and Kiswahili parity, and every key used in code exists |
-| `npm run check:content` | No placeholder text, no server code in client files |
-| `npm run db:types` | Generate `database.types.ts` from the local schema |
-| `npm run fn:serve` | Serve Edge Functions locally |
+This is not a code bug I can patch blind — it's your live Supabase data. Both pages
+call the same `my_month_goal` RPC, and it's returning `{category: null, goal_hours: null}`
+for Delmus's account. That happens when `private.caller_member()` finds no active
+`members` row for his signed-in session — either:
 
-## Structure
+- he has no `service_arrangements` row at all (system currently thinks he's a Publisher), or
+- that row exists but its `status` isn't `'approved'`, or
+- that row's `start_month`/`end_month` window doesn't cover September 2026
 
-```
-src/app            routes (public, (auth), mfa, pending, app, admin, platform)
-src/components     ui primitives, brand, shell, forms, report, admin, auth
-src/lib            domain rules (pure, tested), schemas (zod), actions (server), supabase clients, auth guards
-src/messages       en.json and sw.json (GENERATED by scripts/build-messages.py)
-supabase           migrations, functions, tests, config, scripts, email templates
-docs               PRD, checklist, professional-build guide, setup, decisions, runbook, traceability
-```
+**Run `sql/diagnose-delmus-goal.sql` in the Supabase SQL editor (Production project)**
+and send me the two result sets. That tells us definitively which of the three it is,
+and the fix from there is a one-line data correction (approve/extend the arrangement),
+not a code change — unless the first query comes back completely empty, in which case
+his account isn't linked to a `members` row at all and we'll need to look at that.
 
-## Rules of the house
+## Issue 3: Multiple hour entries per day — already works, no fix needed
 
-- The database is the authority for every rule; the UI only mirrors it for convenience.
-- Components use only semantic design tokens (`globals.css`); no raw hex.
-- Edit strings in `scripts/build-messages.py`, then run it. Both languages change together.
-- No `TODO`, `FIXME`, `XXX` or `HACK` in code (ESLint error). Known gaps live in the issue tracker.
+The schema has no per-day uniqueness constraint on `daily_log_entries`, and the Quick
+Add form creates a new row with a fresh UUID on every submission — it doesn't check or
+merge with existing entries for that date. The ribbon and month total already sum every
+entry for the month (`entries.reduce((sum, e) => sum + e.durationSeconds, 0)`). So
+logging, say, three separate visits on the same day already accumulates correctly once
+sync is working — this was really Issue 1 in disguise: entries *were* accumulating
+locally, they just looked "stuck" because the sync status never resolved.
+
+## Issue 4: Goal rules — confirming against the PRD, no change made
+
+| Category | Goal source | Where in code |
+|---|---|---|
+| Publisher | None — no ribbon at all | `LOG-05`, enforced by the redirect on `/app/log` |
+| Regular pioneer | Congregation default (50h), overridable per person via `member_goals` | `private.goal_for()` |
+| Special pioneer | Congregation default (70h), overridable per person | `private.goal_for()` |
+| Auxiliary pioneer | **Not** a congregation default — chosen as 15 or 30 when the arrangement itself is requested/approved, stored on `service_arrangements.aux_goal_hours` | `private.goal_for()`, PRD §6.6 |
+
+This matches the PRD as written. If you want auxiliary pioneers to *also* have an
+editable personal-goal override independent of their arrangement's 15/30 choice, that's
+a real product decision (not in the PRD as it stands) — tell me and I'll scope it.

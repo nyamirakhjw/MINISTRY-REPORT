@@ -9,11 +9,18 @@ export interface AddEntryInput { serviceDate: string; durationSeconds: number; n
  * Daily log for one month, offline-first (LOG-07). Adding always writes to IndexedDB first (instant, works with
  * no signal), then tries to sync. A conflict on the same id is treated as success: it means a previous attempt
  * already reached the server, which is exactly the idempotency the PRD asks for.
+ *
+ * v0.2.4: sync() previously discarded every Supabase error silently (`const { error }`, never checked), so a
+ * blocked write stayed "Waiting to send" forever with nothing in the logs to explain why. It now: (1) logs every
+ * failure with its code and message, (2) exposes the last failure as `syncError` so the UI can tell the person
+ * something is actually wrong rather than just "pending", and (3) retries automatically every 30s so a transient
+ * failure (a dropped connection, a brief RLS hiccup) clears itself without requiring a reload.
  */
 export function useDailyLog(memberId: string, congregationId: string, month: string) {
   const [entries, setEntries] = React.useState<LocalLogEntry[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [online, setOnline] = React.useState(true);
+  const [syncError, setSyncError] = React.useState<string | null>(null);
 
   const monthEntries = React.useCallback(
     () => db().logEntries.where("memberId").equals(memberId).and((e) => e.serviceDate.startsWith(month.slice(0, 7))).toArray(),
@@ -25,20 +32,43 @@ export function useDailyLog(memberId: string, congregationId: string, month: str
   }, [monthEntries]);
 
   const sync = React.useCallback(async () => {
-    if (!navigator.onLine) return;
+    if (typeof navigator === "undefined" || !navigator.onLine) return;
     const supabase = createClient();
     const pending = await db().logEntries.where("syncedAt").equals("").toArray(); // Dexie stores null as "" key for indexing
+    let lastError: string | null = null;
+
     for (const e of pending) {
-      const { error } = await supabase.from("daily_log_entries").upsert(
-        { id: e.id, congregation_id: e.congregationId, member_id: e.memberId, service_date: e.serviceDate, duration_seconds: e.durationSeconds, note: e.note },
-        { onConflict: "id", ignoreDuplicates: true },
-      );
-      if (!error || error.code === "23505") await db().logEntries.update(e.id, { syncedAt: new Date().toISOString() });
+      try {
+        const { error } = await supabase.from("daily_log_entries").upsert(
+          { id: e.id, congregation_id: e.congregationId, member_id: e.memberId, service_date: e.serviceDate, duration_seconds: e.durationSeconds, note: e.note },
+          { onConflict: "id", ignoreDuplicates: true },
+        );
+        if (!error || error.code === "23505") {
+          await db().logEntries.update(e.id, { syncedAt: new Date().toISOString() });
+        } else {
+          lastError = error.message;
+          console.error("daily_log_entries sync failed:", error.code, error.message, { entryId: e.id });
+        }
+      } catch (err) {
+        lastError = err instanceof Error ? err.message : String(err);
+        console.error("daily_log_entries sync threw:", err, { entryId: e.id });
+      }
     }
+    setSyncError(lastError);
+
     const start = `${month.slice(0, 7)}-01`;
-    const { data } = await supabase.from("daily_log_entries").select("*").eq("member_id", memberId).gte("service_date", start).lt("service_date", nextMonthStr(start));
-    for (const row of data ?? []) {
-      await db().logEntries.put({ id: row.id, memberId: row.member_id, congregationId: row.congregation_id, serviceDate: row.service_date, durationSeconds: row.duration_seconds, note: row.note, createdAt: row.created_at, syncedAt: row.created_at });
+    try {
+      const { data, error } = await supabase.from("daily_log_entries").select("*")
+        .eq("member_id", memberId).gte("service_date", start).lt("service_date", nextMonthStr(start));
+      if (error) console.error("daily_log_entries fetch failed:", error.code, error.message);
+      for (const row of data ?? []) {
+        await db().logEntries.put({
+          id: row.id, memberId: row.member_id, congregationId: row.congregation_id, serviceDate: row.service_date,
+          durationSeconds: row.duration_seconds, note: row.note, createdAt: row.created_at, syncedAt: row.created_at,
+        });
+      }
+    } catch (err) {
+      console.error("daily_log_entries refetch threw:", err);
     }
     await refreshFromCache();
   }, [memberId, month, refreshFromCache]);
@@ -53,12 +83,23 @@ export function useDailyLog(memberId: string, congregationId: string, month: str
     const goOffline = () => setOnline(false);
     window.addEventListener("online", goOnline);
     window.addEventListener("offline", goOffline);
-    return () => { live = false; window.removeEventListener("online", goOnline); window.removeEventListener("offline", goOffline); };
+    // Self-heal: retry every 30s so an item that failed to sync for a transient reason doesn't stay
+    // "Waiting to send" indefinitely once the real cause (network, a brief RLS/session hiccup) clears.
+    const interval = window.setInterval(sync, 30000);
+    return () => {
+      live = false;
+      window.removeEventListener("online", goOnline);
+      window.removeEventListener("offline", goOffline);
+      window.clearInterval(interval);
+    };
   }, [refreshFromCache, sync]);
 
   const addEntry = React.useCallback(async (input: AddEntryInput) => {
-    const row: LocalLogEntry = { id: crypto.randomUUID(), memberId, congregationId, serviceDate: input.serviceDate, durationSeconds: input.durationSeconds, note: input.note, createdAt: new Date().toISOString(), syncedAt: "" };
-    await db().logEntries.add(row);
+    const row: LocalLogEntry = {
+      id: crypto.randomUUID(), memberId, congregationId, serviceDate: input.serviceDate,
+      durationSeconds: input.durationSeconds, note: input.note, createdAt: new Date().toISOString(), syncedAt: null,
+    };
+    await db().logEntries.add({ ...row, syncedAt: "" as unknown as null }); // Dexie can't index null; "" stands for "not yet synced"
     await refreshFromCache();
     sync();
   }, [memberId, congregationId, refreshFromCache, sync]);
@@ -73,7 +114,11 @@ export function useDailyLog(memberId: string, congregationId: string, month: str
   }, [refreshFromCache]);
 
   const totalSeconds = entries.reduce((sum, e) => sum + e.durationSeconds, 0);
-  return { entries, totalSeconds, loading, online, addEntry, deleteEntry, pendingCount: entries.filter((e) => !e.syncedAt).length };
+  return {
+    entries, totalSeconds, loading, online, addEntry, deleteEntry,
+    pendingCount: entries.filter((e) => !e.syncedAt).length,
+    syncError,
+  };
 }
 
 function nextMonthStr(monthStart: string): string {
