@@ -14,50 +14,46 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("log") };
 }
 
-// Accept searchParams to bypass strict TS typing and read URL errors
+// 1. TOP-LEVEL SERVER ACTION: Moving this outside the component makes it 100% immune to Next.js freezing bugs.
+export async function savePersonalGoalAction(formData: FormData) {
+  "use server";
+  const supabaseAction = await createClient();
+  const hoursStr = formData.get("hours")?.toString();
+  const hours = hoursStr ? parseInt(hoursStr, 10) : 0;
+  
+  // Grab the hidden variables we passed from the form
+  const targetDate = formData.get("targetDate")?.toString();
+  const memberId = formData.get("memberId")?.toString();
+
+  if (!targetDate || !memberId) return;
+
+  if (hours > 0) {
+    const { error } = await supabaseAction
+      .from("personal_goals")
+      .upsert(
+        { member_id: memberId, goal_month: targetDate, goal_hours: hours },
+        { onConflict: 'member_id, goal_month' }
+      );
+    if (error) redirect(`/app/log?error=${encodeURIComponent(error.message)}`);
+  } else {
+    const { error } = await supabaseAction
+      .from("personal_goals")
+      .delete()
+      .match({ member_id: memberId, goal_month: targetDate });
+    if (error) redirect(`/app/log?error=${encodeURIComponent(error.message)}`);
+  }
+
+  // Wipe the server cache AND force a unique URL to visibly refresh the browser
+  revalidatePath("/", "layout");
+  redirect(`/app/log?updated=${Date.now()}`);
+}
+
+// Accept searchParams so we can display errors if the database rejects the save
 export default async function Page({ searchParams }: any) {
   const { member } = await requireMember("/app/log");
   const supabase = await createClient();
   const month = monthOf(new Date());
-
-  // 1. Failsafe Server Action with explicit error catching and cache-busting redirects
-  async function savePersonalGoal(formData: FormData) {
-    "use server";
-    const supabaseAction = await createClient();
-    const hoursStr = formData.get("hours")?.toString();
-    const hours = hoursStr ? parseInt(hoursStr, 10) : 0;
-    const targetDate = `${month}-01`;
-
-    // Step A: Safely delete any existing goal for this month
-    const { error: delError } = await supabaseAction
-      .from("personal_goals")
-      .delete()
-      .eq("member_id", member.id)
-      .eq("goal_month", targetDate);
-      
-    if (delError) {
-      redirect(`/app/log?error=${encodeURIComponent("DeleteFailed_" + delError.message)}`);
-    }
-
-    // Step B: Insert the new goal if it's greater than 0
-    if (hours > 0) {
-      const { error: insError } = await supabaseAction
-        .from("personal_goals")
-        .insert({
-          member_id: member.id,
-          goal_month: targetDate,
-          goal_hours: hours,
-        });
-        
-      if (insError) {
-        redirect(`/app/log?error=${encodeURIComponent("InsertFailed_" + insError.message)}`);
-      }
-    }
-    
-    // Step C: Wipe the server cache AND force a unique URL to break the browser cache
-    revalidatePath("/", "layout");
-    redirect(`/app/log?updated=${Date.now()}`);
-  }
+  const targetDate = `${month}-01`;
 
   // 2. Fetch the current goal
   const { data: goal, error: goalError } = await supabase.rpc("my_month_goal", { p_month: month });
@@ -81,7 +77,7 @@ export default async function Page({ searchParams }: any) {
   return (
     <div className="flex flex-col gap-6">
       
-      {/* Show explicit errors on the screen if the database rejects the save */}
+      {/* Show explicit errors on the screen if Supabase blocks us */}
       {searchParams?.error && (
         <div className="bg-red-900 text-white p-4 rounded-md text-sm font-mono">
           Database Error: {searchParams.error}
@@ -94,7 +90,12 @@ export default async function Page({ searchParams }: any) {
           <p className="text-sm text-muted-foreground mb-4">
             Set a custom hour target to unlock the progress ribbon and track your pace this month.
           </p>
-          <form action={savePersonalGoal} method="POST" className="flex items-center gap-3">
+          <form action={savePersonalGoalAction} className="flex items-center gap-3">
+            
+            {/* Hidden inputs safely pass the user ID and Date up to the server action */}
+            <input type="hidden" name="memberId" value={member.id} />
+            <input type="hidden" name="targetDate" value={targetDate} />
+            
             <input
               type="number"
               name="hours"
