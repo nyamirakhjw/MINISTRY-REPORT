@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { revalidatePath } from "next/cache";
@@ -24,25 +26,33 @@ export default async function Page() {
     const hours = hoursStr ? parseInt(hoursStr, 10) : 0;
     const targetDate = `${month}-01`;
 
-    // Always delete the old goal for this month first (Foolproof Upsert)
-    await supabaseAction.from("personal_goals")
+    // Safely delete the old goal first
+    const { error: delError } = await supabaseAction
+      .from("personal_goals")
       .delete()
-      .match({ member_id: member.id, goal_month: targetDate });
+      .eq("member_id", member.id)
+      .eq("goal_month", targetDate);
+      
+    if (delError) console.error("Delete Error:", delError);
 
     // Insert new goal if greater than 0
     if (hours > 0) {
-      await supabaseAction.from("personal_goals").insert({
-        member_id: member.id,
-        goal_month: targetDate,
-        goal_hours: hours,
-      });
+      const { error: insError } = await supabaseAction
+        .from("personal_goals")
+        .insert({
+          member_id: member.id,
+          goal_month: targetDate,
+          goal_hours: hours,
+        });
+        
+      if (insError) console.error("Insert Error:", insError);
     }
     
-    // Wipe the cache so both Home and Log pages update instantly
-    revalidatePath("/app", "layout");
+    // Force the ENTIRE app to wipe its cache and refresh instantly
+    revalidatePath("/", "layout");
   }
 
-  // 2. Fetch the current goal (uses our updated my_month_goal RPC)
+  // 2. Fetch the current goal
   const { data: goal, error: goalError } = await supabase.rpc("my_month_goal", { p_month: month });
   if (goalError) console.error("my_month_goal failed:", goalError.message);
 
@@ -59,7 +69,6 @@ export default async function Page() {
   const yearSeconds = totals.reduce((sum, r) => sum + Number(r.data ?? 0), 0);
   const yearGoal = parsedGoalHours ? months.length * parsedGoalHours : null;
 
-  // Determine if they should see the custom goal UI (Regular Publishers or those with a personal goal)
   const canSetPersonalGoal = category === "publisher" || category === "personal";
 
   return (
