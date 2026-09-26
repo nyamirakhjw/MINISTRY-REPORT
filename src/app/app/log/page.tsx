@@ -14,12 +14,13 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("log") };
 }
 
-export default async function Page() {
+// Accept searchParams to bypass strict TS typing and read URL errors
+export default async function Page({ searchParams }: any) {
   const { member } = await requireMember("/app/log");
   const supabase = await createClient();
   const month = monthOf(new Date());
 
-  // 1. Indestructible Server Action using Upsert & Hard Redirect
+  // 1. Failsafe Server Action with explicit error catching and cache-busting redirects
   async function savePersonalGoal(formData: FormData) {
     "use server";
     const supabaseAction = await createClient();
@@ -27,33 +28,35 @@ export default async function Page() {
     const hours = hoursStr ? parseInt(hoursStr, 10) : 0;
     const targetDate = `${month}-01`;
 
+    // Step A: Safely delete any existing goal for this month
+    const { error: delError } = await supabaseAction
+      .from("personal_goals")
+      .delete()
+      .eq("member_id", member.id)
+      .eq("goal_month", targetDate);
+      
+    if (delError) {
+      redirect(`/app/log?error=${encodeURIComponent("DeleteFailed_" + delError.message)}`);
+    }
+
+    // Step B: Insert the new goal if it's greater than 0
     if (hours > 0) {
-      // Use UPSERT to safely overwrite or create without triggering conflict errors
-      const { error } = await supabaseAction
+      const { error: insError } = await supabaseAction
         .from("personal_goals")
-        .upsert(
-          {
-            member_id: member.id,
-            goal_month: targetDate,
-            goal_hours: hours,
-          },
-          { onConflict: 'member_id, goal_month' }
-        );
+        .insert({
+          member_id: member.id,
+          goal_month: targetDate,
+          goal_hours: hours,
+        });
         
-      if (error) console.error("Upsert Error:", error.message);
-    } else {
-      // If 0 or empty, delete the goal
-      const { error } = await supabaseAction
-        .from("personal_goals")
-        .delete()
-        .match({ member_id: member.id, goal_month: targetDate });
-        
-      if (error) console.error("Delete Error:", error.message);
+      if (insError) {
+        redirect(`/app/log?error=${encodeURIComponent("InsertFailed_" + insError.message)}`);
+      }
     }
     
-    // Wipe the server cache AND force the browser to visibly reload the page
+    // Step C: Wipe the server cache AND force a unique URL to break the browser cache
     revalidatePath("/", "layout");
-    redirect("/app/log");
+    redirect(`/app/log?updated=${Date.now()}`);
   }
 
   // 2. Fetch the current goal
@@ -77,6 +80,14 @@ export default async function Page() {
 
   return (
     <div className="flex flex-col gap-6">
+      
+      {/* Show explicit errors on the screen if the database rejects the save */}
+      {searchParams?.error && (
+        <div className="bg-red-900 text-white p-4 rounded-md text-sm font-mono">
+          Database Error: {searchParams.error}
+        </div>
+      )}
+
       {canSetPersonalGoal && (
         <section className="rounded-lg border border-border bg-surface p-5">
           <h2 className="mb-2 text-lg font-semibold">Personal Monthly Goal</h2>
