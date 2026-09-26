@@ -20,7 +20,7 @@ export default async function Page() {
   if (goalError) console.error("my_month_goal failed:", goalError.message);
   // Fail safe toward showing the page: only redirect on a confirmed "publisher", never on an error or missing data.
   const category = !goalError && (goal as { category?: string } | null)?.category === "publisher" ? "publisher" : null;
-  if (category === "publisher") redirect("/app");
+  // if (category === "publisher") redirect("/app");
 
   const year = serviceYearOf(month);
   const months = serviceYearMonths(year);
