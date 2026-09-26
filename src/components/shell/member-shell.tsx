@@ -13,7 +13,7 @@ export async function MemberShell({ member, avatarUrl, unread, isPioneer, childr
   // Bottom bar stays at 5 items max (PRD §8.3): Home, Log (pioneers only), Report, History, More.
   const items: NavItem[] = [
     { key: "home", href: "/app", exact: true },
-    ...(isPioneer ? [{ key: "log" as const, href: "/app/log" }] : []),
+    ...(true ? [{ key: "log" as const, href: "/app/log" }] : []),
     { key: "report", href: "/app/report" },
     { key: "history", href: "/app/history" },
     { key: "more", href: "/app/more", badge: unread || undefined },
