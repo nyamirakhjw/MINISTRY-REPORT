@@ -15,16 +15,27 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  await requireMember("/app/history");
+  // FIX 1: Capture the current member from the session
+  const { member } = await requireMember("/app/history");
   const t = await getTranslations("history");
   const cat = await getTranslations("categories");
   const st = await getTranslations("status");
   const locale = await getLocale();
   const supabase = await createClient();
+  
+  // FIX 2: Explicitly filter reports by the current user's member.id
   const [{ data }, { data: openCorrections }] = await Promise.all([
-    supabase.from("reports").select("*").order("month", { ascending: false }),
-    supabase.from("report_corrections").select("report_id").eq("status", "pending"),
+    supabase
+      .from("reports")
+      .select("*")
+      .eq("member_id", member.id)
+      .order("month", { ascending: false }),
+    supabase
+      .from("report_corrections")
+      .select("report_id")
+      .eq("status", "pending"),
   ]);
+  
   const rows = (data ?? []) as ReportRow[];
   const pendingCorrection = new Set((openCorrections ?? []).map((c) => c.report_id as string));
   const byYear = new Map<string, ReportRow[]>();
