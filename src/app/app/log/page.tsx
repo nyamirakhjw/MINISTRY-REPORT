@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { LogClient } from "@/components/report/log-client";
 import { requireMember } from "@/lib/auth/session";
 import { monthOf, serviceYearMonths, serviceYearOf } from "@/lib/domain/time";
@@ -18,7 +19,7 @@ export default async function Page() {
   const supabase = await createClient();
   const month = monthOf(new Date());
 
-  // 1. Indestructible Server Action to Save Personal Goal
+  // 1. Indestructible Server Action using Upsert & Hard Redirect
   async function savePersonalGoal(formData: FormData) {
     "use server";
     const supabaseAction = await createClient();
@@ -26,30 +27,33 @@ export default async function Page() {
     const hours = hoursStr ? parseInt(hoursStr, 10) : 0;
     const targetDate = `${month}-01`;
 
-    // Safely delete the old goal first
-    const { error: delError } = await supabaseAction
-      .from("personal_goals")
-      .delete()
-      .eq("member_id", member.id)
-      .eq("goal_month", targetDate);
-      
-    if (delError) console.error("Delete Error:", delError);
-
-    // Insert new goal if greater than 0
     if (hours > 0) {
-      const { error: insError } = await supabaseAction
+      // Use UPSERT to safely overwrite or create without triggering conflict errors
+      const { error } = await supabaseAction
         .from("personal_goals")
-        .insert({
-          member_id: member.id,
-          goal_month: targetDate,
-          goal_hours: hours,
-        });
+        .upsert(
+          {
+            member_id: member.id,
+            goal_month: targetDate,
+            goal_hours: hours,
+          },
+          { onConflict: 'member_id, goal_month' }
+        );
         
-      if (insError) console.error("Insert Error:", insError);
+      if (error) console.error("Upsert Error:", error.message);
+    } else {
+      // If 0 or empty, delete the goal
+      const { error } = await supabaseAction
+        .from("personal_goals")
+        .delete()
+        .match({ member_id: member.id, goal_month: targetDate });
+        
+      if (error) console.error("Delete Error:", error.message);
     }
     
-    // Force the ENTIRE app to wipe its cache and refresh instantly
+    // Wipe the server cache AND force the browser to visibly reload the page
     revalidatePath("/", "layout");
+    redirect("/app/log");
   }
 
   // 2. Fetch the current goal
@@ -79,7 +83,7 @@ export default async function Page() {
           <p className="text-sm text-muted-foreground mb-4">
             Set a custom hour target to unlock the progress ribbon and track your pace this month.
           </p>
-          <form action={savePersonalGoal} className="flex items-center gap-3">
+          <form action={savePersonalGoal} method="POST" className="flex items-center gap-3">
             <input
               type="number"
               name="hours"
