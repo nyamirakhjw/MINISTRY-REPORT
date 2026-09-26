@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import * as React from "react";
 import { db, type LocalLogEntry } from "./dexie";
 import { createClient } from "@/lib/supabase/browser";
@@ -40,7 +40,7 @@ export function useDailyLog(memberId: string, congregationId: string, month: str
     for (const e of pending) {
       try {
         const { error } = await supabase.from("daily_log_entries").upsert(
-          { id: e.id, congregation_id: e.congregationId, member_id: e.memberId, service_date: e.serviceDate, duration_seconds: e.durationSeconds, note: e.note },
+          { id: e.id, congregation_id: e.congregationId, member_id: e.memberId, service_date: e.serviceDate, duration_seconds: e.durationSeconds, note: e.note === "" ? null : e.note },
           { onConflict: "id", ignoreDuplicates: true },
         );
         if (!error || error.code === "23505") {
@@ -54,7 +54,7 @@ export function useDailyLog(memberId: string, congregationId: string, month: str
         console.error("daily_log_entries sync threw:", err, { entryId: e.id });
       }
     }
-    setSyncError(lastError);
+    setSyncError(lastError ? `Database error: ${lastError}` : null);
 
     const start = `${month.slice(0, 7)}-01`;
     try {
@@ -126,3 +126,4 @@ function nextMonthStr(monthStart: string): string {
   d.setUTCMonth(d.getUTCMonth() + 1);
   return d.toISOString().slice(0, 10);
 }
+
