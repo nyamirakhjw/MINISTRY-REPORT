@@ -1,4 +1,5 @@
 export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
@@ -46,7 +47,8 @@ export default async function Page() {
           <p className="mt-2"><Link href="/app/log" className="inline-flex min-h-11 items-center underline underline-offset-4">{t("addHoursLink")}</Link></p>
         </section>
       )}
-      {pendingArr.length > 0 && (
+      <div className="bg-red-900 text-white p-4 rounded-md mb-4 font-mono text-xs overflow-auto">DEBUG GOAL: {JSON.stringify(goalRes)}</div>
+<ReportStatusCard state={(state ?? { state: "not_active" }) as ReportState} />
         <section aria-labelledby="arr-title" className="rounded-lg border border-border bg-surface p-5">
           <h2 id="arr-title" className="text-lg">{t("arrangementsTitle")}</h2>
           <ul className="mt-2 space-y-2">
