@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import * as React from "react";
 import { db, type LocalLogEntry } from "./dexie";
 import { createClient } from "@/lib/supabase/browser";
@@ -97,9 +97,9 @@ export function useDailyLog(memberId: string, congregationId: string, month: str
   const addEntry = React.useCallback(async (input: AddEntryInput) => {
     const row: LocalLogEntry = {
       id: crypto.randomUUID(), memberId, congregationId, serviceDate: input.serviceDate,
-      durationSeconds: input.durationSeconds, note: input.note ?? "", createdAt: new Date().toISOString(), syncedAt: "",
+      durationSeconds: input.durationSeconds, note: input.note, createdAt: new Date().toISOString(), syncedAt: null,
     };
-    await db().logEntries.add(row); // Dexie can't index null; "" stands for "not yet synced"
+    await db().logEntries.add({ ...row, syncedAt: "" as unknown as null }); // Dexie can't index null; "" stands for "not yet synced"
     await refreshFromCache();
     sync();
   }, [memberId, congregationId, refreshFromCache, sync]);
@@ -126,4 +126,3 @@ function nextMonthStr(monthStart: string): string {
   d.setUTCMonth(d.getUTCMonth() + 1);
   return d.toISOString().slice(0, 10);
 }
-

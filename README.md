@@ -1,82 +1,76 @@
-# Fix: hours ribbon missing + "Waiting to send" stuck (v0.2.4)
+# Ministry Report — combined fix (v0.2.3 + v0.2.4 + production schema check)
 
-## What this contains
-- `src/lib/offline/log-store.ts` — full corrected file (offline sync no longer swallows errors)
-- `src/components/report/log-client.tsx` — full corrected file (shows a sync-error banner)
-- `add_translation_key.py` — adds the one new translation key (`log.syncError`) to
-  `scripts/build-messages.py` in the project's existing EN/SW format
-- `daily-log-sync-fix.patch` — unified diff for the two TSX/TS files, `git apply`-ready
-- `sql/diagnose-delmus-goal.sql` — read-only diagnostic query for the ribbon issue
+Everything from the last three fixes, combined into one package, plus the new finding
+from your latest screenshots: the ribbon and the sync error very likely share **one root
+cause** — a missing migration on production — not two separate bugs.
 
-## Issue 1: "Waiting to send" never clears — FIXED
+## Do this first: run the diagnostic (no code changes yet)
 
-### Root cause
-`log-store.ts`'s `sync()` destructured `{ error }` from every Supabase call and never
-checked it. If a write was rejected for *any* reason, the entry just sat in IndexedDB
-forever marked unsynced, with nothing anywhere explaining why.
+Open the Supabase SQL editor on the **PRODUCTION** project and run `sql/01-diagnose.sql`.
+It checks four things in one pass:
+- **A/B)** Was `20260921000100_daily_log.sql` (the migration that created `daily_log_entries`,
+  `my_month_goal`, `my_log_seconds`, `apply_log_carryover`) ever applied to production?
+- **C)** Does `authenticated` actually have grants on `daily_log_entries`?
+- **D)** Is Delmus's `members` row properly linked to his `auth.users` account and active?
 
-### Fix
-- Every sync attempt is now wrapped in `try/catch`, and every failure is logged to the
-  console with its code and message.
-- A failed sync is exposed as `syncError` from the hook, and `log-client.tsx` now shows
-  a visible banner when that happens (§8.5's rule: never a silent stuck state).
-- Added a 30-second retry loop, so a transient failure (network blip, a brief session
-  hiccup) clears itself without the person needing to reload.
+### Why this is the likely root cause
+Your SQL screenshot confirms Delmus's `regular_pioneer` arrangement is `approved` and
+covers September 2026 — so the arrangement itself is fine. But the browser console shows
+`PGRST205: Could not find the table 'public.daily_log_entries' in the schema cache` on
+**every** sync attempt. That table and the `my_month_goal`/`my_log_seconds` functions were
+all created together in the same migration file. If PostgREST can't see one, it's a strong
+sign production never got that whole migration — which explains both the missing ribbon
+(the RPC call fails, and the app correctly fails safe by hiding it) and the stuck
+"Waiting to send" (the table genuinely isn't reachable) with a single explanation.
+
+### Depending on what 01-diagnose.sql shows
+- **Migration/objects missing** → run `sql/02-apply-migration.sql`. It's the exact,
+  unmodified content of `20260921000100_daily_log.sql` — safe to run once against a
+  database that doesn't have these objects yet. If any single statement errors with
+  "already exists," **stop and tell me exactly which one** rather than continuing; it
+  would mean production has some but not all of these objects, which needs a careful
+  hand rather than a blind full re-run.
+- **Objects exist, but PostgREST still 404s** → run `sql/03-reload-schema-cache.sql`.
+- **Member not linked / not active (part D)** → that's a data-fix in your Elder console
+  or a direct `update public.members set status='active', user_id='<correct auth uid>' ...`
+  — send me what part D actually shows and I'll give you the exact statement.
+
+## Then apply the application-code fixes (all four files, consolidated)
+
+- `src/app/app/log/page.tsx` — Log page fails safe toward *showing* the page (v0.2.3)
+- `src/app/app/page.tsx` — Home fails safe toward *hiding* the ribbon on any uncertainty (v0.2.3)
+- `src/lib/offline/log-store.ts` — sync failures are now logged and surfaced instead of silent (v0.2.4)
+- `src/components/report/log-client.tsx` — shows a visible banner on sync failure (v0.2.4)
+- `add_translation_key.py` / `apply_translation_fix.sh` — adds the `log.syncError` string
+  to both language catalogues and verifies it landed, so you don't see a raw `log.syncError`
+  key again
 
 ### Apply
 ```bash
 cd /path/to/ministry-report
-git apply daily-log-sync-fix.patch
-python3 add_translation_key.py        # adds log.syncError to both EN and SW catalogues
-python3 scripts/build-messages.py     # regenerate messages/en.json and messages/sw.json
+
+# 1. Copy the four corrected files directly into place (safest — no patch/context risk)
+cp -r /path/to/unzipped/src/* src/
+
+# 2. Regenerate translations and verify
+cp /path/to/unzipped/add_translation_key.py /path/to/unzipped/apply_translation_fix.sh .
+./apply_translation_fix.sh
+
+# 3. Review, commit, push
+git status --short
 git add -A
-git commit -m "fix: surface daily-log sync failures instead of a silent stuck state (v0.2.4)"
+git commit -m "fix: redirect loop, silent sync failures, missing sync-error translation (v0.2.3 + v0.2.4)"
 git push
 ```
-If `git apply` fails on context, or `add_translation_key.py`'s assertion fails, your
-`log-store.ts` / `build-messages.py` have drifted from what's described above — paste
-me their current contents and I'll re-diff against reality.
 
-### After deploying
-Add hours again. If it still gets stuck, the browser console (not just the server logs)
-will now show `daily_log_entries sync failed: <code> <message>` — send me that exact line.
+This time the files are copied wholesale rather than patched, since a diff can silently
+fail to apply if your local file has drifted even slightly — a direct copy can't have
+that problem, but it also means it will overwrite anything else you've changed in those
+four files, so check `git status`/`git diff` before committing.
 
-## Issue 2: Hours ribbon missing on Home, no goal shown on Log — NOT YET FIXED, needs your data
-
-This is not a code bug I can patch blind — it's your live Supabase data. Both pages
-call the same `my_month_goal` RPC, and it's returning `{category: null, goal_hours: null}`
-for Delmus's account. That happens when `private.caller_member()` finds no active
-`members` row for his signed-in session — either:
-
-- he has no `service_arrangements` row at all (system currently thinks he's a Publisher), or
-- that row exists but its `status` isn't `'approved'`, or
-- that row's `start_month`/`end_month` window doesn't cover September 2026
-
-**Run `sql/diagnose-delmus-goal.sql` in the Supabase SQL editor (Production project)**
-and send me the two result sets. That tells us definitively which of the three it is,
-and the fix from there is a one-line data correction (approve/extend the arrangement),
-not a code change — unless the first query comes back completely empty, in which case
-his account isn't linked to a `members` row at all and we'll need to look at that.
-
-## Issue 3: Multiple hour entries per day — already works, no fix needed
-
-The schema has no per-day uniqueness constraint on `daily_log_entries`, and the Quick
-Add form creates a new row with a fresh UUID on every submission — it doesn't check or
-merge with existing entries for that date. The ribbon and month total already sum every
-entry for the month (`entries.reduce((sum, e) => sum + e.durationSeconds, 0)`). So
-logging, say, three separate visits on the same day already accumulates correctly once
-sync is working — this was really Issue 1 in disguise: entries *were* accumulating
-locally, they just looked "stuck" because the sync status never resolved.
-
-## Issue 4: Goal rules — confirming against the PRD, no change made
-
-| Category | Goal source | Where in code |
-|---|---|---|
-| Publisher | None — no ribbon at all | `LOG-05`, enforced by the redirect on `/app/log` |
-| Regular pioneer | Congregation default (50h), overridable per person via `member_goals` | `private.goal_for()` |
-| Special pioneer | Congregation default (70h), overridable per person | `private.goal_for()` |
-| Auxiliary pioneer | **Not** a congregation default — chosen as 15 or 30 when the arrangement itself is requested/approved, stored on `service_arrangements.aux_goal_hours` | `private.goal_for()`, PRD §6.6 |
-
-This matches the PRD as written. If you want auxiliary pioneers to *also* have an
-editable personal-goal override independent of their arrangement's 15/30 choice, that's
-a real product decision (not in the PRD as it stands) — tell me and I'll scope it.
+## After both the SQL fix and the code are live
+1. Confirm `sql/01-diagnose.sql` part B now shows the table and all three functions.
+2. Reload the app as Delmus, open **Daily log** — the ribbon should show `X / 50` this time.
+3. Add an entry — it should sync and disappear from "Waiting to send" within a few seconds,
+   not stay stuck. If it still gets stuck, the console error will now be a *different*
+   message than PGRST205 — send me that new one.
