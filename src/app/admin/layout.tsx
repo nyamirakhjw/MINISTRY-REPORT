@@ -12,7 +12,8 @@ import { AdminTabs } from "@/components/admin/admin-tabs";
 
 export const metadata: Metadata = { robots: PRIVATE_ROBOTS };
 
-/** Elders see everything; Ministerial Servants see only the Approvals queue (D-13). Enforced again in the database. */
+/** Elders see everything; Ministerial Servants see only the Approvals queue (D-13). Enforced again in the database.
+ * Phase 3 adds Exports (Sprint 4) and Deletions (Sprint 7) to the Elder rail. */
 export default async function Layout({ children }: { children: React.ReactNode }) {
   const { member, isPlatformAdmin } = await requireRole("ministerial_servant", "/admin");
   const t = await getTranslations("nav");
@@ -27,7 +28,10 @@ export default async function Layout({ children }: { children: React.ReactNode }
         { key: "arrangements", href: "/admin/arrangements", badge: counts.arrangements || undefined },
         { key: "corrections", href: "/admin/corrections", badge: counts.corrections || undefined },
         { key: "members", href: "/admin/members" },
+        { key: "exports", href: "/admin/exports" },
+        { key: "deletions", href: "/admin/deletions", badge: counts.deletions || undefined },
         { key: "audit", href: "/admin/audit" },
+        { key: "settings", href: "/admin/settings" },
       ]
     : [{ key: "approvals", href: "/admin/approvals", badge: counts.approvals || undefined }];
   return (
@@ -36,8 +40,6 @@ export default async function Layout({ children }: { children: React.ReactNode }
         <div className="sticky top-0 flex h-dvh flex-col gap-6 p-4 pt-safe">
           <Link href="/admin" className="rounded-md"><Logo /></Link>
           <NavLinks items={items} label={t("adminMenu")} orientation="side" />
-          {/* Platform is a separate, wholly hidden area (only the account bootstrap-owner.sql was run against can open it) —
-              still worth a visible link, since "type the URL from memory" is not real discoverability. */}
           {isPlatformAdmin ? <Link href="/platform" className="inline-flex min-h-12 items-center rounded-md px-3 font-semibold text-primary hover:bg-tint">{t("platform")}</Link> : null}
           <Link href="/app" className="mt-auto inline-flex min-h-12 items-center rounded-md px-3 font-semibold hover:bg-tint">{t("backToApp")}</Link>
           <div><ThemeToggle /></div>

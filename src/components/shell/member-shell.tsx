@@ -10,12 +10,13 @@ import type { Member } from "@/lib/types";
 
 export async function MemberShell({ member, avatarUrl, unread, isPioneer, children }: { member: Member; avatarUrl?: string; unread: number; isPioneer: boolean; children: React.ReactNode }) {
   const t = await getTranslations("nav");
-  // Bottom bar stays at 5 items max (PRD §8.3): Home, Log (pioneers only), Report, History, More.
+  // Bottom bar stays at 5 items max (PRD §8.3): Home, Log (pioneers only), Report, Visits, More.
+  // History moved into More (Phase 3, Sprint 2) so Visits (RV-01) has a permanent slot, matching the route map (§8.1).
   const items: NavItem[] = [
     { key: "home", href: "/app", exact: true },
     ...(true ? [{ key: "log" as const, href: "/app/log" }] : []),
     { key: "report", href: "/app/report" },
-    { key: "history", href: "/app/history" },
+    { key: "visits", href: "/app/visits" },
     { key: "more", href: "/app/more", badge: unread || undefined },
   ];
   return (
@@ -24,7 +25,7 @@ export async function MemberShell({ member, avatarUrl, unread, isPioneer, childr
         <div className="sticky top-0 flex h-dvh flex-col gap-6 p-4 pt-safe">
           <Link href="/app" className="rounded-md"><Logo /></Link>
           <div className="flex items-center gap-3"><Avatar name={member.full_name} src={avatarUrl} size={44} alt={t("photoOf", { name: member.full_name })} /><span className="font-semibold">{member.full_name}</span></div>
-          <NavLinks items={[...items.filter((i) => i.key !== "more"), { key: "notifications", href: "/app/notifications", badge: unread || undefined }]} label={t("main")} orientation="side" />
+          <NavLinks items={[...items.filter((i) => i.key !== "more"), { key: "history", href: "/app/history" }, { key: "notifications", href: "/app/notifications", badge: unread || undefined }]} label={t("main")} orientation="side" />
           {member.role !== "publisher" ? <Link href="/admin" className="inline-flex min-h-12 items-center rounded-md px-3 font-semibold text-primary hover:bg-tint">{t("admin")}</Link> : null}
           <Link href="/app/settings" className="inline-flex min-h-12 items-center rounded-md px-3 font-semibold hover:bg-tint">{t("settings")}</Link>
           <div className="mt-auto flex items-center gap-1">{publicEnv.enableSw ? <LocaleSwitch /> : null}<ThemeToggle /></div>

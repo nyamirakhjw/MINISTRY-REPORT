@@ -1,11 +1,18 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, FileText, History, Menu, Bell, Clock, LayoutDashboard, Users, ClipboardList, ShieldCheck, UserPlus, Briefcase, UserX, PenLine } from "lucide-react";
+import { Home, FileText, History, Menu, Bell, Clock, LayoutDashboard, Users, ClipboardList, ShieldCheck, UserPlus, Briefcase, UserX, PenLine, HeartHandshake, Download, Trash2, Settings } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
-const ICONS = { notifications: Bell, home: Home, log: Clock, report: FileText, history: History, more: Menu, overview: LayoutDashboard, reports: ClipboardList, notReported: UserX, approvals: UserPlus, arrangements: Briefcase, corrections: PenLine, members: Users, audit: ShieldCheck } as const;
+// Sprint 1 adds "settings" (SET-01..07); Phase 3, Sprint 2 adds "visits" (RV-01); Sprint 4 adds "exports"
+// (EXP-01); Sprint 7 adds "deletions" (DEL-02).
+const ICONS = {
+  notifications: Bell, home: Home, log: Clock, report: FileText, history: History, more: Menu,
+  visits: HeartHandshake, overview: LayoutDashboard, reports: ClipboardList, notReported: UserX,
+  approvals: UserPlus, arrangements: Briefcase, corrections: PenLine, members: Users, audit: ShieldCheck,
+  exports: Download, deletions: Trash2, settings: Settings,
+} as const;
 export type NavKey = keyof typeof ICONS;
 export interface NavItem { key: NavKey; href: string; badge?: number; exact?: boolean }
 

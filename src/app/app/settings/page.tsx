@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { ShieldQuestion } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -62,6 +64,13 @@ export default async function Page() {
         <h2 id="s-change">{t("nameChange")}</h2>
         <p className="text-muted-foreground">{t("nameChangeHelp")}</p>
         <ChangeRequest />
+      </section>
+      {/* Phase 3, Sprint 7 (PRO-07): download-my-data, deletion request, consent history. */}
+      <section aria-labelledby="s-data" className="flex flex-col gap-2">
+        <h2 id="s-data">{t("dataControls")}</h2>
+        <Link href="/app/settings/data" className="inline-flex min-h-12 w-fit items-center gap-2 rounded-md border border-input-border bg-surface px-4 font-semibold hover:bg-tint">
+          <ShieldQuestion className="size-5" aria-hidden="true" />{t("openDataControls")}
+        </Link>
       </section>
       <SignOutButton />
     </div>

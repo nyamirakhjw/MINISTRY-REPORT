@@ -51,8 +51,66 @@ export async function getGroups(): Promise<{ id: string; name: string }[]> {
   return data ?? [];
 }
 
-export async function getCounts(): Promise<{ approvals: number; arrangements: number; changes: number; corrections: number }> {
+export async function getCounts(): Promise<{ approvals: number; arrangements: number; changes: number; corrections: number; deletions: number }> {
   const supabase = await createClient();
   const { data } = await supabase.rpc("admin_queue_counts");
-  return { approvals: 0, arrangements: 0, changes: 0, corrections: 0, ...((data as object | null) ?? {}) };
+  return { approvals: 0, arrangements: 0, changes: 0, corrections: 0, deletions: 0, ...((data as object | null) ?? {}) };
+}
+
+// ---------------------------------------------------------------------------------------------------------
+// Phase 3, Sprint 3 — by-group breakdown (ADM-03), trend series (ADM-04/ADM-05) and goal attainment (ADM-04).
+// ---------------------------------------------------------------------------------------------------------
+
+export interface GroupBreakdown { group_id: string | null; group_name: string; reported: number; obligated: number; hours: number; studies: number }
+
+/** ADM-03: reuses the same per-member rows the overview already fetches — no extra round trip. */
+export function byGroup(rows: AdminRow[]): GroupBreakdown[] {
+  const map = new Map<string, GroupBreakdown>();
+  for (const r of rows) {
+    const key = r.group_id ?? "none";
+    const g = map.get(key) ?? { group_id: r.group_id, group_name: r.group_name ?? "—", reported: 0, obligated: 0, hours: 0, studies: 0 };
+    g.obligated++;
+    if (r.status !== "missing" && r.status !== "not_reported") { g.reported++; g.hours += r.hours ?? 0; g.studies += r.studies ?? 0; }
+    map.set(key, g);
+  }
+  return [...map.values()].sort((a, b) => a.group_name.localeCompare(b.group_name));
+}
+
+export interface TrendPoint { month: MonthKey; obligated: number; reported: number; closed: number; late: number; hours: number; studies: number; participants: number }
+
+export async function getMonthTrend(endMonth: MonthKey, months = 24): Promise<TrendPoint[]> {
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("admin_month_trend", { p_end_month: endMonth, p_months: months });
+  return (data ?? []) as TrendPoint[];
+}
+
+export interface GoalAttainment { category: Category; met: number; not_met: number }
+
+export async function getGoalAttainment(month: MonthKey): Promise<GoalAttainment[]> {
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("admin_goal_attainment", { p_month: month });
+  return (data ?? []) as GoalAttainment[];
+}
+
+export interface CategoryMonth { month: MonthKey; category: Category; reporting: number; hours: number; studies: number }
+
+export async function getServiceYearByCategory(serviceYear: string): Promise<CategoryMonth[]> {
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("admin_service_year_by_category", { p_year: serviceYear });
+  return (data ?? []) as CategoryMonth[];
+}
+
+/** Reporting % this month vs previous month and vs the same month last year (ADM-05). */
+export function compareTo(trend: TrendPoint[], month: MonthKey) {
+  const at = (m: MonthKey) => trend.find((t) => t.month === m);
+  const pct = (t?: TrendPoint) => (t && t.obligated > 0 ? Math.round((t.reported / t.obligated) * 100) : null);
+  const cur = at(month);
+  const prevMonth = at(addMonths(month, -1));
+  const yearAgo = at(addMonths(month, -12));
+  return {
+    current: cur ?? null,
+    previousMonth: prevMonth ?? null,
+    sameMonthLastYear: yearAgo ?? null,
+    reportingPercent: { current: pct(cur), previousMonth: pct(prevMonth), sameMonthLastYear: pct(yearAgo) },
+  };
 }
