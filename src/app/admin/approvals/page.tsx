@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ApproveDialog, DecideDialog, ReasonDialog } from "@/components/admin/approval-dialogs";
@@ -30,9 +32,11 @@ export default async function Page() {
     getGroups(),
     elder ? supabase.from("profile_change_requests").select("id, kind, new_value, created_at, members!profile_change_requests_member_id_fkey(full_name, username)").eq("status", "pending").order("created_at") : Promise.resolve({ data: [] }),
   ]);
+  
   const pending = (data ?? []) as Pending[];
   const avatars = await signedAvatarUrls(pending.map((p) => p.avatar_path));
   const change = (changes.data ?? []) as unknown as Change[];
+  
   return (
     <div className="flex flex-col gap-8">
       <h1>{t("approvalsTitle")}</h1>
