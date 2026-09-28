@@ -8,7 +8,10 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/app",
     scope: "/",
     display: "standalone",
-    orientation: "portrait",
+    // "portrait" alone is the natural orientation and covers BOTH portrait-primary and portrait-secondary
+    // (upside-down), so some devices were free to flip 180° on their own even with device rotation locked.
+    // Pinning to portrait-primary stops that.
+    orientation: "portrait-primary",
     background_color: "#F7F9FC",
     theme_color: "#0B2E6B",
     icons: [

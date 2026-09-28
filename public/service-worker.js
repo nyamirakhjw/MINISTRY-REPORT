@@ -5,11 +5,16 @@
  * cannot end up in a shared HTTP cache (PRD §14.7). Offline data (log, visits, drafts, sync queue) arrives in Phase 2
  * and will live in per-user IndexedDB, wiped on sign-out.
  */
-const VERSION = "v1";
+const VERSION = "v2"; // bumped so the activate step clears the old page cache after this fix
 const STATIC_CACHE = `mr-static-${VERSION}`;
 const PAGE_CACHE = `mr-pages-${VERSION}`;
 const PRECACHE = ["/offline", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/icon.svg"];
 const PUBLIC_PAGES = new Set(["/", "/sw", "/privacy", "/terms", "/install", "/signin", "/request-access"]);
+// Member app shell (D-29: dashboard, log, visits and drafts must keep working offline). A refresh while
+// offline on any of these should reopen the last cached shell, not drop straight to the generic offline
+// page — the client-side hooks (Dexie/IndexedDB) then take over for the actual data.
+// /admin and /platform are deliberately excluded: admin tools are online-only.
+const APP_PREFIX = "/app";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(STATIC_CACHE).then((c) => c.addAll(PRECACHE)).then(() => self.skipWaiting()));
@@ -41,9 +46,12 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Public pages: network first, remember the last good copy for offline.
+  // Public pages and the signed-in member app: network first, remember the last good copy for offline.
+  // Everything else (/admin, /platform, auth callbacks, exports) stays network-only (D-29).
   if (req.mode === "navigate") {
-    if (!PUBLIC_PAGES.has(url.pathname)) {
+    const isPublicPage = PUBLIC_PAGES.has(url.pathname);
+    const isMemberApp = url.pathname === APP_PREFIX || url.pathname.startsWith(`${APP_PREFIX}/`);
+    if (!isPublicPage && !isMemberApp) {
       event.respondWith(fetch(req).catch(() => caches.match("/offline")));
       return;
     }

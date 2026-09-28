@@ -27,7 +27,9 @@ export default async function Page() {
   const locale = await getLocale();
   const supabase = await createClient();
   const [{ data: arr }, urls] = await Promise.all([
-    supabase.from("service_arrangements").select("*").order("requested_at", { ascending: false }),
+    // Scoped to self: the "arrangements_elder" RLS policy also lets an Elder read every member's rows,
+    // so an unscoped select here was returning the whole congregation's arrangements on a personal page.
+    supabase.from("service_arrangements").select("*").eq("member_id", member.id).order("requested_at", { ascending: false }),
     signedAvatarUrls([member.avatar_path]),
   ]);
   const arrangements = (arr ?? []) as Arrangement[];

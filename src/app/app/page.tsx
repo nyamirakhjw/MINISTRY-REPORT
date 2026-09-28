@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { InstallCard } from "@/components/shell/install-card";
 import { HoursRibbon } from "@/components/report/hours-ribbon";
 import { ReportStatusCard } from "@/components/report/status-card";
+import { UpcomingVisitsCard } from "@/components/visits/upcoming-visits-card";
 import { requireMember } from "@/lib/auth/session";
 import { monthOf } from "@/lib/domain/time";
 import { createClient } from "@/lib/supabase/server";
@@ -24,7 +25,9 @@ export default async function Page() {
   const month = monthOf(new Date());
   const [reportStateRes, arrangementsRes, goalRes, logSecondsRes] = await Promise.all([
     supabase.rpc("my_report_state"),
-    supabase.from("service_arrangements").select("*").in("status", ["pending", "rejected"]).order("requested_at", { ascending: false }).limit(3),
+    // Scoped to self (same fix as Settings): without this, an Elder/Owner's Home page showed
+    // other members' pending or rejected arrangement requests as if they were their own.
+    supabase.from("service_arrangements").select("*").eq("member_id", member.id).in("status", ["pending", "rejected"]).order("requested_at", { ascending: false }).limit(3),
     supabase.rpc("my_month_goal", { p_month: month }),
     supabase.rpc("my_log_seconds", { p_month: month }),
   ]);
@@ -46,6 +49,8 @@ export default async function Page() {
           <p className="mt-2"><Link href="/app/log" className="inline-flex min-h-11 items-center underline underline-offset-4">{t("addHoursLink")}</Link></p>
         </section>
       )}
+      {/* DSH-01 order: report status, monthly progress (pioneers), return visits due today, then unread messages. */}
+      <UpcomingVisitsCard memberId={member.id} congregationId={member.congregation_id} />
       {pendingArr.length > 0 && (
         <section aria-labelledby="arr-title" className="rounded-lg border border-border bg-surface p-5">
           <h2 id="arr-title" className="text-lg">{t("arrangementsTitle")}</h2>

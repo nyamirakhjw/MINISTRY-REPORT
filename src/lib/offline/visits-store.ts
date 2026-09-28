@@ -73,6 +73,7 @@ export function useReturnVisits(memberId: string, congregationId: string) {
     try {
       const { data, error } = await supabase.from("return_visits").select("*").order("next_visit_at", { ascending: true, nullsFirst: false });
       if (error) console.error("return_visits fetch failed:", error.code, error.message);
+      const serverIds = new Set((data ?? []).map((row) => row.id));
       for (const row of data ?? []) {
         await db().returnVisits.put({
           id: row.id, memberId: row.owner_id, congregationId: row.congregation_id, firstName: row.first_name,
@@ -82,9 +83,19 @@ export function useReturnVisits(memberId: string, congregationId: string) {
           syncedAt: row.updated_at, pendingDelete: 0,
         });
       }
+      // Reconcile deletions made on another device: a row this device previously synced (syncedAt is set)
+      // that the server no longer returns has been deleted elsewhere, so drop it locally too. A row this
+      // device created or edited but hasn't pushed yet (syncedAt === "") is left alone even if the server
+      // doesn't know about it yet.
+      const localRows = await db().returnVisits.where("memberId").equals(memberId).toArray();
+      for (const local of localRows) {
+        if (local.syncedAt !== "" && !local.pendingDelete && !serverIds.has(local.id)) {
+          await db().returnVisits.delete(local.id);
+        }
+      }
     } catch (err) { console.error("return_visits refetch threw:", err); }
     await refreshFromCache();
-  }, [refreshFromCache]);
+  }, [memberId, refreshFromCache]);
 
   React.useEffect(() => {
     let live = true;
