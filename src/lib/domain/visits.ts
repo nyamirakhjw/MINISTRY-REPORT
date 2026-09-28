@@ -58,3 +58,17 @@ export function sortByNextVisit(rows: RvRow[]): RvRow[] {
     return a.first_name.localeCompare(b.first_name);
   });
 }
+
+/** Home screen "Upcoming Return Visits" card: anything scheduled from right now through `days` days ahead
+ * (default 7), soonest first. Deliberately forward-looking only — overdue items surface as a separate count
+ * so the two ideas ("what's coming" vs. "what's slipped") never get mixed in one list. */
+export function upcomingWithin(rows: RvRow[], days = 7, now = new Date()): RvRow[] {
+  const cutoff = new Date(now.getTime() + days * 24 * 3_600_000);
+  return sortByNextVisit(
+    rows.filter((r) => r.next_visit_at && new Date(r.next_visit_at) >= now && new Date(r.next_visit_at) <= cutoff),
+  );
+}
+
+export function overdueCount(rows: RvRow[], now = new Date()): number {
+  return rows.filter((r) => isOverdue(r, now)).length;
+}

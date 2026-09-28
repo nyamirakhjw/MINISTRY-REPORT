@@ -14,10 +14,10 @@ const VIEWS: RvView[] = ["today", "upcoming", "overdue", "all"];
 
 /** RV-01: four views with search. Offline-first (RV-06) via useReturnVisits; the sync status line matches the
  * daily log's wording exactly so the pattern is familiar across the app (§8.5). */
-export function VisitsClient({ memberId, congregationId }: { memberId: string; congregationId: string }) {
+export function VisitsClient({ memberId, congregationId, initialView = "today" }: { memberId: string; congregationId: string; initialView?: RvView }) {
   const t = useTranslations("visits");
   const { rows, loading, online, syncError, addOrEditVisit } = useReturnVisits(memberId, congregationId);
-  const [view, setView] = React.useState<RvView>("today");
+  const [view, setView] = React.useState<RvView>(initialView);
   const [q, setQ] = React.useState("");
 
   const filtered = sortByNextVisit(rows.filter((r) => matchesView(r, view) && matchesSearch(r, q)));

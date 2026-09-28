@@ -10,7 +10,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("visits") };
 }
 
-export default async function Page() {
+export default async function Page({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
   const { member } = await requireMember("/app/visits");
-  return <VisitsClient memberId={member.id} congregationId={member.congregation_id} />;
+  const { view } = await searchParams;
+  const initialView = view === "upcoming" || view === "overdue" || view === "all" ? view : "today";
+  return <VisitsClient memberId={member.id} congregationId={member.congregation_id} initialView={initialView} />;
 }
