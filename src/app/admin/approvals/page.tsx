@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { ApproveDialog, DecideDialog, ReasonDialog } from "@/components/admin/approval-dialogs";
+import { ApproveDialog, DecideDialog, LinkManagedDialog, ReasonDialog } from "@/components/admin/approval-dialogs";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { requireRole } from "@/lib/auth/session";
@@ -27,13 +27,16 @@ export default async function Page() {
   const locale = await getLocale();
   const supabase = await createClient();
   const elder = member.role === "elder";
-  const [{ data }, groups, changes] = await Promise.all([
+  const [{ data }, groups, changes, managed] = await Promise.all([
     supabase.rpc("admin_pending_requests"),
     getGroups(),
     elder ? supabase.from("profile_change_requests").select("id, kind, new_value, created_at, members!profile_change_requests_member_id_fkey(full_name, username)").eq("status", "pending").order("created_at") : Promise.resolve({ data: [] }),
+    // Unclaimed managed profiles, for "this new sign-up is actually someone who already has one" (Elder only).
+    elder ? supabase.from("members").select("id, full_name").eq("congregation_id", member.congregation_id).is("user_id", null).eq("status", "active").order("full_name") : Promise.resolve({ data: [] }),
   ]);
   
   const pending = (data ?? []) as Pending[];
+  const managedProfiles = (managed.data ?? []) as { id: string; full_name: string }[];
   const avatars = await signedAvatarUrls(pending.map((p) => p.avatar_path));
   const change = (changes.data ?? []) as unknown as Change[];
   
@@ -60,6 +63,7 @@ export default async function Page() {
                   <ApproveDialog id={p.id} fullName={p.full_name} groupId={p.group_id} groups={groups} defaultMonth={monthOf(new Date(p.created_at))} />
                   <ReasonDialog id={p.id} name={p.full_name} mode="photo" />
                   <ReasonDialog id={p.id} name={p.full_name} mode="reject" />
+                  {elder && <LinkManagedDialog id={p.id} name={p.full_name} options={managedProfiles} />}
                 </div>
               </li>
             ))}

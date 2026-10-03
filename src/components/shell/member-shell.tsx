@@ -6,6 +6,7 @@ import { LocaleSwitch } from "@/components/shell/locale";
 import { NavLinks, type NavItem } from "@/components/shell/nav-links";
 import { SidebarShell } from "@/components/shell/sidebar-shell";
 import { ThemeToggle } from "@/components/shell/theme";
+import { WarmAppShell } from "@/components/shell/warm-app-shell";
 import { SidebarCollapseProvider } from "@/lib/sidebar-collapse";
 import { publicEnv } from "@/lib/env";
 import type { Member } from "@/lib/types";
@@ -23,6 +24,7 @@ export async function MemberShell({ member, avatarUrl, unread, isPioneer, childr
   ];
   return (
     <SidebarCollapseProvider>
+      <WarmAppShell />
       <div className="min-h-dvh md:flex">
         <SidebarShell
           footer={

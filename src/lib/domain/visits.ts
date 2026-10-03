@@ -72,3 +72,13 @@ export function upcomingWithin(rows: RvRow[], days = 7, now = new Date()): RvRow
 export function overdueCount(rows: RvRow[], now = new Date()): number {
   return rows.filter((r) => isOverdue(r, now)).length;
 }
+
+/** Visits added in the last 24 hours with no next-visit date set yet. Without this, adding a visit before
+ * you know when you'll go back gave no confirmation it saved anywhere on Home — upcomingWithin() only
+ * looks at scheduled dates, so an undated visit was invisible until someone opened the Visits page. */
+export function recentlyAddedUnscheduled(rows: RvRow[], now = new Date()): RvRow[] {
+  const cutoff = now.getTime() - 24 * 3_600_000;
+  return rows
+    .filter((r) => !r.next_visit_at && new Date(r.created_at).getTime() >= cutoff)
+    .sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+}

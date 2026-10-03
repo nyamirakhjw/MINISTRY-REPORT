@@ -3,8 +3,28 @@ import * as React from "react";
 import { useTranslations } from "next-intl";
 import { Input, Select, Textarea } from "@/components/ui/input";
 import { Field } from "@/components/forms/field";
-import { approveMemberAction, decideArrangementAction, decideProfileChangeAction, endArrangementAction, rejectMemberAction, requestNewPhotoAction } from "@/lib/actions/admin";
+import { approveMemberAction, decideArrangementAction, decideProfileChangeAction, endArrangementAction, linkManagedProfileAction, rejectMemberAction, requestNewPhotoAction } from "@/lib/actions/admin";
 import { FormDialog } from "./form-dialog";
+
+/** Elder-only alternative to ordinary approval: for when this "new" sign-up is actually someone who
+ * already has a managed profile (added before they had their own phone). Linking keeps their reporting
+ * history on the same member row instead of starting a second, empty one. */
+export function LinkManagedDialog({ id, name, options }: { id: string; name: string; options: { id: string; full_name: string }[] }) {
+  const t = useTranslations("admin");
+  const [managedId, setManagedId] = React.useState(options[0]?.id ?? "");
+  if (options.length === 0) return null;
+  return (
+    <FormDialog trigger={t("linkExisting")} title={t("linkExistingTitle", { name })} description={t("linkExistingDescription")}
+      submitLabel={t("linkExistingSubmit")} successLabel={t("linkExistingDone")} valid={!!managedId}
+      onSubmit={() => linkManagedProfileAction({ pending_id: id, managed_id: managedId })}>
+      <Field id="lm-pick" label={t("linkExistingPicker")}>
+        <Select id="lm-pick" value={managedId} onChange={(e) => setManagedId(e.target.value)}>
+          {options.map((o) => <option key={o.id} value={o.id}>{o.full_name}</option>)}
+        </Select>
+      </Field>
+    </FormDialog>
+  );
+}
 
 export function ApproveDialog({ id, fullName, groupId, groups, defaultMonth }: { id: string; fullName: string; groupId: string | null; groups: { id: string; name: string }[]; defaultMonth: string }) {
   const t = useTranslations("admin");

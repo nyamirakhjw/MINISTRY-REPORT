@@ -252,7 +252,8 @@
     "upcomingVisits": "Ziara za Kurudia Zijazo",
     "overdueCount": "{count} zimechelewa",
     "nothingInDays": "Hakuna chochote ndani ya siku {days} zijazo.",
-    "viewAllUpcoming": "Ona zote zijazo"
+    "viewAllUpcoming": "Ona zote zijazo",
+    "notScheduledYet": "Bado haijapangwa"
   },
   "report": {
     "pageTitle": "Ripoti ya kila mwezi",
@@ -628,6 +629,17 @@
     "managedDescription": "Kwa mtu asiye na simu au barua pepe. Utawasilisha ripoti zao kwa niaba yao.",
     "managedSubmit": "Ongeza wasifu",
     "managedDone": "Wasifu umeongezwa",
+    "managedPhotoStepTitle": "Ongeza picha? (si lazima)",
+    "managedPhotoStepDescription": "Unaweza kupiga sasa, au kuongeza baadaye kutoka wasifu wa mtu huyu.",
+    "skipPhoto": "Ruka kwa sasa",
+    "donePhoto": "Imekamilika",
+    "linkExisting": "Unganisha na wasifu uliopo",
+    "linkExistingTitle": "Unganisha {name} na wasifu uliopo",
+    "linkExistingDescription": "Ikiwa mtu huyu tayari ana wasifu uliosimamiwa (ulioongezwa na Mzee kabla hajawa na simu yake), kuunganisha kunatunza ripoti zake za zamani badala ya kuanza rekodi mpya tupu.",
+    "linkExistingSubmit": "Unganisha wasifu",
+    "linkExistingDone": "Wasifu vimeunganishwa",
+    "linkExistingPicker": "Huyu ni wasifu upi uliosimamiwa?",
+    "linkExistingNone": "Hakuna wasifu uliosimamiwa ambao haujadaiwa katika kutaniko hili.",
     "phone": "Simu",
     "optional": "(si lazima)",
     "managed": "Bila kuingia",

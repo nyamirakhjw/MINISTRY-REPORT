@@ -27,6 +27,12 @@ export const managedSchema = z.object({
   full_name: z.string().trim().min(2, "name_required").max(120), group_id: uuid,
   phone: z.string().trim().regex(/^(\+?[0-9]{9,15})?$/, "phone_invalid").optional(),
 });
+export const adminAvatarSchema = z.object({ member_id: uuid, path: z.string().trim().min(1).max(200) });
+export const adminArrangementSchema = z.object({
+  member_id: uuid, kind: z.enum(["auxiliary_pioneer", "regular_pioneer", "special_pioneer"]),
+  start_month: month, end_month: month.optional(), aux_goal: z.enum(["15", "30"]).optional(),
+});
+export const linkManagedSchema = z.object({ pending_id: uuid, managed_id: uuid });
 export const endArrangementSchema = z.object({ id: uuid, end_month: month });
 export const congregationSchema = z.object({
   slug: z.string().trim().toLowerCase().regex(/^[a-z0-9-]{2,40}$/, "slug_invalid"),

@@ -34,6 +34,15 @@ export function NavLinks({ items, label, orientation }: { items: NavItem[]; labe
           return (
             <li key={i.key} className={orientation === "bottom" ? "flex-1" : undefined}>
               <Link href={i.href} aria-current={active ? "page" : undefined} title={sideCollapsed ? t(i.key) : undefined}
+                onClick={(e) => {
+                  // Offline, Next's client-side transition has no RSC payload to fetch and just hangs.
+                  // Force a real document navigation instead: the service worker's navigate handler
+                  // already knows how to serve this route from its cache (or the offline page).
+                  if (typeof navigator !== "undefined" && navigator.onLine === false) {
+                    e.preventDefault();
+                    window.location.href = i.href;
+                  }
+                }}
                 className={cn("relative flex items-center rounded-md font-semibold transition-colors", orientation === "bottom" ? "min-h-14 flex-col justify-center gap-0.5 text-xs" : "min-h-12 gap-3 px-3 text-base", active ? "bg-tint text-primary" : "text-muted-foreground hover:bg-tint")}>
                 <Icon className="size-6 shrink-0" aria-hidden="true" />
                 <span className={cn(sideCollapsed && "hidden whitespace-nowrap group-hover/rail:inline-block")}>{t(i.key)}</span>

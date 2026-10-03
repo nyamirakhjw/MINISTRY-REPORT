@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { CalendarClock, MapPin } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useReturnVisits } from "@/lib/offline/visits-store";
-import { upcomingWithin, overdueCount } from "@/lib/domain/visits";
+import { upcomingWithin, overdueCount, recentlyAddedUnscheduled } from "@/lib/domain/visits";
 
 const DAYS_AHEAD = 7;
 const MAX_ROWS = 4;
@@ -38,8 +38,11 @@ export function UpcomingVisitsCard({ memberId, congregationId }: { memberId: str
   if (loading) return <Skeleton className="h-40 w-full rounded-lg" />;
 
   const upcoming = upcomingWithin(rows, DAYS_AHEAD).slice(0, MAX_ROWS);
+  // Covers the gap above: a visit added without a next-visit date still shows here for 24h, so adding one
+  // always gives visible confirmation on Home, not just once a date gets scheduled.
+  const recent = recentlyAddedUnscheduled(rows).slice(0, MAX_ROWS - upcoming.length);
   const overdue = overdueCount(rows);
-  if (upcoming.length === 0 && overdue === 0) return null;
+  if (upcoming.length === 0 && overdue === 0 && recent.length === 0) return null;
 
   return (
     <section aria-labelledby="upcoming-visits" className="rounded-lg border border-border bg-surface p-4">
@@ -55,18 +58,20 @@ export function UpcomingVisitsCard({ memberId, congregationId }: { memberId: str
         )}
       </div>
 
-      {upcoming.length === 0 ? (
+      {upcoming.length === 0 && recent.length === 0 ? (
         <p className="text-sm text-muted-foreground">{t("nothingInDays", { days: DAYS_AHEAD })}</p>
       ) : (
         <ul className="flex flex-col divide-y divide-border">
-          {upcoming.map((rv) => (
+          {[...upcoming, ...recent].map((rv) => (
             <li key={rv.id}>
               <Link href={`/app/visits/${rv.id}`} className="flex items-center justify-between gap-3 py-2.5 hover:bg-tint">
                 <div className="min-w-0">
                   <p className="truncate font-semibold">{rv.first_name}</p>
                   {rv.area && <p className="flex items-center gap-1 truncate text-sm text-muted-foreground"><MapPin className="size-3.5 shrink-0" aria-hidden="true" />{rv.area}</p>}
                 </div>
-                <span className="shrink-0 whitespace-nowrap rounded-full bg-tint px-2.5 py-1 text-sm font-semibold text-primary">{dayLabel(rv.next_visit_at!)}</span>
+                <span className="shrink-0 whitespace-nowrap rounded-full bg-tint px-2.5 py-1 text-sm font-semibold text-primary">
+                  {rv.next_visit_at ? dayLabel(rv.next_visit_at) : t("notScheduledYet")}
+                </span>
               </Link>
             </li>
           ))}

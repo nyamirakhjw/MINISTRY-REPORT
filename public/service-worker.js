@@ -15,9 +15,30 @@ const PUBLIC_PAGES = new Set(["/", "/sw", "/privacy", "/terms", "/install", "/si
 // page — the client-side hooks (Dexie/IndexedDB) then take over for the actual data.
 // /admin and /platform are deliberately excluded: admin tools are online-only.
 const APP_PREFIX = "/app";
+// Warmed on demand (message below), never at install: install can fire before anyone has signed in,
+// and fetching these then would cache the sign-in redirect instead of the real page.
+const APP_SHELL_ROUTES = ["/app", "/app/log", "/app/report", "/app/history", "/app/visits", "/app/notifications", "/app/settings"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(STATIC_CACHE).then((c) => c.addAll(PRECACHE)).then(() => self.skipWaiting()));
+});
+
+// Called once per sign-in (see register-sw.tsx) so every member-app route works offline immediately,
+// not just the one or two a person happened to open first. Runs as real navigation-shaped requests so
+// the results land in the same PAGE_CACHE the navigate handler below reads from.
+self.addEventListener("message", (event) => {
+  if (event.data?.type !== "WARM_APP_SHELL") return;
+  event.waitUntil(
+    caches.open(PAGE_CACHE).then((cache) =>
+      Promise.all(
+        APP_SHELL_ROUTES.map((path) =>
+          fetch(path, { credentials: "same-origin" })
+            .then((res) => { if (res.ok) return cache.put(path, res); })
+            .catch(() => undefined),
+        ),
+      ),
+    ),
+  );
 });
 
 self.addEventListener("activate", (event) => {

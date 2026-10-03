@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/browser";
 import { setAvatarAction } from "@/lib/actions/profile";
+import type { ActionResult } from "@/lib/actions/rpc";
 
 const MAX_INPUT_BYTES = 8 * 1024 * 1024;
 const MAX_OUTPUT_BYTES = 120 * 1024;
@@ -42,7 +43,9 @@ async function renderCropped(src: string, area: Area): Promise<{ blob: Blob; ext
   throw new Error("size");
 }
 
-export function PhotoCropper({ memberId, name, onSaved }: { memberId: string; name: string; onSaved: () => void }) {
+/** onSave defaults to the signed-in member saving their own photo (set_my_avatar). Pass an override — e.g.
+ * an Elder setting a managed profile's photo (admin_set_avatar) — for anyone saving someone else's. */
+export function PhotoCropper({ memberId, name, onSaved, onSave = (path: string) => setAvatarAction(path) }: { memberId: string; name: string; onSaved: () => void; onSave?: (path: string) => Promise<ActionResult> }) {
   const t = useTranslations("photo");
   const [src, setSrc] = React.useState<string | null>(null);
   const [crop, setCrop] = React.useState({ x: 0, y: 0 });
@@ -73,7 +76,7 @@ export function PhotoCropper({ memberId, name, onSaved }: { memberId: string; na
       const supabase = createClient();
       const { error: upErr } = await supabase.storage.from("avatars").upload(path, blob, { upsert: true, contentType: blob.type, cacheControl: "3600" });
       if (upErr) throw new Error("upload");
-      const r = await setAvatarAction(path);
+      const r = await onSave(path);
       if (!r.ok) throw new Error("save");
       onSaved();
     } catch {

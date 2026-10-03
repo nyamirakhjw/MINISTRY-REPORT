@@ -62,10 +62,28 @@ export async function setStatusAction(input: unknown): Promise<ActionResult> {
   if (!p.success) return invalid(p.error);
   return callRpc("set_member_status", { p_member: p.data.member_id, p_status: p.data.status, p_effective_month: p.data.effective_month ?? null });
 }
-export async function createManagedProfileAction(input: unknown): Promise<ActionResult> {
+export async function createManagedProfileAction(input: unknown): Promise<ActionResult<string>> {
   const p = s.managedSchema.safeParse(input);
   if (!p.success) return invalid(p.error);
-  return callRpc("create_managed_profile", { p_full_name: p.data.full_name, p_group: p.data.group_id, p_phone: p.data.phone || null });
+  return callRpc<string>("create_managed_profile", { p_full_name: p.data.full_name, p_group: p.data.group_id, p_phone: p.data.phone || null });
+}
+export async function adminSetAvatarAction(input: unknown): Promise<ActionResult> {
+  const p = s.adminAvatarSchema.safeParse(input);
+  if (!p.success) return invalid(p.error);
+  return callRpc("admin_set_avatar", { p_member: p.data.member_id, p_path: p.data.path });
+}
+export async function adminCreateArrangementAction(input: unknown): Promise<ActionResult> {
+  const p = s.adminArrangementSchema.safeParse(input);
+  if (!p.success) return invalid(p.error);
+  return callRpc("admin_create_arrangement", {
+    p_member: p.data.member_id, p_kind: p.data.kind, p_start_month: p.data.start_month,
+    p_end_month: p.data.end_month ?? null, p_aux_goal: p.data.aux_goal ? Number(p.data.aux_goal) : null,
+  });
+}
+export async function linkManagedProfileAction(input: unknown): Promise<ActionResult> {
+  const p = s.linkManagedSchema.safeParse(input);
+  if (!p.success) return invalid(p.error);
+  return callRpc("link_managed_profile", { p_pending: p.data.pending_id, p_managed: p.data.managed_id });
 }
 export async function submitOnBehalfAction(input: unknown): Promise<ActionResult> {
   const p = s.onBehalfSchema.safeParse(input);

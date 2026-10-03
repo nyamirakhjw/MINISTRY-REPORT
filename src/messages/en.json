@@ -252,7 +252,8 @@
     "upcomingVisits": "Upcoming Return Visits",
     "overdueCount": "{count} overdue",
     "nothingInDays": "Nothing in the next {days} days.",
-    "viewAllUpcoming": "View all upcoming"
+    "viewAllUpcoming": "View all upcoming",
+    "notScheduledYet": "Not scheduled yet"
   },
   "report": {
     "pageTitle": "Monthly report",
@@ -628,6 +629,17 @@
     "managedDescription": "For a person without a phone or email. You submit their reports for them.",
     "managedSubmit": "Add profile",
     "managedDone": "Profile added",
+    "managedPhotoStepTitle": "Add a photo? (optional)",
+    "managedPhotoStepDescription": "You can take one now, or add it later from this person's profile.",
+    "skipPhoto": "Skip for now",
+    "donePhoto": "Done",
+    "linkExisting": "Link to an existing managed profile",
+    "linkExistingTitle": "Link {name} to an existing profile",
+    "linkExistingDescription": "If this person already has a managed profile (added by an Elder before they had their own phone), linking keeps their past reports instead of starting a new, empty record.",
+    "linkExistingSubmit": "Link profiles",
+    "linkExistingDone": "Profiles linked",
+    "linkExistingPicker": "Which managed profile is this?",
+    "linkExistingNone": "No unclaimed managed profiles in this congregation.",
     "phone": "Phone",
     "optional": "(optional)",
     "managed": "No login",
