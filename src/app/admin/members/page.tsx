@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { EditMemberDialog, ManagedProfileDialog, RecoveryLinkButton, ServantRoleDialog, StatusDialog, type MemberLite } from "@/components/admin/member-dialogs";
+import { DeleteMemberDialog, EditMemberDialog, ManagedProfileDialog, RecoveryLinkButton, ServantRoleDialog, StatusDialog, type MemberLite } from "@/components/admin/member-dialogs";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { requireRole } from "@/lib/auth/session";
@@ -52,6 +52,7 @@ export default async function Page() {
               {r.role !== "elder" && !r.is_managed && r.status === "active" && <ServantRoleDialog m={r} />}
               {r.id !== member.id && <StatusDialog m={r} defaultMonth={cur} />}
               {r.status === "active" && <RecoveryLinkButton m={r} />}
+              {r.id !== member.id && r.status !== "anonymized" && <DeleteMemberDialog m={r} />}
             </div>
           </li>
         ))}

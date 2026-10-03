@@ -5,11 +5,11 @@ import { Copy } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import { Input, Select } from "@/components/ui/input";
+import { Input, Select, Textarea } from "@/components/ui/input";
 import { Field } from "@/components/forms/field";
 import { Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { PhotoCropper } from "@/components/forms/photo-cropper";
-import { createManagedProfileAction, adminSetAvatarAction, adminCreateArrangementAction, setRoleAction, setStatusAction, updateMemberAction } from "@/lib/actions/admin";
+import { createManagedProfileAction, adminSetAvatarAction, adminCreateArrangementAction, adminDeleteMemberAction, setRoleAction, setStatusAction, updateMemberAction } from "@/lib/actions/admin";
 import { createRecoveryLinkAction } from "@/lib/actions/auth";
 import { FormDialog } from "./form-dialog";
 
@@ -119,16 +119,48 @@ export function ManagedProfileDialog({ groups }: { groups: { id: string; name: s
   );
 }
 
-export interface MemberLite { id: string; full_name: string; group_id: string | null; role: string; status: string; is_managed: boolean; email: string | null }
+export interface MemberLite { id: string; full_name: string; group_id: string | null; role: string; status: string; is_managed: boolean; email: string | null; phone?: string | null }
 
+/** Name, phone and group are all editable here now — a managed profile started with no phone often gets one
+ * later. For managed profiles only (self-signed-up members manage their own photo), an inline photo section
+ * is added below the fields — PhotoCropper saves itself the moment its own "Save" is pressed (it's a plain
+ * <div>, every one of its buttons defaults to type="button", so it can't accidentally submit this dialog's
+ * own form), independent of this dialog's main "Save changes" button. */
 export function EditMemberDialog({ m, groups }: { m: MemberLite; groups: { id: string; name: string }[] }) {
   const t = useTranslations("admin");
+  const router = useRouter();
   const [name, setName] = React.useState(m.full_name);
+  const [phone, setPhone] = React.useState(m.phone ?? "");
   const [group, setGroup] = React.useState(m.group_id ?? groups[0]?.id ?? "");
   return (
-    <FormDialog trigger={t("edit")} title={t("editTitle", { name: m.full_name })} submitLabel={t("saveChanges")} successLabel={t("saved")} valid={name.trim().length >= 2 && !!group} onSubmit={() => updateMemberAction({ member_id: m.id, group_id: group, full_name: name.trim() })}>
+    <FormDialog trigger={t("edit")} title={t("editTitle", { name: m.full_name })} submitLabel={t("saveChanges")} successLabel={t("saved")} valid={name.trim().length >= 2 && !!group}
+      onSubmit={() => updateMemberAction({ member_id: m.id, group_id: group, full_name: name.trim(), phone: phone.trim() || undefined })}>
       <Field id="em-name" label={t("officialName")}><Input id="em-name" value={name} onChange={(e) => setName(e.target.value)} /></Field>
+      <Field id="em-phone" label={t("phone")} optional optionalLabel={t("optional")}><Input id="em-phone" type="tel" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} /></Field>
       <Field id="em-group" label={t("group")}><Select id="em-group" value={group} onChange={(e) => setGroup(e.target.value)}>{groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}</Select></Field>
+      {m.is_managed && (
+        <div className="flex flex-col gap-2 border-t border-border pt-4">
+          <p className="font-semibold">{t("photoSection")}</p>
+          <PhotoCropper memberId={m.id} name={m.full_name}
+            onSave={(path) => adminSetAvatarAction({ member_id: m.id, path })}
+            onSaved={() => { toast.success(t("photoSaved")); router.refresh(); }} />
+        </div>
+      )}
+    </FormDialog>
+  );
+}
+
+/** Elder-triggered, immediate version of the self-service 30-day deletion flow (§16.7): same end state
+ * (personal details wiped, sign-in removed, past report NUMBERS kept so congregation totals stay correct),
+ * just without the wait — and it works whether or not the person ever filed a request themselves. */
+export function DeleteMemberDialog({ m }: { m: MemberLite }) {
+  const t = useTranslations("admin");
+  const [reason, setReason] = React.useState("");
+  return (
+    <FormDialog trigger={t("deleteMember")} title={t("deleteMemberTitle", { name: m.full_name })} description={t("deleteMemberDescription")}
+      submitLabel={t("deleteMemberSubmit")} successLabel={t("deleteMemberDone")} valid={reason.trim().length >= 3} danger
+      onSubmit={() => adminDeleteMemberAction({ member_id: m.id, reason: reason.trim() })}>
+      <Field id="dm-reason" label={t("deleteMemberReason")} hint={t("deleteMemberReasonHint")}><Textarea id="dm-reason" value={reason} onChange={(e) => setReason(e.target.value)} className="min-h-20" /></Field>
     </FormDialog>
   );
 }
