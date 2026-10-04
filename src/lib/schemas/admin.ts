@@ -24,6 +24,7 @@ export const roleSchema = z.object({ member_id: uuid, role: z.enum(["publisher",
 export const memberUpdateSchema = z.object({
   member_id: uuid, group_id: uuid, full_name: z.string().trim().min(2).max(120),
   phone: z.string().trim().regex(/^(\+?[0-9]{9,15})?$/, "phone_invalid").optional(),
+  first_report_month: month.optional(),
 });
 export const statusSchema = z.object({ member_id: uuid, status: z.enum(["active", "inactive"]), effective_month: month.optional() });
 export const managedSchema = z.object({

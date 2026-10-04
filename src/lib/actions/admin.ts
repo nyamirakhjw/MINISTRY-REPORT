@@ -55,7 +55,7 @@ export async function setRoleAction(input: unknown): Promise<ActionResult> {
 export async function updateMemberAction(input: unknown): Promise<ActionResult> {
   const p = s.memberUpdateSchema.safeParse(input);
   if (!p.success) return invalid(p.error);
-  return callRpc("admin_update_member", { p_member: p.data.member_id, p_group: p.data.group_id, p_full_name: p.data.full_name, p_phone: p.data.phone || null });
+  return callRpc("admin_update_member", { p_member: p.data.member_id, p_group: p.data.group_id, p_full_name: p.data.full_name, p_phone: p.data.phone || null, p_first_report_month: p.data.first_report_month ?? null });
 }
 export async function adminDeleteMemberAction(input: unknown): Promise<ActionResult> {
   const p = s.adminDeleteSchema.safeParse(input);

@@ -124,7 +124,7 @@ export function ManagedProfileDialog({ groups }: { groups: { id: string; name: s
   );
 }
 
-export interface MemberLite { id: string; full_name: string; group_id: string | null; role: string; status: string; is_managed: boolean; email: string | null; phone?: string | null }
+export interface MemberLite { id: string; full_name: string; group_id: string | null; role: string; status: string; is_managed: boolean; email: string | null; phone?: string | null; first_report_month?: string | null }
 
 /** Name, phone and group are all editable here now — a managed profile started with no phone often gets one
  * later. For managed profiles only (self-signed-up members manage their own photo), an inline photo section
@@ -137,12 +137,14 @@ export function EditMemberDialog({ m, groups }: { m: MemberLite; groups: { id: s
   const [name, setName] = React.useState(m.full_name);
   const [phone, setPhone] = React.useState(m.phone ?? "");
   const [group, setGroup] = React.useState(m.group_id ?? groups[0]?.id ?? "");
+  const [month, setMonth] = React.useState((m.first_report_month ?? new Date().toISOString()).slice(0, 7));
   return (
     <FormDialog trigger={t("edit")} title={t("editTitle", { name: m.full_name })} submitLabel={t("saveChanges")} successLabel={t("saved")} valid={name.trim().length >= 2 && !!group}
-      onSubmit={() => updateMemberAction({ member_id: m.id, group_id: group, full_name: name.trim(), phone: phone.trim() || undefined })}>
+      onSubmit={() => updateMemberAction({ member_id: m.id, group_id: group, full_name: name.trim(), phone: phone.trim() || undefined, first_report_month: `${month}-01` })}>
       <Field id="em-name" label={t("officialName")}><Input id="em-name" value={name} onChange={(e) => setName(e.target.value)} /></Field>
       <Field id="em-phone" label={t("phone")} optional optionalLabel={t("optional")}><Input id="em-phone" type="tel" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} /></Field>
       <Field id="em-group" label={t("group")}><Select id="em-group" value={group} onChange={(e) => setGroup(e.target.value)}>{groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}</Select></Field>
+      <Field id="em-month" label={t("firstMonth")} hint={t("firstMonthHint")}><Input id="em-month" type="month" value={month} onChange={(e) => setMonth(e.target.value)} /></Field>
       {m.is_managed && (
         <div className="flex flex-col gap-2 border-t border-border pt-4">
           <p className="font-semibold">{t("photoSection")}</p>
