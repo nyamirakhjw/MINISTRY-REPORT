@@ -13,6 +13,7 @@ export const REPORT_ERROR_CODES = [
   "received_in_future", "received_before_open", "reason_required", "forbidden", "mfa_required", "not_found",
   "cannot_approve_self", "not_pending", "photo_missing", "name_required", "invalid_group", "forbidden_platform_only",
   "username_unavailable", "bad_kind", "bad_status", "cannot_deactivate_self", "bad_path",
+  "phone_invalid", "already_deleted", "not_a_signup", "already_claimed", "same_member",
 ] as const;
 
 /** Postgres errors from our functions carry a stable code in `message`. Anything else becomes "unknown". */
