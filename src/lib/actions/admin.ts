@@ -70,7 +70,7 @@ export async function setStatusAction(input: unknown): Promise<ActionResult> {
 export async function createManagedProfileAction(input: unknown): Promise<ActionResult<string>> {
   const p = s.managedSchema.safeParse(input);
   if (!p.success) return invalid(p.error);
-  return callRpc<string>("create_managed_profile", { p_full_name: p.data.full_name, p_group: p.data.group_id, p_phone: p.data.phone || null });
+  return callRpc<string>("create_managed_profile", { p_full_name: p.data.full_name, p_group: p.data.group_id, p_phone: p.data.phone || null, p_first_report_month: p.data.first_report_month ?? null });
 }
 export async function adminSetAvatarAction(input: unknown): Promise<ActionResult> {
   const p = s.adminAvatarSchema.safeParse(input);

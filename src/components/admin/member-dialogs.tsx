@@ -33,13 +33,14 @@ export function ManagedProfileDialog({ groups }: { groups: { id: string; name: s
   const [group, setGroup] = React.useState(groups[0]?.id ?? "");
   const [arrangement, setArrangement] = React.useState<Arrangement>("publisher");
   const [auxGoal, setAuxGoal] = React.useState<"15" | "30">("15");
+  const [month, setMonth] = React.useState(new Date().toISOString().slice(0, 7));
   const [error, setError] = React.useState<string | null>(null);
   const [pending, start] = React.useTransition();
   const [newId, setNewId] = React.useState<string | null>(null);
 
   function reset() {
     setStep("form"); setName(""); setPhone(""); setGroup(groups[0]?.id ?? "");
-    setArrangement("publisher"); setAuxGoal("15"); setError(null); setNewId(null);
+    setArrangement("publisher"); setAuxGoal("15"); setMonth(new Date().toISOString().slice(0, 7)); setError(null); setNewId(null);
   }
   function finish() {
     setOpen(false); reset(); router.refresh();
@@ -49,7 +50,7 @@ export function ManagedProfileDialog({ groups }: { groups: { id: string; name: s
     e.preventDefault();
     setError(null);
     start(async () => {
-      const r = await createManagedProfileAction({ full_name: name.trim(), group_id: group, phone: phone.trim() || undefined });
+      const r = await createManagedProfileAction({ full_name: name.trim(), group_id: group, phone: phone.trim() || undefined, first_report_month: `${month}-01` });
       if (!r.ok || !r.data) {
         const code = r.ok ? undefined : r.fields ? Object.values(r.fields)[0] : r.code;
         const base = code && te.has(code) ? te(code) : te("unknown");
@@ -87,6 +88,9 @@ export function ManagedProfileDialog({ groups }: { groups: { id: string; name: s
             <Field id="mp-phone" label={t("phone")} optional optionalLabel={t("optional")}><Input id="mp-phone" type="tel" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} /></Field>
             <Field id="mp-group" label={t("group")}>
               <Select id="mp-group" value={group} onChange={(e) => setGroup(e.target.value)}>{groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}</Select>
+            </Field>
+            <Field id="mp-month" label={t("firstMonth")} hint={t("firstMonthHint")}>
+              <Input id="mp-month" type="month" value={month} onChange={(e) => setMonth(e.target.value)} />
             </Field>
             <Field id="mp-arrangement" label={ra("arrangement")} hint={ra("arrangementHint")}>
               <Select id="mp-arrangement" value={arrangement} onChange={(e) => setArrangement(e.target.value as Arrangement)}>

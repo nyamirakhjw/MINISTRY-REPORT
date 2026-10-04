@@ -29,6 +29,7 @@ export const statusSchema = z.object({ member_id: uuid, status: z.enum(["active"
 export const managedSchema = z.object({
   full_name: z.string().trim().min(2, "name_required").max(120), group_id: uuid,
   phone: z.string().trim().regex(/^(\+?[0-9]{9,15})?$/, "phone_invalid").optional(),
+  first_report_month: month.optional(),
 });
 export const adminAvatarSchema = z.object({ member_id: uuid, path: z.string().trim().min(1).max(200) });
 export const adminArrangementSchema = z.object({
