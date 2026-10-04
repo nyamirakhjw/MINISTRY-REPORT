@@ -52,7 +52,8 @@ export function ManagedProfileDialog({ groups }: { groups: { id: string; name: s
       const r = await createManagedProfileAction({ full_name: name.trim(), group_id: group, phone: phone.trim() || undefined });
       if (!r.ok || !r.data) {
         const code = r.ok ? undefined : r.fields ? Object.values(r.fields)[0] : r.code;
-        setError(code && te.has(code) ? te(code) : te("unknown"));
+        const base = code && te.has(code) ? te(code) : te("unknown");
+        setError(r.ok || !code || te.has(code) || !r.hint ? base : `${base} (${r.hint})`);
         return;
       }
       const memberId = r.data;

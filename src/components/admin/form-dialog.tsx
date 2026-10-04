@@ -26,7 +26,10 @@ export function FormDialog({ trigger, triggerVariant = "secondary", triggerSize 
       const r = await onSubmit();
       if (r.ok) { toast.success(successLabel); setOpen(false); router.refresh(); return; }
       const code = r.fields ? Object.values(r.fields)[0] : r.code;
-      setError(code && te.has(code) ? te(code) : te("unknown"));
+      // An unrecognized code means this error has never been mapped to a message — show the raw detail
+      // underneath the generic line instead of hiding it, so it's reportable instead of a dead end.
+      const base = code && te.has(code) ? te(code) : te("unknown");
+      setError(!code || te.has(code) || !r.hint ? base : `${base} (${r.hint})`);
     });
   };
 
