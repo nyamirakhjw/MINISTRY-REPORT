@@ -1,0 +1,100 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Design tokens: PRD §10.3. Components use ONLY these semantic tokens; no raw hex in components. */
+:root {
+  --background: #F7F9FC;
+  --surface: #FFFFFF;
+  --surface-raised: #FFFFFF;
+  --tint: #E6EFFC;
+  --foreground: #0F172A;
+  --muted-foreground: #475569;
+  --primary: #0B2E6B;
+  --primary-foreground: #FFFFFF;
+  --accent: #F2C14E;
+  --accent-text: #8A6A00;
+  --border: #D5DDEA;
+  --input-border: #7A8CA8;
+  --ring: #1E5BB8;
+  --success: #0F6B3A;
+  --warning: #8A5300;
+  --danger: #B42318;
+  --scrim: rgb(15 23 42 / 0.55);
+}
+.dark {
+  --background: #0B1220;
+  --surface: #111B2E;
+  --surface-raised: #17243B;
+  --tint: #17243B;
+  --foreground: #E6ECF7;
+  --muted-foreground: #A9B6CC;
+  --primary: #7DB0FF;
+  --primary-foreground: #0B1220;
+  --accent: #F2C14E;
+  --accent-text: #F2C14E;
+  --border: #26364F;
+  --input-border: #5B7196;
+  --ring: #7DB0FF;
+  --success: #5FD08F;
+  --warning: #F2C14E;
+  --danger: #FF8A80;
+  --scrim: rgb(0 0 0 / 0.65);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-tint: var(--tint);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-border: var(--border);
+  --color-input-border: var(--input-border);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-scrim: var(--scrim);
+  --font-heading: var(--font-lexend), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-source-sans), ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+}
+
+@layer base {
+  html { color-scheme: light; scroll-padding-top: 4rem; -webkit-text-size-adjust: 100%; }
+  html.dark { color-scheme: dark; }
+  body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); font-size: 1rem; line-height: 1.5; }
+  h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; line-height: 1.25; }
+  h1 { font-size: 1.5rem; } h2 { font-size: 1.25rem; } h3 { font-size: 1.125rem; }
+  @media (min-width: 768px) { h1 { font-size: 1.875rem; } }
+  :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+  button, a, input, select, textarea, [role="button"] { touch-action: manipulation; }
+  button:not(:disabled), [role="button"]:not([aria-disabled="true"]), summary { cursor: pointer; }
+  ::selection { background: var(--accent); color: #0B2E6B; }
+}
+
+@utility tabular { font-variant-numeric: tabular-nums; }
+@utility pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+@utility pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+
+/* Overlay motion: entrance 320ms ease-out, exit faster (PRD §10.7). Only opacity and transform animate. */
+@keyframes overlay-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes overlay-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes sheet-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes sheet-out { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(8px); } }
+[data-overlay][data-state="open"] { animation: overlay-in 200ms ease-out; }
+[data-overlay][data-state="closed"] { animation: overlay-out 150ms ease-in; }
+[data-sheet][data-state="open"] { animation: sheet-in 320ms ease-out; }
+[data-sheet][data-state="closed"] { animation: sheet-out 200ms ease-in; }
+@keyframes skeleton { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+.skeleton { animation: skeleton 1.6s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}

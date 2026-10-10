@@ -1,0 +1,69 @@
+# Local Supabase stack (supabase start). Hosted settings are listed in docs/SETUP.md.
+project_id = "ministry-report"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]   # "private" is deliberately NOT exposed
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+major_version = 17
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[realtime]
+enabled = true
+
+[storage]
+enabled = true
+file_size_limit = "1MiB"
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/auth/confirm"]
+jwt_expiry = 3600
+enable_signup = true
+minimum_password_length = 10
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = true
+
+[auth.email.template.confirmation]
+subject = "Confirm your email / Thibitisha barua pepe yako"
+content_path = "./templates/confirmation.html"
+
+[auth.email.template.recovery]
+subject = "Reset your password / Weka upya nenosiri lako"
+content_path = "./templates/recovery.html"
+
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
+
+[auth.rate_limit]
+email_sent = 30
+sign_in_sign_ups = 30
+
+[inbucket]
+enabled = true
+port = 54324
+
+[edge_runtime]
+enabled = true
+
+[functions.dispatch-notifications]
+verify_jwt = false   # authenticated with DISPATCH_SECRET inside the function
+[functions.use-recovery-code]
+verify_jwt = false   # verifies the caller's JWT in code (works with any JWT signing key setup)
+[functions.issue-recovery-codes]
+verify_jwt = false
+[functions.create-recovery-link]
+verify_jwt = false

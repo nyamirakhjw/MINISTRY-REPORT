@@ -1,0 +1,86 @@
+{
+  "settings": {
+    "title": "Congregation settings",
+    "subtitle": "Changes here affect the whole congregation and are recorded in the audit log.",
+    "nav": {
+      "general": "General & landing",
+      "groups": "Groups",
+      "goals": "Goal defaults",
+      "window": "Window rules",
+      "reminders": "Reminders"
+    },
+    "goals": {
+      "title": "Goal defaults",
+      "description": "These are the monthly hour goals publishers see until they set a personal goal. A snapshot is kept on each submitted report, so changing a default never rewrites past months.",
+      "regularLabel": "Regular pioneer, monthly hours",
+      "specialLabel": "Special pioneer, monthly hours",
+      "auxiliaryHeading": "Auxiliary pioneer options",
+      "auxiliaryDescription": "A publisher requesting auxiliary service picks one of these two figures for that arrangement.",
+      "auxiliaryLowerLabel": "Lower option, hours",
+      "auxiliaryHigherLabel": "Higher option, hours",
+      "save": "Save goal defaults",
+      "saving": "Saving goal defaults…",
+      "saved": "Goal defaults saved."
+    },
+    "window": {
+      "title": "Window rules",
+      "description": "Controls when a monthly report counts as on time or late, and whether leftover minutes in the daily log carry over to the next month. Changes apply to future months only.",
+      "onTimeDayLabel": "On-time day of the following month",
+      "lateWindowLabel": "Late window length, in months",
+      "carryOverLabel": "Carry over leftover minutes",
+      "carryOverDescription": "When a report matches the whole hours from the daily log, the leftover minutes are added to next month's log as a labelled entry. A publisher can still turn this off for their own log.",
+      "save": "Save window rules",
+      "saving": "Saving window rules…",
+      "saved": "Window rules saved."
+    },
+    "reminders": {
+      "title": "Reminders",
+      "description": "A reminder always goes out on the opening day in addition to the days below. Nothing is pushed during quiet hours — it waits until the next morning.",
+      "scheduleDaysLabel": "Reminder days of the month",
+      "scheduleDaysHint": "Comma-separated days of the month, for example 3, 5, 8, 10.",
+      "finalCallLabel": "Final-call hour on the on-time day (24-hour)",
+      "weeklyLabel": "Continue weekly after that",
+      "weeklyDescription": "Until the report is submitted or the month is closed.",
+      "quietHoursHeading": "Quiet hours (Africa/Nairobi)",
+      "quietStartLabel": "Starts",
+      "quietEndLabel": "Ends",
+      "save": "Save reminder schedule",
+      "saving": "Saving reminder schedule…",
+      "saved": "Reminder schedule saved."
+    },
+    "general": {
+      "landingTitle": "Landing page",
+      "landingDescription": "Shown to visitors before they sign in — meeting times, address and contact line. No meeting details are invented; leave a field blank rather than guess.",
+      "midweekHeading": "Midweek meeting",
+      "weekendHeading": "Weekend meeting",
+      "dayLabel": "Day",
+      "timeLabel": "Time",
+      "addressLabel": "Kingdom Hall address",
+      "mapLinkLabel": "Map link (optional)",
+      "contactLineLabel": "Public contact line (optional)",
+      "saveLanding": "Save landing details",
+      "savingLanding": "Saving landing details…",
+      "savedLanding": "Landing page details saved.",
+      "letterheadTitle": "Letterhead & exports",
+      "letterheadDescription": "Appears on the congregation PDF and Excel exports and the individual service-year record.",
+      "letterheadLinesLabel": "Letterhead lines",
+      "letterheadLinesHint": "One line per line of text. Up to six lines.",
+      "signatoryTitleLabel": "Signatory title",
+      "saveLetterhead": "Save letterhead",
+      "savingLetterhead": "Saving letterhead…",
+      "savedLetterhead": "Letterhead saved."
+    },
+    "groups": {
+      "title": "Groups",
+      "description": "Service groups are a filter, not a ranking. Retiring a group keeps its history; it never deletes anything.",
+      "empty": "No groups yet. Add the first one below.",
+      "addLabel": "Add a group",
+      "addPlaceholder": "e.g. Nyamira Town",
+      "addButton": "Add group",
+      "retired": "Retired",
+      "retireAction": "Retire",
+      "reactivateAction": "Reactivate",
+      "renameAction": "Rename"
+    }
+  }
+}

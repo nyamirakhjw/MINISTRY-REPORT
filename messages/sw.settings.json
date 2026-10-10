@@ -1,0 +1,87 @@
+{
+  "_note": "DRAFT — every string here must be reviewed and approved by the Kiswahili reviewer before it ships to members (D-39, gate G-6). Do not merge into sw.json until reviewed.",
+  "settings": {
+    "title": "Mipangilio ya kutaniko",
+    "subtitle": "Mabadiliko hapa huathiri kutaniko lote na hurekodiwa kwenye kumbukumbu ya ukaguzi.",
+    "nav": {
+      "general": "Jumla na ukurasa wa mwanzo",
+      "groups": "Vikundi",
+      "goals": "Malengo chaguo-msingi",
+      "window": "Kanuni za muda",
+      "reminders": "Vikumbusho"
+    },
+    "goals": {
+      "title": "Malengo chaguo-msingi",
+      "description": "Haya ni malengo ya saa za kila mwezi ambayo wahubiri huona hadi wawekewe lengo lao binafsi.",
+      "regularLabel": "Painia wa kawaida, saa za mwezi",
+      "specialLabel": "Painia maalum, saa za mwezi",
+      "auxiliaryHeading": "Chaguo za painia msaidizi",
+      "auxiliaryDescription": "Mhubiri anayeomba huduma ya painia msaidizi huchagua mojawapo ya nambari hizi mbili.",
+      "auxiliaryLowerLabel": "Chaguo la chini, saa",
+      "auxiliaryHigherLabel": "Chaguo la juu, saa",
+      "save": "Hifadhi malengo chaguo-msingi",
+      "saving": "Inahifadhi malengo…",
+      "saved": "Malengo chaguo-msingi yamehifadhiwa."
+    },
+    "window": {
+      "title": "Kanuni za muda",
+      "description": "Hudhibiti wakati ripoti ya kila mwezi inahesabiwa kuwa kwa wakati au imechelewa.",
+      "onTimeDayLabel": "Siku ya mwisho ya kuwasilisha kwa wakati, mwezi unaofuata",
+      "lateWindowLabel": "Muda wa kuchelewa unaoruhusiwa, kwa miezi",
+      "carryOverLabel": "Beba dakika zilizobaki",
+      "carryOverDescription": "Wakati ripoti inalingana na saa kamili kutoka kwenye kumbukumbu ya kila siku, dakika zilizobaki huongezwa kwenye kumbukumbu ya mwezi unaofuata.",
+      "save": "Hifadhi kanuni za muda",
+      "saving": "Inahifadhi kanuni za muda…",
+      "saved": "Kanuni za muda zimehifadhiwa."
+    },
+    "reminders": {
+      "title": "Vikumbusho",
+      "description": "Ukumbusho hutumwa siku ya ufunguzi pamoja na siku zilizo hapa chini. Hakuna kinachotumwa wakati wa saa za utulivu.",
+      "scheduleDaysLabel": "Siku za mwezi za kutuma vikumbusho",
+      "scheduleDaysHint": "Siku za mwezi zikitenganishwa na mkato, kwa mfano 3, 5, 8, 10.",
+      "finalCallLabel": "Saa ya mwisho ya wito siku ya mwisho ya kuwasilisha kwa wakati",
+      "weeklyLabel": "Endelea kila wiki baada ya hapo",
+      "weeklyDescription": "Hadi ripoti iwasilishwe au mwezi ufungwe.",
+      "quietHoursHeading": "Saa za utulivu (Afrika/Nairobi)",
+      "quietStartLabel": "Huanza",
+      "quietEndLabel": "Huisha",
+      "save": "Hifadhi ratiba ya vikumbusho",
+      "saving": "Inahifadhi ratiba…",
+      "saved": "Ratiba ya vikumbusho imehifadhiwa."
+    },
+    "general": {
+      "landingTitle": "Ukurasa wa mwanzo",
+      "landingDescription": "Huonyeshwa kwa mgeni kabla ya kuingia — nyakati za mikutano, anwani na mawasiliano.",
+      "midweekHeading": "Mkutano wa katikati ya wiki",
+      "weekendHeading": "Mkutano wa wikendi",
+      "dayLabel": "Siku",
+      "timeLabel": "Saa",
+      "addressLabel": "Anwani ya Jumba la Ufalme",
+      "mapLinkLabel": "Kiungo cha ramani (si lazima)",
+      "contactLineLabel": "Mawasiliano ya umma (si lazima)",
+      "saveLanding": "Hifadhi maelezo ya ukurasa wa mwanzo",
+      "savingLanding": "Inahifadhi…",
+      "savedLanding": "Maelezo ya ukurasa wa mwanzo yamehifadhiwa.",
+      "letterheadTitle": "Kichwa cha barua na ripoti",
+      "letterheadDescription": "Huonekana kwenye ripoti za PDF na Excel za kutaniko na rekodi ya mwaka wa huduma ya mtu binafsi.",
+      "letterheadLinesLabel": "Mistari ya kichwa cha barua",
+      "letterheadLinesHint": "Mstari mmoja kwa kila mstari wa maandishi. Hadi mistari sita.",
+      "signatoryTitleLabel": "Cheo cha msaini",
+      "saveLetterhead": "Hifadhi kichwa cha barua",
+      "savingLetterhead": "Inahifadhi…",
+      "savedLetterhead": "Kichwa cha barua kimehifadhiwa."
+    },
+    "groups": {
+      "title": "Vikundi",
+      "description": "Vikundi vya huduma ni kichujio, si orodha ya ushindani. Kustaafisha kikundi huhifadhi historia yake.",
+      "empty": "Hakuna vikundi bado. Ongeza cha kwanza hapa chini.",
+      "addLabel": "Ongeza kikundi",
+      "addPlaceholder": "mfano, Nyamira Town",
+      "addButton": "Ongeza kikundi",
+      "retired": "Kimestaafishwa",
+      "retireAction": "Staafisha",
+      "reactivateAction": "Rejesha",
+      "renameAction": "Badilisha jina"
+    }
+  }
+}

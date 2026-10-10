@@ -1,0 +1,32 @@
+# Runbook
+
+## Common fixes for Elders
+
+| Situation | Action |
+|---|---|
+| Someone cannot receive email | Members, then **One-time recovery link**. Hand it over in person |
+| Someone lost their phone (Elder or Ministerial Servant) | They use **Lost your device?** with a recovery code. If both are lost, the Platform Owner removes the factor after confirming identity in person |
+| A month is stuck ("can no longer be sent by you") | Reports, open the person, **Submit for them** or **Close month** |
+| Someone has no phone or email | Members, **Add a member without a phone**, then submit for them each month |
+| A report is wrong | The publisher taps **Request correction** on History (or an Elder can act without waiting for one). Corrections queue: **Approve and reopen** lets the publisher fix and resubmit it themselves with no extra deadline; **Edit directly** changes it in place immediately; **Decline** needs a reason. Every step is audited |
+| Someone asks "forgot password" and nothing arrives (running without SMTP) | Expected: self-service reset depends on Supabase's own email, which is not set up. Use **One-time recovery link** from Members and send it to them yourself |
+| Someone was approved but hasn't come back | Expected: with no email provider configured, approval notifications sit in-app only. Tell them directly that they're approved |
+
+## Backups (free plan has none, risk R-03)
+
+Until Supabase Pro is on, a manual backup is mandatory monthly, right after the 10th. The in-app encrypted export arrives in Phase 3; until then:
+
+```bash
+supabase db dump --linked --data-only -f backup-$(date +%Y-%m).sql
+gpg --symmetric --cipher-algo AES256 backup-$(date +%Y-%m).sql && shred -u backup-$(date +%Y-%m).sql
+```
+
+Store the encrypted file with two Elders on separate devices. **Test a restore into the development project before launch and every quarter.**
+
+## Incident note template
+
+What happened, when, who was affected, what was done, what changes. Notify the congregation body and, if required, the regulator (confirm the legal time limits with the adviser).
+
+## Monthly health review
+
+Failed email deliveries (`notification_deliveries` where `status = 'failed'`), Supabase and Vercel error logs, dependency alerts.
