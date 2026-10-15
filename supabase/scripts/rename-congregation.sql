@@ -3,5 +3,5 @@
 -- Run in the Supabase SQL editor. Changes the name everywhere at once: the landing page, and every PDF and
 -- Excel export's letterhead (src/lib/exports/data.ts reads this same column).
 update public.congregations
-   set name = 'Nyamira Congregation of Jehovah''s Witnesses'
+   set name = 'Nyamira congregation of Jehovah''s Witnesses'
  where slug = 'nyamira';

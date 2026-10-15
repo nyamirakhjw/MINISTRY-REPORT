@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.2
+
+- Corrected the casing from 0.3.1: it's "Nyamira **congregation** of Jehovah's Witnesses" (lowercase c), per an
+  explicit follow-up — not the capitalized "Congregation" I used the first time. Fixed everywhere that touched:
+  both seed/rename SQL scripts, the landing fallback text, the settings-form placeholder, and the short header
+  label (now "Nyamira congregation").
+- Confirmed neither the PDF letterhead (`src/lib/exports/pdf/letterhead.tsx`) nor the Excel letterhead
+  (`src/lib/exports/excel/congregation-report.ts`) apply any uppercase/text-transform styling — both render
+  `congregations.name` exactly as stored, so the SQL update is the complete fix for the downloads too, with no
+  separate export-side casing to fight.
+
 ## 0.3.1
 
 - Renamed the congregation from "Nyamira Kingdom Hall of Jehovah's Witnesses" to "Nyamira Congregation of

@@ -37,7 +37,7 @@
     "strength3": "Strong",
     "decrease": "Decrease {label}",
     "increase": "Increase {label}",
-    "congregationShort": "Nyamira Congregation"
+    "congregationShort": "Nyamira congregation"
   },
   "status": {
     "onTime": "On time",
@@ -91,7 +91,7 @@
   },
   "landing": {
     "siteName": "Ministry Report",
-    "fallbackName": "Nyamira Congregation of Jehovah's Witnesses",
+    "fallbackName": "Nyamira congregation of Jehovah's Witnesses",
     "metaTitle": "Monthly ministry report: JW Nyamira",
     "metaDescription": "Report your ministry each month, keep your own record, and sign in or ask for access.",
     "headline": "Monthly ministry report",
