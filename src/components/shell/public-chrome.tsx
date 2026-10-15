@@ -10,7 +10,7 @@ export async function PublicHeader({ path }: { path: string }) {
   return (
     <header className="border-b border-border bg-surface pt-safe">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-2">
-        <Link href="/" className="rounded-md" aria-label={t("appName")}><Logo sub={t("kingdomHallShort")} /></Link>
+        <Link href="/" className="rounded-md" aria-label={t("appName")}><Logo sub={t("congregationShort")} /></Link>
         <div className="flex items-center gap-1">
           {publicEnv.enableSw ? <PublicLocaleSwitch path={path} /> : null}
           <ThemeToggle />

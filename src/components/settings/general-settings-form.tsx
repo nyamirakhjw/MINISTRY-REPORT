@@ -172,7 +172,7 @@ function LetterheadSettingsForm({ settings }: { settings: CongregationSettings }
           <Textarea
             id="letterheadLines"
             rows={4}
-            placeholder={"Nyamira Kingdom Hall of Jehovah's Witnesses\nP.O. Box …, Nyamira"}
+            placeholder={"Nyamira Congregation of Jehovah's Witnesses\nP.O. Box …, Nyamira"}
             aria-describedby="letterheadLines-hint"
             {...form.register("letterheadLines")}
           />

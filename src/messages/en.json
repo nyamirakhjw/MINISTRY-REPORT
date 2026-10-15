@@ -6,7 +6,6 @@
   },
   "common": {
     "appName": "Ministry Report",
-    "kingdomHallShort": "Nyamira Kingdom Hall",
     "skipToContent": "Skip to main content",
     "home": "Home",
     "breadcrumb": "Breadcrumb",
@@ -37,7 +36,8 @@
     "strength2": "Good",
     "strength3": "Strong",
     "decrease": "Decrease {label}",
-    "increase": "Increase {label}"
+    "increase": "Increase {label}",
+    "congregationShort": "Nyamira Congregation"
   },
   "status": {
     "onTime": "On time",
@@ -91,7 +91,7 @@
   },
   "landing": {
     "siteName": "Ministry Report",
-    "fallbackName": "Nyamira Kingdom Hall of Jehovah's Witnesses",
+    "fallbackName": "Nyamira Congregation of Jehovah's Witnesses",
     "metaTitle": "Monthly ministry report: JW Nyamira",
     "metaDescription": "Report your ministry each month, keep your own record, and sign in or ask for access.",
     "headline": "Monthly ministry report",

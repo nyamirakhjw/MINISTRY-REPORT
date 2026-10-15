@@ -11,7 +11,7 @@ T = {
 },
 "common": {
   "appName": ("Ministry Report", "Ripoti ya Huduma"),
-  "kingdomHallShort": ("Nyamira Kingdom Hall", "Jumba la Ufalme Nyamira"),
+  "congregationShort": ("Nyamira Congregation", "Kutaniko la Nyamira"),
   "skipToContent": ("Skip to main content", "Ruka hadi maudhui makuu"),
   "home": ("Home", "Nyumbani"), "breadcrumb": ("Breadcrumb", "Njia ya kurasa"),
   "legal": ("Legal", "Sheria"), "privacy": ("Privacy notice", "Taarifa ya faragha"), "terms": ("Terms", "Masharti"),
@@ -44,7 +44,7 @@ T = {
   "pendingCount": ("{count} waiting", "{count} zinasubiri"), "photoOf": ("Photo of {name}", "Picha ya {name}"),
 },
 "landing": {
-  "siteName": ("Ministry Report", "Ripoti ya Huduma"), "fallbackName": ("Nyamira Kingdom Hall of Jehovah's Witnesses", "Jumba la Ufalme la Mashahidi wa Yehova, Nyamira"),
+  "siteName": ("Ministry Report", "Ripoti ya Huduma"), "fallbackName": ("Nyamira Congregation of Jehovah's Witnesses", "Kutaniko la Nyamira la Mashahidi wa Yehova"),
   "metaTitle": ("Monthly ministry report: JW Nyamira", "Ripoti ya huduma ya kila mwezi: JW Nyamira"),
   "metaDescription": ("Report your ministry each month, keep your own record, and sign in or ask for access.", "Ripoti huduma yako kila mwezi, hifadhi kumbukumbu yako, na uingie au uombe kuingia."),
   "headline": ("Monthly ministry report", "Ripoti ya huduma ya kila mwezi"),

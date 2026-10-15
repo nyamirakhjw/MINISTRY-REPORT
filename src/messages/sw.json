@@ -6,7 +6,6 @@
   },
   "common": {
     "appName": "Ripoti ya Huduma",
-    "kingdomHallShort": "Jumba la Ufalme Nyamira",
     "skipToContent": "Ruka hadi maudhui makuu",
     "home": "Nyumbani",
     "breadcrumb": "Njia ya kurasa",
@@ -37,7 +36,8 @@
     "strength2": "Nzuri",
     "strength3": "Imara",
     "decrease": "Punguza {label}",
-    "increase": "Ongeza {label}"
+    "increase": "Ongeza {label}",
+    "congregationShort": "Kutaniko la Nyamira"
   },
   "status": {
     "onTime": "Kwa wakati",
@@ -91,7 +91,7 @@
   },
   "landing": {
     "siteName": "Ripoti ya Huduma",
-    "fallbackName": "Jumba la Ufalme la Mashahidi wa Yehova, Nyamira",
+    "fallbackName": "Kutaniko la Nyamira la Mashahidi wa Yehova",
     "metaTitle": "Ripoti ya huduma ya kila mwezi: JW Nyamira",
     "metaDescription": "Ripoti huduma yako kila mwezi, hifadhi kumbukumbu yako, na uingie au uombe kuingia.",
     "headline": "Ripoti ya huduma ya kila mwezi",

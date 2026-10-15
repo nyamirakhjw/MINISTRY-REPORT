@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3.1
+
+- Renamed the congregation from "Nyamira Kingdom Hall of Jehovah's Witnesses" to "Nyamira Congregation of
+  Jehovah's Witnesses" everywhere it's sourced from code: the dev seed (`supabase/seed.sql`), the landing page's
+  fallback name (shown only if the database fetch fails), and a settings-form placeholder example. Also renamed
+  the header's short subtitle label from `common.kingdomHallShort` ("Nyamira Kingdom Hall") to
+  `common.congregationShort` ("Nyamira Congregation") — the key name was stale otherwise.
+- **The actual live site needs a database update, not just a code deploy** — `congregations.name` is the one
+  column both the landing page and every PDF/Excel export letterhead read from, and it was seeded once, not
+  re-read from `seed.sql` on every deploy. Added `supabase/scripts/rename-congregation.sql` to run in the SQL
+  editor; there's no Settings UI field for this (general settings covers tagline and letterhead address lines,
+  not the core name).
+- Left `docs/PRD.md` untouched — it's the original source requirements document, not live configuration.
+
 ## 0.3.0
 
 - **New congregation logo.** Replaced the original hand-drawn shield-and-monogram emblem with the supplied
