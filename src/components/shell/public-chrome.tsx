@@ -5,12 +5,12 @@ import { PublicLocaleSwitch } from "@/components/shell/locale";
 import { ThemeToggle } from "@/components/shell/theme";
 import { publicEnv } from "@/lib/env";
 
-export async function PublicHeader({ path }: { path: string }) {
+export async function PublicHeader({ path, scrollEdge = false }: { path: string; scrollEdge?: boolean }) {
   const t = await getTranslations("common");
   return (
-    <header className="border-b border-border bg-surface pt-safe">
+    <header data-edge={scrollEdge ? "" : undefined} className="lp-header sticky top-0 z-40 border-b border-border bg-surface pt-safe">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-2">
-        <Link href="/" className="rounded-md" aria-label={t("appName")}><Logo sub={t("congregationShort")} /></Link>
+        <Link href="/" className="lp-logo-link rounded-md" aria-label={t("appName")}><Logo sub={t("congregationShort")} /></Link>
         <div className="flex items-center gap-1">
           {publicEnv.enableSw ? <PublicLocaleSwitch path={path} /> : null}
           <ThemeToggle />
@@ -22,7 +22,7 @@ export async function PublicHeader({ path }: { path: string }) {
 
 export async function PublicFooter({ prefix = "" }: { prefix?: string }) {
   const t = await getTranslations("common");
-  const link = "inline-flex min-h-11 items-center rounded-md px-1 underline underline-offset-4";
+  const link = "lp-footlink inline-flex min-h-11 items-center rounded-md px-1 underline underline-offset-4";
   return (
     <footer className="border-t border-border bg-surface pb-safe">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-1 px-4 py-3 text-sm text-muted-foreground">

@@ -1,14 +1,21 @@
-import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
-import { BrandWave } from "@/components/brand/emblem";
 import { buttonVariants } from "@/components/ui/button";
+import { Hero } from "@/components/landing/hero";
+import { PrivateByDesign } from "@/components/landing/private-by-design";
+import { RevealObserver } from "@/components/landing/reveal-observer";
+import { RibbonDemo } from "@/components/landing/ribbon-demo";
+import { Steps } from "@/components/landing/steps";
+import "@/components/landing/landing.css";
 import { InstallCard } from "@/components/shell/install-card";
 import { PublicFooter, PublicHeader } from "@/components/shell/public-chrome";
 import { getPublicCongregation } from "@/lib/congregation";
 import { publicEnv } from "@/lib/env";
 import { cn } from "@/lib/utils";
 
-/** Landing (PRD §8.2): short, real content only. No stock photos, invented statistics or carousels. */
+/**
+ * Landing (PRD v1.1 §4, "The Open Door"): short, real content only. No stock photos, invented statistics or carousels.
+ * A server component: only the ribbon demo, the reveal fallback, the theme toggle and the install card ship JavaScript.
+ */
 export async function Landing() {
   const t = await getTranslations("landing");
   const locale = await getLocale();
@@ -34,23 +41,29 @@ export async function Landing() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <PublicHeader path="/" />
+      <PublicHeader path="/" scrollEdge />
       <main id="main" className="flex-1">
-        <section className="mx-auto max-w-5xl px-4 pb-8 pt-10 md:pt-16">
-          <h1 className="max-w-2xl text-3xl md:text-5xl">{t("headline")}</h1>
-          <p className="mt-4 max-w-xl text-lg text-muted-foreground">{t("lead")}</p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/signin" className={buttonVariants({ variant: "primary" })}>{t("signIn")}</Link>
-            <Link href="/request-access" className={buttonVariants({ variant: "secondary" })}>{t("requestAccess")}</Link>
+        <Hero tagline={cong?.tagline ?? t("tagline")} />
+
+        <section aria-labelledby="demo-title" className="lp-band lp-section">
+          <div className="lp-wrap lp-band-grid">
+            <div className="lp-reveal">
+              <h2 id="demo-title" className="lp-h2">{t("demoTitle")}</h2>
+              <p className="lp-muted mt-3 max-w-md text-lg">{t("demoLead")}</p>
+              <p className="lp-pill mt-5">{t("demoSample")}</p>
+            </div>
+            <div className="lp-reveal"><RibbonDemo /></div>
           </div>
-          <p className="mt-8 font-heading text-lg text-accent-text">{cong?.tagline ?? t("tagline")}</p>
         </section>
-        <BrandWave />
+
+        <Steps />
+        <PrivateByDesign />
+
         {(meetings.length > 0 || address.length > 0) && (
-          <section aria-labelledby="meetings-title" className="border-b border-border bg-surface">
-            <div className="mx-auto grid max-w-5xl gap-8 px-4 py-8 md:grid-cols-2">
+          <section aria-labelledby="meetings-title" className="lp-divider-top">
+            <div className="lp-wrap lp-meet lp-section">
               {meetings.length > 0 && (
-                <div>
+                <div className="lp-reveal">
                   <h2 id="meetings-title" className="text-xl">{t("meetings")}</h2>
                   <dl className="mt-3 space-y-2">
                     {meetings.map((x) => (
@@ -60,7 +73,7 @@ export async function Landing() {
                 </div>
               )}
               {address.length > 0 && (
-                <div>
+                <div className="lp-reveal">
                   <h2 className="text-xl">{t("hall")}</h2>
                   <address className="mt-3 not-italic">{address.map((a) => <div key={a}>{a}</div>)}</address>
                   {l.map_url ? <a href={l.map_url} rel="noopener noreferrer" target="_blank" className={cn(buttonVariants({ variant: "link" }), "mt-2 inline-flex min-h-11 items-center")}>{t("map")}</a> : null}
@@ -69,9 +82,11 @@ export async function Landing() {
             </div>
           </section>
         )}
-        <section className="mx-auto max-w-5xl px-4 py-8"><InstallCard /></section>
+
+        <section className="lp-wrap py-8 lp-reveal"><InstallCard /></section>
       </main>
       <PublicFooter prefix={prefix} />
+      <RevealObserver />
       {jsonLd.map((d, i) => <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(d).replace(/</g, "\\u003c") }} />)}
     </div>
   );

@@ -1,0 +1,159 @@
+/* Landing page styles (PRD v1.1 §3, §4, §7.1, §8). Imported by components/landing.tsx so it only loads on pages that use it.
+   Colours come from semantic tokens in globals.css. Only transform and opacity animate (plus clip-path on the
+   one-time door and scroll-timeline hairlines). Everything that moves has a reduced-motion path. */
+
+/* ---------- layout primitives ---------- */
+.lp-wrap { margin-inline: auto; width: 100%; max-width: 64rem; padding-inline: 1rem; }
+.lp-section { padding-block: 3rem; }
+@media (min-width: 768px) { .lp-section { padding-block: 4.5rem; } }
+.lp-h2 { font-size: 1.5rem; line-height: 1.2; }
+@media (min-width: 768px) { .lp-h2 { font-size: 1.875rem; } }
+.lp-muted { color: var(--muted-foreground); }
+.lp-rule { height: 2px; width: 3.5rem; background: var(--accent); transform-origin: left center; }
+
+/* ---------- header (landing only) ---------- */
+.lp-header { position: sticky; top: 0; z-index: 40; }
+
+/* ---------- hero ---------- */
+.lp-hero { background: linear-gradient(180deg, var(--hero-from), var(--hero-to)); }
+.lp-hero-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; align-items: center; padding-block: 1.5rem 2.5rem; }
+@media (min-width: 768px) { .lp-hero-grid { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 3rem; padding-block: 3.5rem 4rem; } }
+.lp-stage { position: relative; margin-inline: auto; width: min(15.5rem, 70vw); aspect-ratio: 1; order: -1; }
+@media (min-width: 768px) { .lp-stage { order: 0; width: min(21rem, 100%); } }
+.lp-h1 { font-size: clamp(2rem, 1.2rem + 3.4vw, 3.5rem); line-height: 1.15; max-width: 16ch; }
+.lp-lead { margin-top: 1rem; max-width: 34rem; font-size: 1.125rem; color: var(--muted-foreground); }
+.lp-cta { margin-top: 1.75rem; display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.lp-cta > * { flex: 1 1 11rem; }
+@media (min-width: 768px) { .lp-cta > * { flex: 0 0 auto; } }
+.lp-tagline { margin-top: 1.75rem; font-family: var(--font-heading); font-size: 1.125rem; color: var(--accent-text); }
+
+/* the doorway of light behind the mark: an arch that opens from a slit (LM-01) */
+.lp-door { position: absolute; left: 50%; bottom: 4%; width: 86%; height: 96%; margin-left: -43%; border-radius: 999px 999px 0 0;
+  background: linear-gradient(180deg, transparent 0%, var(--door-glow) 100%);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--accent) 70%, transparent); }
+.lp-threshold { position: absolute; left: 0; right: 0; bottom: 4%; height: 2px; background: var(--accent); transform-origin: center; }
+.lp-plate { position: absolute; inset: 14% 12% 8%; display: grid; place-items: center; border-radius: 50%; background: var(--plate); }
+.lp-mark { width: 100%; height: auto; max-height: 100%; object-fit: contain; }
+
+/* ---------- wave ---------- */
+.lp-wave { display: block; width: 100%; height: 3.5rem; margin-bottom: -1px; }
+@media (min-width: 768px) { .lp-wave { height: 6rem; } }
+.lp-wave .w-fill { fill: var(--wave-fill); }
+.lp-wave .w-back { fill: var(--wave-fill); opacity: 0.35; }
+.lp-wave .w-line { fill: none; stroke: var(--accent); stroke-width: 4; vector-effect: non-scaling-stroke; }
+
+/* ---------- navy band with the ribbon demo ---------- */
+.lp-band { background: var(--wave-fill); color: var(--band-foreground); }
+.lp-band .lp-muted { color: color-mix(in srgb, var(--band-foreground) 82%, transparent); }
+.lp-band-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; align-items: center; }
+@media (min-width: 768px) { .lp-band-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 3rem; } }
+.lp-pill { display: inline-flex; align-items: center; min-height: 1.75rem; padding-inline: 0.75rem; border: 1px solid currentColor; border-radius: 999px; font-size: 0.875rem; font-weight: 600; }
+.lp-panel { background: var(--surface); color: var(--foreground); border-radius: 10px; padding: 1.25rem; }
+@media (min-width: 768px) { .lp-panel { padding: 1.5rem; } }
+.lp-demo-num { font-family: var(--font-heading); font-size: 2rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.lp-demo-row { display: flex; align-items: baseline; gap: 0.5rem; }
+.lp-demo-ok { width: 1.5rem; height: 1.5rem; color: var(--success); align-self: center; }
+.lp-demo-ok path { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset var(--dur-slow) var(--ease-out); }
+[data-done="true"] .lp-demo-ok path { stroke-dashoffset: 0; }
+.lp-demo-ok { opacity: 0; transition: opacity var(--dur-fast) ease; }
+[data-done="true"] .lp-demo-ok { opacity: 1; }
+.lp-track { position: relative; height: 1.75rem; overflow: hidden; border-radius: 6px; background: var(--tint); margin-top: 0.75rem; }
+.lp-fill { position: absolute; inset: 0; background: var(--primary); transform-origin: left center; transform: scaleX(var(--p, 0)); transition: transform 560ms var(--ease-spring); }
+.lp-tipwrap { position: absolute; inset: 0; transform: translateX(calc(var(--p, 0) * 100%)); transition: transform 560ms var(--ease-spring); pointer-events: none; }
+.lp-tip { position: absolute; top: 0; bottom: 0; left: 0; width: 4px; margin-left: -4px; background: var(--accent); transform: skewX(-20deg); transform-origin: bottom; }
+[data-done="true"] .lp-tip { opacity: 0; }
+.lp-tick { position: absolute; top: 0; bottom: 0; width: 1px; background: color-mix(in srgb, var(--border) 70%, transparent); }
+.lp-demo-actions { margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.75rem; }
+
+/* ---------- how it works ---------- */
+.lp-steps { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; margin-top: 2rem; padding-left: 0; list-style: none; }
+.lp-steps::before { content: ""; position: absolute; left: 1rem; top: 1rem; bottom: 1rem; width: 2px; margin-left: -1px; background: var(--accent); transform-origin: top center; }
+.lp-step { position: relative; padding-left: 3.25rem; }
+.lp-step-n { position: absolute; left: 0; top: 0; display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; border: 2px solid var(--primary); background: var(--background); color: var(--primary); font-family: var(--font-heading); font-size: 0.9375rem; }
+.lp-step h3 { font-size: 1.25rem; }
+.lp-step p { margin-top: 0.25rem; color: var(--muted-foreground); max-width: 28rem; }
+.lp-vis { margin-top: 1rem; max-width: 18rem; pointer-events: none; }
+@media (min-width: 900px) {
+  .lp-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2.5rem; }
+  .lp-steps::before { left: 1rem; right: calc(33.333% - 2.667rem); top: 1rem; bottom: auto; width: auto; height: 2px; margin: -1px 0 0; transform-origin: left center; }
+  .lp-step { padding-left: 0; padding-top: 3.25rem; }
+}
+/* mini visuals: shapes only, no figures */
+.lp-mini { border: 1px solid var(--border); border-radius: 10px; background: var(--surface); padding: 0.875rem; }
+.lp-mini-track { height: 1rem; border-radius: 4px; background: var(--tint); overflow: hidden; position: relative; }
+.lp-mini-fill { position: absolute; inset: 0; width: 100%; background: var(--primary); transform: scaleX(0.62); transform-origin: left center; }
+.lp-mini-chip { display: inline-flex; margin-top: 0.625rem; min-height: 1.75rem; align-items: center; padding-inline: 0.625rem; border-radius: 6px; border: 1px solid var(--input-border); font-size: 0.875rem; font-weight: 600; }
+.lp-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.lp-seg > span { display: inline-flex; align-items: center; justify-content: center; gap: 0.375rem; min-height: 2.5rem; border-radius: 6px; border: 1px solid var(--input-border); font-weight: 600; }
+.lp-seg > span[data-on="true"] { background: var(--primary); color: var(--primary-foreground); border-color: var(--primary); }
+.lp-card-mini { height: 6.5rem; max-width: 10rem; display: grid; grid-template-rows: auto 1fr; gap: 0.5rem; padding: 0.625rem; }
+.lp-card-mini .bar { height: 0.75rem; border-radius: 3px; background: var(--primary); width: 70%; }
+.lp-card-mini .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.lp-card-mini .tiles > span { border-radius: 6px; background: var(--tint); border-bottom: 2px solid var(--accent); }
+
+/* ---------- private by design ---------- */
+.lp-private { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+@media (min-width: 768px) { .lp-private { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 3rem; } }
+.lp-facts { list-style: none; padding: 0; margin: 0; }
+.lp-fact { position: relative; display: flex; gap: 0.875rem; padding-block: 1.125rem; }
+.lp-fact + .lp-fact { border-top: 1px solid var(--border); }
+.lp-fact svg { width: 1.5rem; height: 1.5rem; flex: none; margin-top: 0.125rem; color: var(--primary); }
+.lp-divider-top { border-top: 1px solid var(--border); }
+
+/* ---------- meetings ---------- */
+.lp-meet { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+@media (min-width: 768px) { .lp-meet { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+
+/* ---------- footer link hover ---------- */
+@media (hover: hover) and (pointer: fine) {
+  .lp-footlink { transition: text-underline-offset var(--dur-fast) var(--ease-out); }
+  .lp-footlink:hover { text-underline-offset: 6px; }
+}
+
+/* =====================================================================
+   MOTION. Everything below is only defined when the person has not asked for reduced motion.
+   Without it, the finished state is simply shown (door open, line drawn, text visible).
+   ===================================================================== */
+@media (prefers-reduced-motion: no-preference) {
+  /* LM-01 and LM-02: the door opens once, the mark rises, text staggers in. Nothing waits on JavaScript. */
+  .lp-door { clip-path: inset(0 50% 0 50%); animation: lp-door-open var(--dur-hero) var(--ease-out) 60ms both; }
+  .lp-threshold { animation: lp-draw-x var(--dur-slow) var(--ease-out) 40ms both; }
+  .lp-mark { animation: lp-mark-in var(--dur-slow) var(--ease-out) 140ms both; }
+  .lp-h1 { animation: lp-rise var(--dur-base) var(--ease-out) 60ms both; }   /* transform only: keeps the headline paint (LCP) immediate */
+  .lp-enter { animation: lp-enter var(--dur-base) var(--ease-out) both; animation-delay: calc(120ms + var(--i, 0) * var(--stagger)); }
+  .lp-wave[data-animated="true"] .w-line { transform-box: fill-box; transform-origin: left center; animation: lp-draw-x 600ms var(--ease-out) 300ms both; }
+
+  /* LM-14 and press feedback on the big logo target */
+  .lp-logo-link { transition: transform var(--dur-press) var(--ease-out); }
+  .lp-logo-link:active { transform: scale(0.985); }
+
+  /* Reveal fallback (JavaScript sets data-reveal when scroll timelines are not supported) */
+  .lp-reveal[data-reveal] { transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out); }
+  .lp-reveal[data-reveal="out"] { opacity: 0; transform: translateY(var(--shift)); }
+
+  @supports (animation-timeline: view()) {
+    .lp-reveal { animation: lp-enter linear both; animation-timeline: view(); animation-range: entry 0% cover 25%; }
+    .lp-rule.lp-reveal { animation-name: lp-draw-x; }
+    /* LM-07: the gold line between the steps draws with scroll progress */
+    .lp-steps::before { animation: lp-draw-y linear both; animation-timeline: view(); animation-range: entry 10% cover 55%; }
+    @media (min-width: 900px) { .lp-steps::before { animation-name: lp-draw-x; } }
+    /* LM-05: the back wave drifts a little as the hero scrolls away */
+    .lp-wave .w-back { animation: lp-drift linear both; animation-timeline: view(); animation-range: entry 0% exit 100%; }
+  }
+  @supports (animation-timeline: scroll()) {
+    /* LM-03: header edge appears once the page scrolls */
+    .lp-header[data-edge] { border-bottom-color: transparent; animation: lp-edge linear both; animation-timeline: scroll(root); animation-range: 0px 48px; }
+  }
+}
+
+@keyframes lp-door-open { to { clip-path: inset(0 0 0 0); } }
+@keyframes lp-mark-in { from { opacity: 0; transform: translateY(8px); } }
+@keyframes lp-rise { from { transform: translateY(var(--shift)); } }
+@keyframes lp-enter { from { opacity: 0; transform: translateY(var(--shift)); } }
+@keyframes lp-draw-x { from { transform: scaleX(0); } }
+@keyframes lp-draw-y { from { transform: scaleY(0); } }
+@keyframes lp-drift { from { transform: translateX(-30px); } to { transform: translateX(30px); } }
+@keyframes lp-edge { to { border-bottom-color: var(--border); } }
+
+/* muted text inside the white demo panel (the navy band overrides .lp-muted, so the panel has its own) */
+.lp-pmuted { color: var(--muted-foreground); }

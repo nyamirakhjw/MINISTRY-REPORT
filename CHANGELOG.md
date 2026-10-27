@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased: landing redesign
+
+- New landing page ("The Open Door"): hero with a gold door of light that opens once behind the logo, a labelled
+  sample of the hours ribbon you can try, a three-step "How it works" joined by a gold line that draws on scroll,
+  "Private by design", then the existing meetings, hall and install sections. Motion is CSS only, with a reduced-motion
+  path for every effect, and works without JavaScript.
+- Design tokens for landing and motion added to `globals.css`; overlay exits now use ease-out; buttons get a 0.97
+  press; theme change uses a circular View Transition where supported. `BrandWave` and `::selection` no longer use raw hex.
+- Faster landing: the proxy skips the Supabase auth call on public pages, and the congregation lookup is cached for five
+  minutes with a cookie-free client (expired immediately when Elders save the public profile).
+- Logo images: header and hero use small WebP files in `public/brand/` instead of the 467 KB PWA icon.
+- Service worker `VERSION` bumped to `v3`; `/brand/` is cached like `/icons/`.
+- Added `e2e/landing.spec.ts`. New Kiswahili strings are drafts (gate G-6).
+
 ## 0.3.2
 
 - Corrected the casing from 0.3.1: it's "Nyamira **congregation** of Jehovah's Witnesses" (lowercase c), per an

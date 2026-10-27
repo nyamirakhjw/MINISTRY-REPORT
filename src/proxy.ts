@@ -3,6 +3,9 @@ import { createServerClient } from "@supabase/ssr";
 
 const PRIVATE_PREFIXES = ["/app", "/admin", "/platform", "/pending", "/mfa"];
 const PUBLIC_EN_ONLY = new Set(["/", "/privacy", "/terms"]);
+// Exact public pages that show nothing about the signed-in person. They get the nonce, CSP and language headers but skip
+// the Supabase auth round trip (PRD v1.1 §10.3). Private areas are never listed here; keep this an exact-match allow-list.
+const PUBLIC_NO_AUTH = new Set(["/", "/sw", "/privacy", "/terms", "/sw/privacy", "/sw/terms", "/install", "/offline"]);
 
 function buildCsp(nonce: string): string {
   const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
@@ -38,6 +41,11 @@ export async function proxy(request: NextRequest) {
   else if (PUBLIC_EN_ONLY.has(pathname)) requestHeaders.set("x-locale", "en");
 
   let response = NextResponse.next({ request: { headers: requestHeaders } });
+
+  if (PUBLIC_NO_AUTH.has(pathname)) {
+    response.headers.set("Content-Security-Policy", csp);
+    return response;
+  }
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

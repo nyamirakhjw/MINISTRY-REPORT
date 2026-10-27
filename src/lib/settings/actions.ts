@@ -1,6 +1,7 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
+import { PUBLIC_CONGREGATION_TAG } from "@/lib/congregation";
 // Assumption: your repo already exports a server-side Supabase client
 // from this path (per PRD §14.2, built on @supabase/ssr). Adjust the
 // import if your project uses a different path or name.
@@ -120,6 +121,7 @@ export async function updateLandingSettings(values: LandingSettingsValues): Prom
   });
   if (error) return { error: friendlyError(error) };
   revalidatePath("/admin/settings/general");
+  updateTag(PUBLIC_CONGREGATION_TAG); // the landing page reads this through a five-minute cache
   return {};
 }
 

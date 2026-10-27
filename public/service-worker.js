@@ -5,7 +5,7 @@
  * cannot end up in a shared HTTP cache (PRD §14.7). Offline data (log, visits, drafts, sync queue) arrives in Phase 2
  * and will live in per-user IndexedDB, wiped on sign-out.
  */
-const VERSION = "v2"; // bumped so the activate step clears the old page cache after this fix
+const VERSION = "v3"; // bumped so returning visitors get the redesigned landing page and the new /brand/ images
 const STATIC_CACHE = `mr-static-${VERSION}`;
 const PAGE_CACHE = `mr-pages-${VERSION}`;
 const PRECACHE = ["/offline", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/icon.svg"];
@@ -56,7 +56,7 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return; // Supabase and everything else: network only
 
   // Hashed build assets and icons: cache first.
-  if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/")) {
+  if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/") || url.pathname.startsWith("/brand/")) {
     event.respondWith(
       caches.match(req).then((hit) => hit || fetch(req).then((res) => {
         const copy = res.clone();
