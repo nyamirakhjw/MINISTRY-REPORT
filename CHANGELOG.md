@@ -1,6 +1,18 @@
 # Changelog
 
-## Unreleased: landing redesign
+## Unreleased: signed-in app motion
+
+- Hours ribbon rewritten: transform-driven fill with a spring transition, separate gold tip, numerals counted by writing
+  to one DOM node (no per-frame state), tick pulses and a drawn check at the goal. Mini chart bars grow in.
+- Yes / No: one fill slides between the options; choosing No folds studies and comment away (inert while folded), and a
+  hidden comment can no longer block a "No" report. Stepper numbers nudge in the direction of change.
+- Dialogs: phone sheets rise from the edge, desktop dialogs scale in; exits are faster.
+- Report submitted: the check draws, text rises in turn, then the new report card settles in.
+- New report card (PRD §7.8): 1080 x 1080 PNG drawn on the device, download or share, in History via `/app/card/<month>`.
+- Elder console: new or changed report rows and queue items get a one-off gold highlight; queue count badges pop when the number changes.
+- New Kiswahili strings are drafts (gate G-6).
+
+## Landing redesign
 
 - New landing page ("The Open Door"): hero with a gold door of light that opens once behind the logo, a labelled
   sample of the hours ribbon you can try, a three-step "How it works" joined by a gold line that draws on scroll,

@@ -1,4 +1,5 @@
 "use client";
+import { CountBadge } from "@/components/shell/count-badge";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, FileText, History, Menu, Bell, Clock, LayoutDashboard, Users, ClipboardList, ShieldCheck, UserPlus, Briefcase, UserX, PenLine, HeartHandshake, Download, Trash2, Settings } from "lucide-react";
@@ -46,7 +47,7 @@ export function NavLinks({ items, label, orientation }: { items: NavItem[]; labe
                 className={cn("relative flex items-center rounded-md font-semibold transition-colors", orientation === "bottom" ? "min-h-14 flex-col justify-center gap-0.5 text-xs" : "min-h-12 gap-3 px-3 text-base", active ? "bg-tint text-primary" : "text-muted-foreground hover:bg-tint")}>
                 <Icon className="size-6 shrink-0" aria-hidden="true" />
                 <span className={cn(sideCollapsed && "hidden whitespace-nowrap group-hover/rail:inline-block")}>{t(i.key)}</span>
-                {i.badge ? <span className={cn("ml-auto min-w-6 rounded-full bg-accent px-1.5 text-center text-sm text-[#0B2E6B]", sideCollapsed && "absolute -right-1 -top-1 ml-0 group-hover/rail:static group-hover/rail:ml-auto")} aria-label={t("pendingCount", { count: i.badge })}>{i.badge}</span> : null}
+                {i.badge ? <CountBadge count={i.badge} label={t("pendingCount", { count: i.badge })} className={cn("ml-auto min-w-6 rounded-full bg-accent px-1.5 text-center text-sm text-[#0B2E6B]", sideCollapsed && "absolute -right-1 -top-1 ml-0 group-hover/rail:static group-hover/rail:ml-auto")} /> : null}
               </Link>
             </li>
           );

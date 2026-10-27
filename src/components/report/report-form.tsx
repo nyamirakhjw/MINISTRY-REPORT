@@ -1,11 +1,13 @@
 "use client";
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input, Select, Textarea } from "@/components/ui/input";
+import { Collapse } from "@/components/ui/collapse";
+import { DrawnCheck } from "@/components/ui/drawn-check";
 import { Segmented } from "@/components/ui/segmented";
+import { ReportCard, type ReportCardData } from "@/components/report/report-card";
 import { Field } from "@/components/forms/field";
 import { Stepper } from "@/components/forms/stepper";
 import { applyLogCarryoverAction, submitReportAction } from "@/lib/actions/report";
@@ -14,13 +16,14 @@ import { isPioneer, type Category } from "@/lib/domain/categories";
 import { floorHours, formatHMS } from "@/lib/domain/log";
 import { formatDateTime, formatMonth } from "@/lib/format";
 
-interface Props { month: string; options: Category[]; windowNote: string; logSeconds?: number }
+interface Props { month: string; options: Category[]; windowNote: string; logSeconds?: number; card: Omit<ReportCardData, "month" | "category" | "participated" | "hours" | "studies"> }
 type Step = "edit" | "review" | "done";
 
-export function ReportForm({ month, options, windowNote, logSeconds = 0 }: Props) {
+export function ReportForm({ month, options, windowNote, logSeconds = 0, card }: Props) {
   const t = useTranslations("report");
   const cat = useTranslations("categories");
   const te = useTranslations("errors");
+  const tc = useTranslations("card");
   const locale = useLocale();
   const router = useRouter();
   // One key per form so a double tap or a retry after a weak connection creates one report (REP-10).
@@ -47,7 +50,7 @@ export function ReportForm({ month, options, windowNote, logSeconds = 0 }: Props
     const e: Record<string, string> = {};
     if (!pioneer && participated === "") e.participated = te("participation_required");
     if (pioneer && (hoursNum === null || !Number.isInteger(hoursNum) || hoursNum < 0 || hoursNum > 744)) e.hours = te(hoursNum === null ? "hours_required" : "hours_out_of_range");
-    if (words > COMMENT_WORD_LIMIT) e.comment = te("comment_too_long");
+    if (!saidNo && words > COMMENT_WORD_LIMIT) e.comment = te("comment_too_long");
     setErrors(e);
     if (Object.keys(e).length > 0) { setTimeout(() => summary.current?.focus(), 0); return false; }
     return true;
@@ -73,12 +76,20 @@ export function ReportForm({ month, options, windowNote, logSeconds = 0 }: Props
   }
 
   if (step === "done") {
+    // The report-submitted moment (PRD v1.1 AM-10): the check draws, the words rise in turn, then the card settles in.
+    const order = (n: number) => ({ "--i": n }) as React.CSSProperties;
     return (
-      <div role="status" className="rounded-lg border border-border bg-surface p-5">
-        <CheckCircle2 className="size-8 text-success" aria-hidden="true" />
-        <h2 className="mt-3 text-xl">{t("submittedTitle")}</h2>
-        <p className="mt-2">{t("submittedBody", { month: formatMonth(month, locale), time: formatDateTime(doneAt ?? new Date().toISOString(), locale) })}</p>
-        <div className="mt-4"><Button onClick={() => router.push("/app")}>{t("backHome")}</Button></div>
+      <div className="flex flex-col gap-5">
+        <div role="status" className="rounded-lg border border-border bg-surface p-5">
+          <DrawnCheck />
+          <h2 className="m-enter mt-3 text-xl" style={order(2)}>{t("submittedTitle")}</h2>
+          <p className="m-enter mt-2" style={order(3)}>{t("submittedBody", { month: formatMonth(month, locale), time: formatDateTime(doneAt ?? new Date().toISOString(), locale) })}</p>
+          <div className="m-enter mt-4" style={order(4)}><Button onClick={() => router.push("/app")}>{t("backHome")}</Button></div>
+        </div>
+        <section aria-labelledby="card-title" className="m-enter flex flex-col gap-3" style={order(5)}>
+          <h2 id="card-title" className="text-xl">{tc("heading", { month: formatMonth(month, locale) })}</h2>
+          <ReportCard data={{ ...card, month, category, participated: pioneer ? (hoursNum ?? 0) > 0 : participated === "yes", hours: pioneer ? hoursNum : null, studies: saidNo ? 0 : studies }} />
+        </section>
       </div>
     );
   }
@@ -86,7 +97,7 @@ export function ReportForm({ month, options, windowNote, logSeconds = 0 }: Props
   if (step === "review") {
     const bigHours = pioneer && (hoursNum ?? 0) > 300;
     return (
-      <div className="flex flex-col gap-5">
+      <div className="m-enter flex flex-col gap-5">
         <h2 className="text-xl">{t("reviewTitle")}</h2>
         <dl className="divide-y divide-border rounded-lg border border-border bg-surface">
           <Row k={t("month")} v={formatMonth(month, locale)} />
@@ -109,7 +120,7 @@ export function ReportForm({ month, options, windowNote, logSeconds = 0 }: Props
 
   const items = [...Object.entries(errors).map(([id, message]) => ({ id, message })), ...(serverError ? [{ id: "category", message: serverError }] : [])];
   return (
-    <form onSubmit={(e) => { e.preventDefault(); if (validate()) setStep("review"); }} noValidate className="flex flex-col gap-6">
+    <form onSubmit={(e) => { e.preventDefault(); if (validate()) setStep("review"); }} noValidate className="m-enter flex flex-col gap-6">
       {items.length > 0 && (
         <div ref={summary} role="alert" tabIndex={-1} className="rounded-md border-2 border-danger bg-surface p-4">
           <h2 className="text-lg text-danger">{te("summaryTitle")}</h2>
@@ -135,18 +146,18 @@ export function ReportForm({ month, options, windowNote, logSeconds = 0 }: Props
           <Input id="hours" inputMode="numeric" pattern="[0-9]*" value={hours} aria-invalid={!!errors.hours} onChange={(e) => setHours(e.target.value.replace(/\D/g, ""))} className="text-xl font-semibold tabular" />
         </Field>
       )}
-      {!saidNo && (
-        <>
+      <Collapse open={!saidNo}>
+        <div className="flex flex-col gap-6">
           <Field id="studies" label={t("studies")}>
             <Stepper id="studies" value={studies} onChange={setStudies} label={t("studies")} />
           </Field>
           <Field id="comment" label={t("comment")} optional optionalLabel={t("optional")} hint={t("commentHint")} error={errors.comment}>
             <Textarea id="comment" value={comment} onChange={(e) => setComment(e.target.value)} aria-invalid={!!errors.comment} aria-describedby="comment-count comment-hint" />
-            <p id="comment-count" aria-live="polite" className={`text-sm tabular ${words > COMMENT_WORD_LIMIT ? "font-semibold text-danger" : "text-muted-foreground"}`}>{t("wordCount", { count: words, max: COMMENT_WORD_LIMIT })}</p>
+            <p id="comment-count" aria-live="polite" className={`text-sm tabular transition-colors ${words > COMMENT_WORD_LIMIT ? "font-semibold text-danger" : words >= COMMENT_WORD_LIMIT - 5 ? "font-semibold text-warning" : "text-muted-foreground"}`}>{t("wordCount", { count: words, max: COMMENT_WORD_LIMIT })}</p>
           </Field>
-        </>
-      )}
-      {saidNo && <p className="rounded-md bg-tint p-3">{t("noLocks")}</p>}
+        </div>
+      </Collapse>
+      <Collapse open={saidNo}><p className="rounded-md bg-tint p-3">{t("noLocks")}</p></Collapse>
       <Button type="submit">{t("review")}</Button>
     </form>
   );

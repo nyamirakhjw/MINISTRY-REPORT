@@ -1,4 +1,5 @@
 "use client";
+import { CountBadge } from "@/components/shell/count-badge";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -17,7 +18,7 @@ export function AdminTabs({ items, label }: { items: NavItem[]; label: string })
           return (
             <li key={i.key} className="shrink-0">
               <Link href={i.href} aria-current={active ? "page" : undefined} className={cn("flex min-h-12 items-center gap-2 border-b-4 px-3 font-semibold", active ? "border-accent text-primary" : "border-transparent text-muted-foreground")}>
-                {t(i.key)}{i.badge ? <span className="rounded-full bg-accent px-1.5 text-sm text-[#0B2E6B]" aria-label={t("pendingCount", { count: i.badge })}>{i.badge}</span> : null}
+                {t(i.key)}{i.badge ? <CountBadge count={i.badge} label={t("pendingCount", { count: i.badge })} className="rounded-full bg-accent px-1.5 text-sm text-[#0B2E6B]" /> : null}
               </Link>
             </li>
           );

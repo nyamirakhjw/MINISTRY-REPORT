@@ -369,7 +369,8 @@
     "correctionReason": "Tueleze zaidi",
     "shownToElder": "Mzee ataona hili.",
     "correctionSubmit": "Tuma ombi",
-    "correctionSent": "Ombi limetumwa"
+    "correctionSent": "Ombi limetumwa",
+    "downloadCard": "Kadi ya ripoti"
   },
   "notifications": {
     "title": "Ujumbe",
@@ -927,5 +928,27 @@
     "backupReady": "Nakala rudufu imepakuliwa",
     "preparing": "Inatayarisha…",
     "close": "Funga"
+  },
+  "card": {
+    "pageTitle": "Kadi ya ripoti",
+    "heading": "Kadi yako ya ripoti ya {month}",
+    "title": "Ripoti ya huduma ya kila mwezi",
+    "forMonth": "Kwa {month}",
+    "hours": "Idadi ya saa",
+    "studies": "Mafunzo yaliyoendeshwa",
+    "participated": "Ushiriki",
+    "yes": "Ndiyo",
+    "didNot": "Hakushiriki mwezi huu",
+    "app": "Ministry Report",
+    "alt": "Kadi ya ripoti ya {name}, {month}: {summary}",
+    "summaryPioneer": "Saa {hours} na mafunzo {studies}",
+    "summaryYes": "Alishiriki, mafunzo {studies}",
+    "summaryNo": "Hakushiriki",
+    "drawing": "Inaandaa kadi yako",
+    "download": "Pakua kadi",
+    "share": "Shiriki kadi",
+    "failed": "Kadi haikuweza kutengenezwa. Jaribu tena.",
+    "retry": "Jaribu tena",
+    "back": "Rudi kwenye historia"
   }
 }

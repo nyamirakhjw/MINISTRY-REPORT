@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input, Select } from "@/components/ui/input";
 import { Table, TBody, TD, TH, THead, TR } from "@/components/ui/table";
+import { useRowFlash } from "@/hooks/use-row-flash";
 import { formatDateTime } from "@/lib/format";
 import type { AdminRow } from "@/lib/admin-data";
 import { CloseMonthDialog, OnBehalfDialog } from "./report-dialogs";
@@ -20,6 +21,9 @@ function statusOf(r: AdminRow): "onTime" | "late" | "didNotReport" | "notYet" | 
   if (r.status === "reopened") return "reopened";
   return r.is_late ? "late" : "onTime";
 }
+
+const rowId = (r: AdminRow) => r.member_id;
+const rowSignature = (r: AdminRow) => [r.status, r.report_id, r.hours, r.studies, r.participated, r.is_late, r.submitted_at, r.zero_hours, r.was_corrected].join("|");
 
 export function ReportsTable({ rows, groups, month, avatars }: { rows: AdminRow[]; groups: { id: string; name: string }[]; month: string; avatars: Record<string, string> }) {
   const t = useTranslations("admin");
@@ -34,6 +38,8 @@ export function ReportsTable({ rows, groups, month, avatars }: { rows: AdminRow[
   const [sort, setSort] = React.useState<{ key: SortKey; dir: 1 | -1 }>({ key: "full_name", dir: 1 });
   const [open, setOpen] = React.useState<AdminRow | null>(null);
 
+  // Live updates arrive as a refetch (PRD §14.5). Rows that are new or changed since the previous render get a short gold wash (EM-04).
+  const flashing = useRowFlash(rows, rowId, rowSignature);
   const shown = React.useMemo(() => {
     const list = rows.filter((r) =>
       (!q || r.full_name.toLowerCase().includes(q.toLowerCase())) && (!group || r.group_name === group) &&
@@ -64,7 +70,7 @@ export function ReportsTable({ rows, groups, month, avatars }: { rows: AdminRow[
           <THead><TR>{head("full_name", t("name"))}{head("group_name", t("group"))}{head("category", t("category"))}{head("hours", t("hoursOrParticipated"))}{head("studies", t("studies"))}{head("status", t("status"))}<TH>{t("flags")}</TH></TR></THead>
           <TBody>
             {shown.map((r) => (
-              <TR key={r.member_id}>
+              <TR key={r.member_id} data-flash={flashing.has(r.member_id) ? "" : undefined}>
                 <TD><button type="button" onClick={() => setOpen(r)} className="flex min-h-11 items-center gap-2 text-left font-semibold underline-offset-4 hover:underline"><Avatar name={r.full_name} src={r.avatar_path ? avatars[r.avatar_path] : null} size={32} alt={t("photoOf", { name: r.full_name })} />{r.full_name}</button></TD>
                 <TD>{r.group_name ?? "–"}</TD>
                 <TD>{r.category ? cat(r.category) : "–"}</TD>

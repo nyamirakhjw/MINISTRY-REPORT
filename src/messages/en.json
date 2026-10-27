@@ -369,7 +369,8 @@
     "correctionReason": "Tell us more",
     "shownToElder": "An Elder will see this.",
     "correctionSubmit": "Send request",
-    "correctionSent": "Request sent"
+    "correctionSent": "Request sent",
+    "downloadCard": "Report card"
   },
   "notifications": {
     "title": "Messages",
@@ -926,5 +927,27 @@
     "backupReady": "Backup downloaded",
     "preparing": "Preparing…",
     "close": "Close"
+  },
+  "card": {
+    "pageTitle": "Report card",
+    "heading": "Your report card for {month}",
+    "title": "Monthly ministry report",
+    "forMonth": "For {month}",
+    "hours": "No. of hours",
+    "studies": "Studies conducted",
+    "participated": "Participated",
+    "yes": "Yes",
+    "didNot": "Did not participate this month",
+    "app": "Ministry Report",
+    "alt": "Report card for {name}, {month}: {summary}",
+    "summaryPioneer": "{hours} hours and {studies} studies",
+    "summaryYes": "Participated, {studies} studies",
+    "summaryNo": "Did not participate",
+    "drawing": "Creating your card",
+    "download": "Download card",
+    "share": "Share card",
+    "failed": "The card could not be created. Try again.",
+    "retry": "Try again",
+    "back": "Back to history"
   }
 }

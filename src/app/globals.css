@@ -68,6 +68,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   :root { --shift: 0px; --scale-press: 1; }
+  .m-ribbon-fill, .m-ribbon-tipwrap, .m-seg-ind { transition-duration: 0.01ms; }
 }
 
 @theme inline {
@@ -115,12 +116,20 @@
 /* Overlay motion: entrance 320ms ease-out, exit faster (PRD §10.7). Only opacity and transform animate. */
 @keyframes overlay-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes overlay-out { from { opacity: 1; } to { opacity: 0; } }
-@keyframes sheet-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes sheet-out { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(8px); } }
+@keyframes sheet-in { from { opacity: 0; transform: translateY(100%); } to { opacity: 1; transform: translateY(0); } }
+@keyframes sheet-out { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(40%); } }
+@keyframes dialog-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+@keyframes dialog-out { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.98); } }
 [data-overlay][data-state="open"] { animation: overlay-in var(--dur-fast) var(--ease-out); }
 [data-overlay][data-state="closed"] { animation: overlay-out 150ms var(--ease-out); }
+/* Phones: a bottom sheet that rises from the edge. From 768px the dialog is centred (Tailwind positions it with the separate
+   `translate` property, so these transform keyframes never fight it) and grows from 0.96. Exits are faster than entrances. */
 [data-sheet][data-state="open"] { animation: sheet-in 320ms var(--ease-out); }
 [data-sheet][data-state="closed"] { animation: sheet-out var(--dur-fast) var(--ease-out); }
+@media (min-width: 768px) {
+  [data-sheet][data-state="open"] { animation: dialog-in 220ms var(--ease-out); }
+  [data-sheet][data-state="closed"] { animation: dialog-out 150ms var(--ease-out); }
+}
 @keyframes skeleton { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 .skeleton { animation: skeleton 1.6s ease-in-out infinite; }
 
@@ -137,6 +146,52 @@
   from { clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 50%)); }
   to { clip-path: circle(var(--vt-r, 150vmax) at var(--vt-x, 50%) var(--vt-y, 50%)); }
 }
+
+/* ---------- Signed-in app motion (PRD v1.1 §7.2 and §7.3). Subtle for everyday controls; one-off moments get a spring. ---------- */
+.m-enter { animation: m-enter var(--dur-base) var(--ease-out) both; animation-delay: calc(var(--i, 0) * var(--stagger)); }
+.m-pop { animation: m-pop var(--dur-slow) var(--ease-spring) both; animation-delay: calc(var(--i, 0) * var(--stagger)); }
+@keyframes m-enter { from { opacity: 0; transform: translateY(var(--shift)); } }
+@keyframes m-pop { from { opacity: 0; transform: scale(0.94); } }
+
+/* A check that draws itself (report submitted, goal reached). Elements need pathLength="1". */
+.m-draw path { stroke-dasharray: 1; animation: m-draw 420ms var(--ease-out) 120ms both; }
+.m-draw circle { animation: m-fade var(--dur-base) var(--ease-out) both; }
+@keyframes m-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes m-fade { from { opacity: 0; } }
+
+/* Hours ribbon: the fill is a scaled layer and the slanted gold tip a separate moved layer, driven by one variable (--p, 0 to 1). */
+.m-ribbon-fill { position: absolute; inset: 0; background: var(--primary); transform-origin: left center; transform: scaleX(var(--p, 0)); transition: transform 560ms var(--ease-spring); }
+.m-ribbon-tipwrap { position: absolute; inset: 0; transform: translateX(calc(var(--p, 0) * 100%)); transition: transform 560ms var(--ease-spring); pointer-events: none; }
+.m-ribbon-tip { position: absolute; top: 0; bottom: 0; left: 0; width: 4px; margin-left: -4px; background: var(--accent); transform: skewX(-20deg); transform-origin: bottom; }
+[data-complete="true"] .m-ribbon-tip { opacity: 0; }
+
+/* Mini chart bars grow from the baseline, staggered; capped at twelve bars. */
+.m-bar { transform-origin: bottom; animation: m-grow var(--dur-slow) var(--ease-out) both; animation-delay: calc(var(--i, 0) * 30ms); }
+@keyframes m-grow { from { transform: scaleY(0); } }
+
+/* Yes / No selection: one fill that slides between the two options. */
+.m-seg-ind { position: absolute; z-index: 10; top: 0; bottom: 0; left: 0; width: calc((100% - 0.75rem) / 2); border-radius: 6px; background: var(--primary); pointer-events: none;
+  transform: translateX(calc(var(--i, 0) * (100% + 0.75rem))); opacity: 0; transition: transform var(--dur-base) var(--ease-soft), opacity var(--dur-fast) var(--ease-soft); }
+.m-seg-ind[data-visible="true"] { opacity: 1; }
+
+/* Fields that fold away (a "No" report collapses studies and comment). Hidden content is also inert in the markup. */
+.m-collapse { display: grid; grid-template-rows: 1fr; opacity: 1; transition: grid-template-rows var(--dur-fast) var(--ease-soft), opacity var(--dur-fast) var(--ease-soft); }
+.m-collapse[data-open="false"] { grid-template-rows: 0fr; opacity: 0; }
+.m-collapse > .m-collapse-inner { min-height: 0; overflow: hidden; }
+.m-collapse[data-open="true"] > .m-collapse-inner { animation: m-unclip 0s linear var(--dur-fast) both; }
+@keyframes m-unclip { from { overflow: hidden; } to { overflow: visible; } }
+
+/* Live update highlight (Elder console): a gold wash that fades over 1.2s. It is an overlay whose opacity animates, so nothing repaints. */
+[data-flash] { position: relative; }
+[data-flash]:not(tr)::after, tr[data-flash] > td::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--accent); pointer-events: none; animation: m-flash 1.2s var(--ease-out) both; }
+tr[data-flash] > td { position: relative; }
+@keyframes m-flash { from { opacity: 0.35; } to { opacity: 0; } }
+.m-badge-pop { animation: m-badge-pop var(--dur-base) var(--ease-out); }
+@keyframes m-badge-pop { from { transform: scale(0.92); } 50% { transform: scale(1.12); } to { transform: scale(1); } }
+
+/* Card creation: a quiet progress ring while the image is drawn. */
+.m-ring { animation: m-spin 900ms linear infinite; transform-origin: center; }
+@keyframes m-spin { to { transform: rotate(360deg); } }
 
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }

@@ -68,6 +68,7 @@ export default async function Page() {
                 )}
                 {r.comment ? <p className="text-base">{r.comment}</p> : null}
                 <p className="text-sm text-muted-foreground">{r.submitted_via === "elder" ? t("byElder") : t("submittedAt", { time: formatDateTime(r.server_received_at, locale) })}</p>
+                {r.status !== "not_reported" && r.category ? <p><Link href={`/app/card/${r.month.slice(0, 7)}`} className="font-semibold underline underline-offset-4">{t("downloadCard")}</Link></p> : null}
                 {r.status === "submitted" && (
                   pendingCorrection.has(r.id)
                     ? <p className="text-sm text-muted-foreground">{t("correctionPending")}</p>

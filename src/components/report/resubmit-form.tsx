@@ -1,7 +1,8 @@
 "use client";
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
+import { DrawnCheck } from "@/components/ui/drawn-check";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/input";
@@ -55,7 +56,7 @@ export function ResubmitForm({ reportId, category, participated: p0, hours: h0, 
   if (done) {
     return (
       <div role="status" className="rounded-lg border border-border bg-surface p-5">
-        <CheckCircle2 className="size-8 text-success" aria-hidden="true" />
+        <DrawnCheck />
         <h2 className="mt-3 text-xl">{t("resubmittedTitle")}</h2>
         <p className="mt-2">{t("resubmittedBody")}</p>
       </div>

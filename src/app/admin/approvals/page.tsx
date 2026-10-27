@@ -11,6 +11,7 @@ import { getGroups } from "@/lib/admin-data";
 import { monthOf } from "@/lib/domain/time";
 import { formatDateTime } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
+import { LiveItem, LiveList } from "@/components/shell/live-list";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("nav");
@@ -41,14 +42,14 @@ export default async function Page() {
   const change = (changes.data ?? []) as unknown as Change[];
   
   return (
-    <div className="flex flex-col gap-8">
+    <LiveList className="flex flex-col gap-8">
       <h1>{t("approvalsTitle")}</h1>
       <section aria-labelledby="req">
         <h2 id="req" className="mb-3">{t("accessRequests")}</h2>
         {pending.length === 0 ? <p className="rounded-lg border border-border bg-surface p-5">{t("noRequests")}</p> : (
           <ul className="flex flex-col gap-4">
             {pending.map((p) => (
-              <li key={p.id} className="rounded-lg border border-border bg-surface p-4">
+              <LiveItem key={p.id} sig={`${p.id}:${p.avatar_path ?? ""}`} className="rounded-lg border border-border bg-surface p-4">
                 <div className="flex items-start gap-4">
                   <Avatar name={p.full_name} src={p.avatar_path ? avatars[p.avatar_path] : null} size={88} alt={t("photoOf", { name: p.full_name })} />
                   <div className="min-w-0">
@@ -65,7 +66,7 @@ export default async function Page() {
                   <ReasonDialog id={p.id} name={p.full_name} mode="reject" />
                   {elder && <LinkManagedDialog id={p.id} name={p.full_name} options={managedProfiles} />}
                 </div>
-              </li>
+              </LiveItem>
             ))}
           </ul>
         )}
@@ -76,15 +77,15 @@ export default async function Page() {
           {change.length === 0 ? <p className="rounded-lg border border-border bg-surface p-5">{t("noChanges")}</p> : (
             <ul className="divide-y divide-border rounded-lg border border-border bg-surface">
               {change.map((c) => (
-                <li key={c.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <LiveItem key={c.id} sig={c.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
                   <p>{t(c.kind === "username" ? "changeUsername" : "changeName", { name: c.members?.full_name ?? "", value: c.new_value })}</p>
                   <DecideDialog id={c.id} name={c.members?.full_name ?? ""} kind="change" />
-                </li>
+                </LiveItem>
               ))}
             </ul>
           )}
         </section>
       )}
-    </div>
+    </LiveList>
   );
 }

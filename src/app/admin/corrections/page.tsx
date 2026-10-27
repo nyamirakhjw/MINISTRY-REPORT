@@ -8,6 +8,7 @@ import { signedAvatarUrls } from "@/lib/auth/avatars";
 import { formatDateTime, formatMonth } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 import type { Category } from "@/lib/domain/categories";
+import { LiveItem, LiveList } from "@/components/shell/live-list";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("nav");
@@ -34,7 +35,7 @@ export default async function Page() {
   const avatars = await signedAvatarUrls(rows.map((r) => r.reports?.members?.avatar_path));
 
   return (
-    <div className="flex flex-col gap-4">
+    <LiveList className="flex flex-col gap-4">
       <h1>{t("correctionsTitle")}</h1>
       {rows.length === 0 ? <p className="rounded-lg border border-border bg-surface p-5">{t("noCorrections")}</p> : (
         <ul className="flex flex-col gap-4">
@@ -42,7 +43,7 @@ export default async function Page() {
             const m = r.reports!.members!;
             const rep = r.reports!;
             return (
-              <li key={r.id} className="rounded-lg border border-border bg-surface p-4">
+              <LiveItem key={r.id} sig={r.id} className="rounded-lg border border-border bg-surface p-4">
                 <div className="flex items-start gap-3">
                   <Avatar name={m.full_name} src={m.avatar_path ? avatars[m.avatar_path] : null} size={48} alt={t("photoOf", { name: m.full_name })} />
                   <div className="min-w-0 flex-1">
@@ -64,11 +65,11 @@ export default async function Page() {
                   <EditDirectlyDialog correctionId={r.id} name={m.full_name} current={{ category: rep.category, participated: rep.participated, hours: rep.hours, studies: rep.studies, comment: rep.comment }} />
                   <DeclineCorrectionDialog id={r.id} name={m.full_name} />
                 </div>
-              </li>
+              </LiveItem>
             );
           })}
         </ul>
       )}
-    </div>
+    </LiveList>
   );
 }

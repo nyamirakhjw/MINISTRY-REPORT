@@ -4,6 +4,8 @@ import { ReportForm } from "@/components/report/report-form";
 import { ResubmitForm } from "@/components/report/resubmit-form";
 import { ReportStatusCard } from "@/components/report/status-card";
 import { requireMember } from "@/lib/auth/session";
+import { signedAvatarUrls } from "@/lib/auth/avatars";
+import { getPublicCongregation } from "@/lib/congregation";
 import { formatEnd, formatMonth } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 import type { ReportState } from "@/lib/types";
@@ -17,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
  * fixing first (COR-03). The two never conflict: a reopened month already has a report row, so it doesn't block
  * the order rule for whatever the next open month is. */
 export default async function Page() {
-  await requireMember("/app/report");
+  const { member } = await requireMember("/app/report");
   const t = await getTranslations("report");
   const locale = await getLocale();
   const supabase = await createClient();
@@ -38,10 +40,12 @@ export default async function Page() {
   }
   const note = state.is_late ? t("bannerLate", { end: formatEnd(state.late_until ?? "", locale) }) : t("bannerOnTime", { end: formatEnd(state.on_time_until ?? "", locale) });
   const { data: logSeconds } = await supabase.rpc("my_log_seconds", { p_month: state.month });
+  const [avatars, cong] = await Promise.all([signedAvatarUrls([member.avatar_path]), getPublicCongregation()]);
+  const card = { name: member.full_name, username: member.username, avatarUrl: member.avatar_path ? avatars[member.avatar_path] ?? null : null, tagline: cong?.tagline ?? "" };
   return (
     <div className="flex flex-col gap-4">
       <h1>{t("reportFor", { month: formatMonth(state.month, locale) })}</h1>
-      <ReportForm key={state.month} month={state.month} options={state.options} windowNote={note} logSeconds={Number(logSeconds ?? 0)} />
+      <ReportForm key={state.month} month={state.month} options={state.options} windowNote={note} logSeconds={Number(logSeconds ?? 0)} card={card} />
     </div>
   );
 }
