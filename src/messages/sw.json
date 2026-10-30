@@ -37,7 +37,8 @@
     "strength3": "Imara",
     "decrease": "Punguza {label}",
     "increase": "Ongeza {label}",
-    "congregationShort": "Kutaniko la Nyamira"
+    "congregationShort": "Kutaniko la Nyamira",
+    "downloadFailed": "Faili haikuweza kutengenezwa. Jaribu tena."
   },
   "status": {
     "onTime": "Kwa wakati",

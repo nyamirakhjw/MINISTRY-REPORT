@@ -1,3 +1,4 @@
+import { KpiValue } from "@/components/admin/kpi-value";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -35,12 +36,12 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
   const syToDate = categoryMonths.filter((c) => c.month <= month);
 
   const kpis = [
-    { label: t("kpiReported"), value: `${s.reported} / ${s.obligated}` },
-    { label: t("kpiNotYet"), value: String(s.notYet) },
-    { label: t("kpiPercent"), value: `${s.reportingPercent}%` },
-    { label: t("kpiLate"), value: String(s.late) },
-    { label: t("kpiHours"), value: String(s.totalHours) },
-    { label: t("kpiStudies"), value: String(s.totalStudies) },
+    { label: t("kpiReported"), value: <KpiValue id="reported" value={s.reported} total={s.obligated} /> },
+    { label: t("kpiNotYet"), value: <KpiValue id="notYet" value={s.notYet} /> },
+    { label: t("kpiPercent"), value: <KpiValue id="percent" value={s.reportingPercent} suffix="%" /> },
+    { label: t("kpiLate"), value: <KpiValue id="late" value={s.late} /> },
+    { label: t("kpiHours"), value: <KpiValue id="hours" value={s.totalHours} /> },
+    { label: t("kpiStudies"), value: <KpiValue id="studies" value={s.totalStudies} /> },
   ];
 
   return (

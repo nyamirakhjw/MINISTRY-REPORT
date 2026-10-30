@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased: remaining motion
+
+- Pages ease in when you move around the app (member app rises 4px; Elder console fades). Language change crossfades.
+- Return visits: drag a card left to log the visit (button for keyboard users); one underline glides between the four tabs; the list fades when the tab changes.
+- Elder overview numbers count up once per session; charts draw in on first render only; report PDF and Excel downloads show progress and report failures.
+- Empty states draw a small door; 404, error and offline pages show the gold door swinging open; offline notices and settings "saved" messages ease in.
+
 ## Unreleased: export downloads fix
 
 - Exports no longer fail when the congregation name has a curly apostrophe or other non-Latin-1 character: it went into the

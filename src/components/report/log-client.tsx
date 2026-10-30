@@ -19,7 +19,7 @@ export function LogClient({ memberId, congregationId, month, goalHours, yearLabe
   return (
     <div className="flex flex-col gap-8">
       <h1>{t("title")}</h1>
-      {!log.online && <p role="status" className="rounded-md bg-tint p-3">{t("offlineNote")}</p>}
+      {!log.online && <p role="status" className="m-enter rounded-md bg-tint p-3">{t("offlineNote")}</p>}
       {log.pendingCount > 0 && <p role="status" className="text-muted-foreground">{t("syncing", { count: log.pendingCount })}</p>}
       {/* v0.2.4: sync() no longer swallows its errors silently — this makes a genuinely stuck item visible
           instead of leaving the person staring at "Waiting to send" with no explanation. */}

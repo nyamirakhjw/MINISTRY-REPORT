@@ -34,7 +34,7 @@ export function SettingsSection({
       {status?.type === "success" ? (
         <div
           role="status"
-          className="rounded-md border border-success/30 bg-success/10 px-4 py-3 text-sm text-success"
+          className="m-enter rounded-md border border-success/30 bg-success/10 px-4 py-3 text-sm text-success"
         >
           {status.message ?? "Saved."}
         </div>
@@ -43,7 +43,7 @@ export function SettingsSection({
       {status?.type === "error" ? (
         <div
           role="alert"
-          className="rounded-md border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger"
+          className="m-enter rounded-md border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger"
         >
           {status.message ?? "That didn't save. Try again."}
         </div>

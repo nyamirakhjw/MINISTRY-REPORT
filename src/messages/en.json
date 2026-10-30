@@ -37,7 +37,8 @@
     "strength3": "Strong",
     "decrease": "Decrease {label}",
     "increase": "Increase {label}",
-    "congregationShort": "Nyamira congregation"
+    "congregationShort": "Nyamira congregation",
+    "downloadFailed": "The file could not be created. Try again."
   },
   "status": {
     "onTime": "On time",

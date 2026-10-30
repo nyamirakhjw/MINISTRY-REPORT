@@ -1,7 +1,7 @@
 "use client";
 import { useTranslations } from "next-intl";
 import { FileDown, FileSpreadsheet } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { DownloadLink } from "@/components/ui/download-link";
 import type { MonthKey } from "@/lib/domain/time";
 
 /**
@@ -24,16 +24,8 @@ export function ReportDownloadButtons({ month }: { month: MonthKey }) {
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <Button asChild variant="secondary" size="sm">
-        <a href={`/api/exports/congregation?${params}`}>
-          <FileDown className="size-4" aria-hidden="true" />{t("downloadPdf")}
-        </a>
-      </Button>
-      <Button asChild variant="secondary" size="sm">
-        <a href={`/api/exports/congregation-excel?${params}`}>
-          <FileSpreadsheet className="size-4" aria-hidden="true" />{t("downloadExcel")}
-        </a>
-      </Button>
+      <DownloadLink href={`/api/exports/congregation?${params}`} icon={<FileDown className="size-4" aria-hidden="true" />}>{t("downloadPdf")}</DownloadLink>
+      <DownloadLink href={`/api/exports/congregation-excel?${params}`} icon={<FileSpreadsheet className="size-4" aria-hidden="true" />}>{t("downloadExcel")}</DownloadLink>
       <p className="w-full text-xs text-muted-foreground sm:w-auto">{t("downloadFullMonthNote")}</p>
     </div>
   );

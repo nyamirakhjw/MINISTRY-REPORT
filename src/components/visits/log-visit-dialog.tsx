@@ -13,9 +13,11 @@ import { logVisitSchema, type LogVisitInput } from "@/lib/schemas/visits";
 import type { LogVisitInput as StoreLogInput } from "@/lib/offline/visits-store";
 
 /** RV-03: every time the publisher logs a visit, the return visit's last/next visit date updates. */
-export function LogVisitDialog({ returnVisitId, onLog, trigger }: { returnVisitId: string; onLog: (input: StoreLogInput) => Promise<void>; trigger?: React.ReactNode }) {
+export function LogVisitDialog({ returnVisitId, onLog, trigger, open: openProp, onOpenChange }: { returnVisitId: string; onLog: (input: StoreLogInput) => Promise<void>; trigger?: React.ReactNode; open?: boolean; onOpenChange?: (open: boolean) => void }) {
   const t = useTranslations("visits");
-  const [open, setOpen] = React.useState(false);
+  const [innerOpen, setInnerOpen] = React.useState(false);
+  const open = openProp ?? innerOpen;
+  const setOpen = onOpenChange ?? setInnerOpen; // controlled when the card opens it from a swipe
   const [saving, setSaving] = React.useState(false);
   const now = new Date().toISOString().slice(0, 16);
   const { register, handleSubmit, reset } = useForm<LogVisitInput>({
@@ -38,7 +40,7 @@ export function LogVisitDialog({ returnVisitId, onLog, trigger }: { returnVisitI
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{trigger ?? <Button variant="secondary"><CheckCircle2 className="size-5" aria-hidden="true" />{t("markVisited")}</Button>}</DialogTrigger>
+      {trigger !== null ? <DialogTrigger asChild>{trigger ?? <Button variant="secondary"><CheckCircle2 className="size-5" aria-hidden="true" />{t("markVisited")}</Button>}</DialogTrigger> : null}
       <DialogContent title={t("logVisitTitle")} closeLabel={t("close")}>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <div><Label htmlFor="visited_at">{t("visitedAt")}</Label><Input id="visited_at" type="datetime-local" {...register("visited_at")} /></div>

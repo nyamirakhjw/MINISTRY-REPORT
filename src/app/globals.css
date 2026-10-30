@@ -137,11 +137,16 @@
 .press { transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease, opacity var(--dur-fast) ease; }
 .press:not(:disabled):active { transform: scale(var(--scale-press)); }
 
-/* Theme change: a circular reveal from the toggle (View Transitions API; see lib/motion.ts). Skipped when reduced motion is on. */
+/* View transitions (lib/motion.ts sets data-vt on the root while one runs): the theme change is a circular reveal from the
+   toggle; a language change is a short crossfade with a 2px blur bridge. Both are skipped under reduced motion. */
 @media (prefers-reduced-motion: no-preference) {
   ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
-  ::view-transition-new(root) { animation: vt-reveal var(--dur-slow) var(--ease-in-out) both; }
+  :root[data-vt="reveal"]::view-transition-new(root) { animation: vt-reveal var(--dur-slow) var(--ease-in-out) both; }
+  :root[data-vt="fade"]::view-transition-old(root) { animation: vt-out 120ms var(--ease-out) both; }
+  :root[data-vt="fade"]::view-transition-new(root) { animation: vt-in var(--dur-fast) var(--ease-out) both; }
 }
+@keyframes vt-out { to { opacity: 0; filter: blur(2px); } }
+@keyframes vt-in { from { opacity: 0; filter: blur(2px); } }
 @keyframes vt-reveal {
   from { clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 50%)); }
   to { clip-path: circle(var(--vt-r, 150vmax) at var(--vt-x, 50%) var(--vt-y, 50%)); }
@@ -192,6 +197,30 @@ tr[data-flash] > td { position: relative; }
 /* Card creation: a quiet progress ring while the image is drawn. */
 .m-ring { animation: m-spin 900ms linear infinite; transform-origin: center; }
 @keyframes m-spin { to { transform: rotate(360deg); } }
+
+/* Moving between pages inside the app (PRD v1.1 AM-01). The member app rises 4px as it fades; the Elder console only fades, because it is used all day. */
+.m-route { animation: m-route var(--dur-base) var(--ease-out) both; }
+.m-route-soft { animation: m-fade 150ms var(--ease-out) both; }
+@keyframes m-route { from { opacity: 0; transform: translateY(4px); } }
+
+/* Empty states draw a small door line by line (PRD v1.1 AM-22). */
+.m-line path, .m-line circle { stroke-dasharray: 1; animation: m-draw 500ms var(--ease-out) both; animation-delay: calc(var(--k, 0) * 90ms); }
+
+/* Error, not-found and offline pages: a closed gold door that swings open once (PRD v1.1 AM-24). Reduced motion: it is simply open. */
+.m-door { width: 6rem; height: 8.25rem; perspective: 520px; }
+.m-door-frame { position: relative; width: 100%; height: 100%; border: 3px solid var(--primary); border-bottom-width: 3px; border-radius: 3rem 3rem 0 0; overflow: hidden; background: linear-gradient(180deg, transparent, var(--door-glow)); }
+.m-door-leaf { position: absolute; inset: 0; background: var(--accent); border-radius: inherit; transform-origin: left center; transform: rotateY(-72deg); }
+.m-door-leaf::after { content: ""; position: absolute; right: 14%; top: 54%; width: 0.4rem; height: 0.4rem; border-radius: 50%; background: var(--on-accent); }
+@media (prefers-reduced-motion: no-preference) {
+  .m-door-leaf { transform: rotateY(0deg); animation: m-door-open 700ms var(--ease-out) 350ms both; }
+}
+@keyframes m-door-open { to { transform: rotateY(-72deg); } }
+
+/* Visit cards: the foreground follows the finger and springs back; the action waits underneath (PRD v1.1 AM-16). */
+.m-swipe-fg { touch-action: pan-y; will-change: transform; }
+
+/* One tab underline that glides to the chosen tab (AM-17). Width is a scale of a 1px bar. */
+.m-tab-ind { position: absolute; left: 0; bottom: 0; height: 4px; width: 1px; background: var(--accent); transform-origin: left center; transition: transform var(--dur-base) var(--ease-soft); pointer-events: none; }
 
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }

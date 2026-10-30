@@ -1,3 +1,4 @@
+import { EmptyState } from "@/components/ui/empty-state";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { NotificationList } from "@/components/shell/notification-list";
@@ -19,7 +20,7 @@ export default async function Page() {
   return (
     <div className="flex flex-col gap-4">
       <h1>{t("title")}</h1>
-      {items.length === 0 ? <p className="rounded-lg border border-border bg-surface p-5">{t("empty")}</p> : <NotificationList items={items} />}
+      {items.length === 0 ? <EmptyState>{t("empty")}</EmptyState> : <NotificationList items={items} />}
     </div>
   );
 }
