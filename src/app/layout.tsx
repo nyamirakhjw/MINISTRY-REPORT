@@ -26,8 +26,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const fontClasses = inter.variable + ' ' + roboto.variable;
   return (
-    <html lang="en" suppressHydrationWarning className={${inter.variable} }>
+    <html lang="en" suppressHydrationWarning className={fontClasses}>
       <body className="min-h-screen bg-background font-sans antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
