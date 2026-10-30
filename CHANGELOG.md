@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased: export downloads fix
+
+- Exports no longer fail when the congregation name has a curly apostrophe or other non-Latin-1 character: it went into the
+  `Content-Disposition` header, which Node rejects, so the browser reported an invalid response. File names are now plain
+  ASCII (with a UTF-8 `filename*` for the full name). Applies to all six exports and "download my data".
+- Export failures are logged with their stack and answered with a short JSON message instead of a blank error page.
+
 ## Unreleased: signed-in app motion
 
 - Hours ribbon rewritten: transform-driven fill with a spring transition, separate gold tip, numerals counted by writing
