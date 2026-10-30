@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Lexend, Source_Sans_3 } from "next/font/google";
+
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { Toaster } from "sonner";
@@ -9,8 +9,8 @@ import { publicEnv } from "@/lib/env";
 import "./globals.css";
 
 // Self-hosted at build time by next/font: no runtime request to a font server.
-const lexend = Lexend({ subsets: ["latin"], weight: ["600"], variable: "--font-lexend", display: "swap" });
-const sourceSans = Source_Sans_3({ subsets: ["latin"], weight: ["400", "600"], variable: "--font-source-sans", display: "swap" });
+
+
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("meta");
@@ -53,3 +53,4 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     </html>
   );
 }
+
