@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { Inter, Roboto } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/shell/theme';
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -21,18 +23,23 @@ export const metadata: Metadata = {
   description: 'Nyamira congregation of Jehovah’s Witnesses Ministry Report Platform',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = await getLocale();
+  const messages = await getMessages();
   const fontClasses = inter.variable + ' ' + roboto.variable;
+
   return (
-    <html lang="en" suppressHydrationWarning className={fontClasses}>
+    <html lang={locale} suppressHydrationWarning className={fontClasses}>
       <body className="min-h-screen bg-background font-sans antialiased">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {children}
-        </ThemeProvider>
+        <NextIntlClientProvider messages={messages} locale={locale}>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            {children}
+          </ThemeProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
