@@ -12,6 +12,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ['pdfkit'],
   reactStrictMode: true,
   poweredByHeader: false,
   // Production source maps must never be published (checklist: technical cleanup).
