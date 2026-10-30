@@ -12,6 +12,9 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  outputFileTracingIncludes: {
+    '/api/**/*': ['./node_modules/pdfkit/**/*'],
+  },
   serverExternalPackages: ['pdfkit'],
   reactStrictMode: true,
   poweredByHeader: false,
@@ -36,3 +39,4 @@ const nextConfig: NextConfig = {
 };
 
 export default withNextIntl(nextConfig);
+
