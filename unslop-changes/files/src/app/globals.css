@@ -1,0 +1,239 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Design tokens: PRD §10.3. Components use ONLY these semantic tokens; no raw hex in components. */
+:root {
+  --background: #F7F9FC;
+  --surface: #FFFFFF;
+  --surface-raised: #FFFFFF;
+  --tint: #E6EFFC;
+  --foreground: #0F172A;
+  --muted-foreground: #475569;
+  --primary: #0B2E6B;
+  --primary-foreground: #FFFFFF;
+  --accent: #F2C14E;
+  --accent-text: #8A6A00;
+  --border: #D5DDEA;
+  --input-border: #7A8CA8;
+  --ring: #1E5BB8;
+  --success: #0F6B3A;
+  --warning: #8A5300;
+  --danger: #B42318;
+  --scrim: rgb(15 23 42 / 0.55);
+  /* Landing (PRD v1.1 §3.3). Brand artwork may use one subtle two-stop gradient. */
+  --hero-from: #F7F9FC;
+  --hero-to: #E6EFFC;
+  --door-glow: rgb(242 193 78 / 0.30);
+  --wave-fill: var(--primary);
+  --band-foreground: #FFFFFF;
+  --plate: transparent;
+  --on-accent: #0B2E6B;
+  --float-shadow: 0 8px 24px rgb(15 23 42 / 0.08);   /* neutral and soft; only for things that float over the page */
+}
+.dark {
+  --background: #0B1220;
+  --surface: #111B2E;
+  --surface-raised: #17243B;
+  --tint: #17243B;
+  --foreground: #E6ECF7;
+  --muted-foreground: #A9B6CC;
+  --primary: #7DB0FF;
+  --primary-foreground: #0B1220;
+  --accent: #F2C14E;
+  --accent-text: #F2C14E;
+  --border: #26364F;
+  --input-border: #5B7196;
+  --ring: #7DB0FF;
+  --success: #5FD08F;
+  --warning: #F2C14E;
+  --danger: #FF8A80;
+  --scrim: rgb(0 0 0 / 0.65);
+  --hero-from: #0B1220;
+  --hero-to: #111B2E;
+  --door-glow: rgb(242 193 78 / 0.34);
+  --wave-fill: #17243B;
+  --band-foreground: #E6ECF7;
+  --plate: rgb(230 236 247 / 0.92);
+  --on-accent: #0B2E6B;
+  --float-shadow: 0 8px 24px rgb(0 0 0 / 0.4);
+}
+
+/* Motion tokens (PRD v1.1 §6.2). Only transform and opacity animate; ease-out for UI, never ease-in. */
+:root {
+  --dur-press: 120ms; --dur-fast: 180ms; --dur-base: 260ms; --dur-slow: 420ms; --dur-hero: 900ms;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-soft: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  /* Spring k=200 c=22: settles in 560ms with 2% overshoot (scripts/spring_to_css.py). */
+  --ease-spring: linear(0, 0.0323, 0.1119, 0.2176, 0.3339, 0.4502, 0.5594, 0.6575, 0.7423, 0.8133, 0.871, 0.9165, 0.9513, 0.977, 0.9952, 1.0074, 1.0149, 1.0189, 1.0204, 1.0202, 1.0188, 1.0167, 1.0144, 1.012, 1.0097, 1.0076, 1.0058, 1.0042, 1.003, 1);
+  --shift: 8px; --scale-press: 0.97; --stagger: 50ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { --shift: 0px; --scale-press: 1; }
+  .m-ribbon-fill, .m-ribbon-tipwrap, .m-seg-ind { transition-duration: 0.01ms; }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-tint: var(--tint);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-border: var(--border);
+  --color-input-border: var(--input-border);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-scrim: var(--scrim);
+  --color-on-accent: var(--on-accent);
+  --shadow-float: var(--float-shadow);
+  --font-heading: var(--font-lexend), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-source-sans), ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+}
+
+@layer base {
+  html { color-scheme: light; scroll-padding-top: 4rem; -webkit-text-size-adjust: 100%; }
+  html.dark { color-scheme: dark; }
+  body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); font-size: 1rem; line-height: 1.5; }
+  h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; line-height: 1.25; }
+  h1 { font-size: 1.5rem; } h2 { font-size: 1.25rem; } h3 { font-size: 1.125rem; }
+  @media (min-width: 768px) { h1 { font-size: 1.875rem; } }
+  :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+  button, a, input, select, textarea, [role="button"] { touch-action: manipulation; }
+  button:not(:disabled), [role="button"]:not([aria-disabled="true"]), summary { cursor: pointer; }
+  ::selection { background: var(--accent); color: var(--on-accent); }
+}
+
+@utility tabular { font-variant-numeric: tabular-nums; }
+@utility pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+@utility pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+
+/* Overlay motion: entrance 320ms ease-out, exit faster (PRD §10.7). Only opacity and transform animate. */
+@keyframes overlay-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes overlay-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes sheet-in { from { opacity: 0; transform: translateY(100%); } to { opacity: 1; transform: translateY(0); } }
+@keyframes sheet-out { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(40%); } }
+@keyframes dialog-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+@keyframes dialog-out { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.98); } }
+[data-overlay][data-state="open"] { animation: overlay-in var(--dur-fast) var(--ease-out); }
+[data-overlay][data-state="closed"] { animation: overlay-out 150ms var(--ease-out); }
+/* Phones: a bottom sheet that rises from the edge. From 768px the dialog is centred (Tailwind positions it with the separate
+   `translate` property, so these transform keyframes never fight it) and grows from 0.96. Exits are faster than entrances. */
+[data-sheet][data-state="open"] { animation: sheet-in 320ms var(--ease-out); }
+[data-sheet][data-state="closed"] { animation: sheet-out var(--dur-fast) var(--ease-out); }
+@media (min-width: 768px) {
+  [data-sheet][data-state="open"] { animation: dialog-in 220ms var(--ease-out); }
+  [data-sheet][data-state="closed"] { animation: dialog-out 150ms var(--ease-out); }
+}
+@keyframes skeleton { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+.skeleton { animation: skeleton 1.6s ease-in-out infinite; }
+
+/* Press feedback (PRD v1.1 §8.6). Hover colours stay with each button variant, which Tailwind already limits to fine pointers. */
+.press { transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease, opacity var(--dur-fast) ease; }
+.press:not(:disabled):active { transform: scale(var(--scale-press)); }
+
+/* View transitions (lib/motion.ts sets data-vt on the root while one runs): the theme change is a circular reveal from the
+   toggle; a language change is a short crossfade with a 2px blur bridge. Both are skipped under reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+  :root[data-vt="reveal"]::view-transition-new(root) { animation: vt-reveal var(--dur-slow) var(--ease-in-out) both; }
+  :root[data-vt="fade"]::view-transition-old(root) { animation: vt-out 120ms var(--ease-out) both; }
+  :root[data-vt="fade"]::view-transition-new(root) { animation: vt-in var(--dur-fast) var(--ease-out) both; }
+}
+@keyframes vt-out { to { opacity: 0; filter: blur(2px); } }
+@keyframes vt-in { from { opacity: 0; filter: blur(2px); } }
+@keyframes vt-reveal {
+  from { clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 50%)); }
+  to { clip-path: circle(var(--vt-r, 150vmax) at var(--vt-x, 50%) var(--vt-y, 50%)); }
+}
+
+/* ---------- Signed-in app motion (PRD v1.1 §7.2 and §7.3). Subtle for everyday controls; one-off moments get a spring. ---------- */
+.m-enter { animation: m-enter var(--dur-base) var(--ease-out) both; animation-delay: calc(var(--i, 0) * var(--stagger)); }
+.m-pop { animation: m-pop var(--dur-slow) var(--ease-spring) both; animation-delay: calc(var(--i, 0) * var(--stagger)); }
+@keyframes m-enter { from { opacity: 0; transform: translateY(var(--shift)); } }
+@keyframes m-pop { from { opacity: 0; transform: scale(0.94); } }
+
+/* A check that draws itself (report submitted, goal reached). Elements need pathLength="1". */
+.m-draw path { stroke-dasharray: 1; animation: m-draw 420ms var(--ease-out) 120ms both; }
+.m-draw circle { animation: m-fade var(--dur-base) var(--ease-out) both; }
+@keyframes m-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes m-fade { from { opacity: 0; } }
+
+/* Hours ribbon: the fill is a scaled layer and the slanted gold tip a separate moved layer, driven by one variable (--p, 0 to 1). */
+.m-ribbon-fill { position: absolute; inset: 0; background: var(--primary); transform-origin: left center; transform: scaleX(var(--p, 0)); transition: transform 560ms var(--ease-spring); }
+.m-ribbon-tipwrap { position: absolute; inset: 0; transform: translateX(calc(var(--p, 0) * 100%)); transition: transform 560ms var(--ease-spring); pointer-events: none; }
+.m-ribbon-tip { position: absolute; top: 0; bottom: 0; left: 0; width: 4px; margin-left: -4px; background: var(--accent); transform: skewX(-20deg); transform-origin: bottom; }
+[data-complete="true"] .m-ribbon-tip { opacity: 0; }
+
+/* Mini chart bars grow from the baseline, staggered; capped at twelve bars. */
+.m-bar { transform-origin: bottom; animation: m-grow var(--dur-slow) var(--ease-out) both; animation-delay: calc(var(--i, 0) * 30ms); }
+@keyframes m-grow { from { transform: scaleY(0); } }
+
+/* Yes / No selection: one fill that slides between the two options. */
+.m-seg-ind { position: absolute; z-index: 10; top: 0; bottom: 0; left: 0; width: calc((100% - 0.75rem) / 2); border-radius: 6px; background: var(--primary); pointer-events: none;
+  transform: translateX(calc(var(--i, 0) * (100% + 0.75rem))); opacity: 0; transition: transform var(--dur-base) var(--ease-soft), opacity var(--dur-fast) var(--ease-soft); }
+.m-seg-ind[data-visible="true"] { opacity: 1; }
+
+/* Fields that fold away (a "No" report collapses studies and comment). Hidden content is also inert in the markup. */
+.m-collapse { display: grid; grid-template-rows: 1fr; opacity: 1; transition: grid-template-rows var(--dur-fast) var(--ease-soft), opacity var(--dur-fast) var(--ease-soft); }
+.m-collapse[data-open="false"] { grid-template-rows: 0fr; opacity: 0; }
+.m-collapse > .m-collapse-inner { min-height: 0; overflow: hidden; }
+.m-collapse[data-open="true"] > .m-collapse-inner { animation: m-unclip 0s linear var(--dur-fast) both; }
+@keyframes m-unclip { from { overflow: hidden; } to { overflow: visible; } }
+
+/* Live update highlight (Elder console): a gold wash that fades over 1.2s. It is an overlay whose opacity animates, so nothing repaints. */
+[data-flash] { position: relative; }
+[data-flash]:not(tr)::after, tr[data-flash] > td::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--accent); pointer-events: none; animation: m-flash 1.2s var(--ease-out) both; }
+tr[data-flash] > td { position: relative; }
+@keyframes m-flash { from { opacity: 0.35; } to { opacity: 0; } }
+.m-badge-pop { animation: m-badge-pop var(--dur-base) var(--ease-out); }
+@keyframes m-badge-pop { from { transform: scale(0.92); } 50% { transform: scale(1.12); } to { transform: scale(1); } }
+
+/* Card creation: a quiet progress ring while the image is drawn. */
+.m-ring { animation: m-spin 900ms linear infinite; transform-origin: center; }
+@keyframes m-spin { to { transform: rotate(360deg); } }
+
+/* Moving between pages inside the app (PRD v1.1 AM-01). The member app rises 4px as it fades; the Elder console only fades, because it is used all day. */
+.m-route { animation: m-route var(--dur-base) var(--ease-out) both; }
+.m-route-soft { animation: m-fade 150ms var(--ease-out) both; }
+@keyframes m-route { from { opacity: 0; transform: translateY(4px); } }
+
+/* Empty states draw a small door line by line (PRD v1.1 AM-22). */
+.m-line path, .m-line circle { stroke-dasharray: 1; animation: m-draw 500ms var(--ease-out) both; animation-delay: calc(var(--k, 0) * 90ms); }
+
+/* Error, not-found and offline pages: a closed gold door that swings open once (PRD v1.1 AM-24). Reduced motion: it is simply open. */
+.m-door { width: 6rem; height: 8.25rem; perspective: 520px; }
+.m-door-frame { position: relative; width: 100%; height: 100%; border: 3px solid var(--primary); border-bottom-width: 3px; border-radius: 3rem 3rem 0 0; overflow: hidden; background: linear-gradient(180deg, transparent, var(--door-glow)); }
+.m-door-leaf { position: absolute; inset: 0; background: var(--accent); border-radius: inherit; transform-origin: left center; transform: rotateY(-72deg); }
+.m-door-leaf::after { content: ""; position: absolute; right: 14%; top: 54%; width: 0.4rem; height: 0.4rem; border-radius: 50%; background: var(--on-accent); }
+@media (prefers-reduced-motion: no-preference) {
+  .m-door-leaf { transform: rotateY(0deg); animation: m-door-open 700ms var(--ease-out) 350ms both; }
+}
+@keyframes m-door-open { to { transform: rotateY(-72deg); } }
+
+/* Visit cards: the foreground follows the finger and springs back; the action waits underneath (PRD v1.1 AM-16). */
+.m-swipe-fg { touch-action: pan-y; will-change: transform; }
+
+/* Bar that slides up when something is selected (Elder console, EM-07). Closed: out of reach, inert in the markup. Exit is faster than entrance. */
+.m-sticky-bar { position: sticky; bottom: 0; z-index: 30; padding-top: 0.75rem; padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px)); transform: translateY(calc(100% + 1.5rem)); opacity: 0; pointer-events: none;
+  transition: transform 160ms var(--ease-out), opacity 120ms ease; }
+.m-sticky-bar[data-open="true"] { transform: none; opacity: 1; pointer-events: auto; transition: transform var(--dur-base) var(--ease-out), opacity var(--dur-fast) ease; }
+
+/* Photo cropper: arrow-button nudges ease for a moment; drag and zoom never do (AM-19). */
+[data-nudging="true"] .m-crop-media { transition: transform 120ms var(--ease-out); }
+
+/* One tab underline that glides to the chosen tab (AM-17). Width is a scale of a 1px bar. */
+.m-tab-ind { position: absolute; left: 0; bottom: 0; height: 4px; width: 1px; background: var(--accent); transform-origin: left center; transition: transform var(--dur-base) var(--ease-soft); pointer-events: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}

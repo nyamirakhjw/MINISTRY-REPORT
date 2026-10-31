@@ -1,0 +1,358 @@
+diff -ruN '--exclude=node_modules' ./src/app/app/log/page.tsx ../../MINISTRY-REPORT-main/src/app/app/log/page.tsx
+--- a/src/app/app/log/page.tsx	2026-10-31 19:47:20.000000000 +0000
++++ b/src/app/app/log/page.tsx	2026-10-31 20:03:58.667502043 +0000
+@@ -48,7 +48,7 @@
+               min="0"
+               defaultValue={category === "personal" ? parsedGoalHours || "" : ""}
+               placeholder="Hours (e.g. 15)"
+-              className="flex h-11 w-full max-w-[150px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
++              className="flex h-11 w-full max-w-40 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+             />
+             <button
+               type="submit"
+diff -ruN '--exclude=node_modules' ./src/app/globals.css ../../MINISTRY-REPORT-main/src/app/globals.css
+--- a/src/app/globals.css	2026-10-31 19:47:20.000000000 +0000
++++ b/src/app/globals.css	2026-10-31 20:03:58.666048154 +0000
+@@ -28,6 +28,7 @@
+   --band-foreground: #FFFFFF;
+   --plate: transparent;
+   --on-accent: #0B2E6B;
++  --float-shadow: 0 8px 24px rgb(15 23 42 / 0.08);   /* neutral and soft; only for things that float over the page */
+ }
+ .dark {
+   --background: #0B1220;
+@@ -54,6 +55,7 @@
+   --band-foreground: #E6ECF7;
+   --plate: rgb(230 236 247 / 0.92);
+   --on-accent: #0B2E6B;
++  --float-shadow: 0 8px 24px rgb(0 0 0 / 0.4);
+ }
+ 
+ /* Motion tokens (PRD v1.1 §6.2). Only transform and opacity animate; ease-out for UI, never ease-in. */
+@@ -89,6 +91,8 @@
+   --color-warning: var(--warning);
+   --color-danger: var(--danger);
+   --color-scrim: var(--scrim);
++  --color-on-accent: var(--on-accent);
++  --shadow-float: var(--float-shadow);
+   --font-heading: var(--font-lexend), ui-sans-serif, system-ui, sans-serif;
+   --font-sans: var(--font-source-sans), ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+   --radius-sm: 4px;
+diff -ruN '--exclude=node_modules' ./src/components/admin/not-reported-list.tsx ../../MINISTRY-REPORT-main/src/components/admin/not-reported-list.tsx
+--- a/src/components/admin/not-reported-list.tsx	2026-10-31 19:47:20.000000000 +0000
++++ b/src/components/admin/not-reported-list.tsx	2026-10-31 20:03:58.666570144 +0000
+@@ -74,7 +74,7 @@
+       </div>
+ 
+       <div className="m-sticky-bar" data-open={open ? "true" : "false"} inert={!open} aria-hidden={open ? undefined : true}>
+-        <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-surface px-4 py-3 shadow-lg">
++        <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-surface px-4 py-3 shadow-float">
+           <p aria-live="polite" className="font-semibold">{t("selectedCount", { count: selected.size })}</p>
+           <p className="text-sm text-muted-foreground">{reachable.length === 0 ? t("noneHavePhone") : t("messageProgress", { done, total: reachable.length })}</p>
+           <div className="ml-auto flex flex-wrap gap-2">
+diff -ruN '--exclude=node_modules' ./src/components/landing/landing.css ../../MINISTRY-REPORT-main/src/components/landing/landing.css
+--- a/src/components/landing/landing.css	2026-10-31 19:47:20.000000000 +0000
++++ b/src/components/landing/landing.css	2026-10-31 20:03:48.352319721 +0000
+@@ -9,7 +9,7 @@
+ .lp-h2 { font-size: 1.5rem; line-height: 1.2; }
+ @media (min-width: 768px) { .lp-h2 { font-size: 1.875rem; } }
+ .lp-muted { color: var(--muted-foreground); }
+-.lp-rule { height: 2px; width: 3.5rem; background: var(--accent); transform-origin: left center; }
++.lp-rule { display: block; height: 2px; width: 3.5rem; margin-bottom: 1rem; background: var(--accent); }
+ 
+ /* ---------- header (landing only) ---------- */
+ .lp-header { position: sticky; top: 0; z-index: 40; }
+@@ -47,7 +47,8 @@
+ .lp-band .lp-muted { color: color-mix(in srgb, var(--band-foreground) 82%, transparent); }
+ .lp-band-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; align-items: center; }
+ @media (min-width: 768px) { .lp-band-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 3rem; } }
+-.lp-pill { display: inline-flex; align-items: center; min-height: 1.75rem; padding-inline: 0.75rem; border: 1px solid currentColor; border-radius: 999px; font-size: 0.875rem; font-weight: 600; }
++/* a quiet label, not a pill: it only says the numbers are made up */
++.lp-sample { font-size: 0.875rem; }
+ .lp-panel { background: var(--surface); color: var(--foreground); border-radius: 10px; padding: 1.25rem; }
+ @media (min-width: 768px) { .lp-panel { padding: 1.5rem; } }
+ .lp-demo-num { font-family: var(--font-heading); font-size: 2rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+@@ -57,7 +58,7 @@
+ [data-done="true"] .lp-demo-ok path { stroke-dashoffset: 0; }
+ .lp-demo-ok { opacity: 0; transition: opacity var(--dur-fast) ease; }
+ [data-done="true"] .lp-demo-ok { opacity: 1; }
+-.lp-track { position: relative; height: 1.75rem; overflow: hidden; border-radius: 6px; background: var(--tint); margin-top: 0.75rem; }
++.lp-track { position: relative; height: 1.75rem; overflow: hidden; border-radius: 4px; background: var(--tint); margin-top: 0.75rem; }
+ .lp-fill { position: absolute; inset: 0; background: var(--primary); transform-origin: left center; transform: scaleX(var(--p, 0)); transition: transform 560ms var(--ease-spring); }
+ .lp-tipwrap { position: absolute; inset: 0; transform: translateX(calc(var(--p, 0) * 100%)); transition: transform 560ms var(--ease-spring); pointer-events: none; }
+ .lp-tip { position: absolute; top: 0; bottom: 0; left: 0; width: 4px; margin-left: -4px; background: var(--accent); transform: skewX(-20deg); transform-origin: bottom; }
+@@ -79,25 +80,25 @@
+   .lp-step { padding-left: 0; padding-top: 3.25rem; }
+ }
+ /* mini visuals: shapes only, no figures */
+-.lp-mini { border: 1px solid var(--border); border-radius: 10px; background: var(--surface); padding: 0.875rem; }
++.lp-mini { border: 1px solid var(--border); border-radius: 10px; background: var(--surface); padding: 1rem; }
+ .lp-mini-track { height: 1rem; border-radius: 4px; background: var(--tint); overflow: hidden; position: relative; }
+ .lp-mini-fill { position: absolute; inset: 0; width: 100%; background: var(--primary); transform: scaleX(0.62); transform-origin: left center; }
+-.lp-mini-chip { display: inline-flex; margin-top: 0.625rem; min-height: 1.75rem; align-items: center; padding-inline: 0.625rem; border-radius: 6px; border: 1px solid var(--input-border); font-size: 0.875rem; font-weight: 600; }
++.lp-mini-chip { display: inline-flex; margin-top: 0.75rem; min-height: 1.75rem; align-items: center; padding-inline: 0.75rem; border-radius: 4px; border: 1px solid var(--input-border); font-size: 0.875rem; font-weight: 600; }
+ .lp-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+-.lp-seg > span { display: inline-flex; align-items: center; justify-content: center; gap: 0.375rem; min-height: 2.5rem; border-radius: 6px; border: 1px solid var(--input-border); font-weight: 600; }
++.lp-seg > span { display: inline-flex; align-items: center; justify-content: center; gap: 0.375rem; min-height: 2.5rem; border-radius: 4px; border: 1px solid var(--input-border); font-weight: 600; }
+ .lp-seg > span[data-on="true"] { background: var(--primary); color: var(--primary-foreground); border-color: var(--primary); }
+-.lp-card-mini { height: 6.5rem; max-width: 10rem; display: grid; grid-template-rows: auto 1fr; gap: 0.5rem; padding: 0.625rem; }
+-.lp-card-mini .bar { height: 0.75rem; border-radius: 3px; background: var(--primary); width: 70%; }
++.lp-card-mini { height: 6.5rem; max-width: 10rem; display: grid; grid-template-rows: auto 1fr; gap: 0.5rem; padding: 0.75rem; }
++.lp-card-mini .bar { height: 0.75rem; border-radius: 4px; background: var(--primary); width: 70%; }
+ .lp-card-mini .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+-.lp-card-mini .tiles > span { border-radius: 6px; background: var(--tint); border-bottom: 2px solid var(--accent); }
++.lp-card-mini .tiles > span { border-radius: 4px; background: var(--tint); border-bottom: 2px solid var(--accent); }
+ 
+ /* ---------- private by design ---------- */
+ .lp-private { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+ @media (min-width: 768px) { .lp-private { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 3rem; } }
+ .lp-facts { list-style: none; padding: 0; margin: 0; }
+-.lp-fact { position: relative; display: flex; gap: 0.875rem; padding-block: 1.125rem; }
++.lp-fact { position: relative; display: flex; gap: 1rem; padding-block: 1.25rem; }
+ .lp-fact + .lp-fact { border-top: 1px solid var(--border); }
+-.lp-fact svg { width: 1.5rem; height: 1.5rem; flex: none; margin-top: 0.125rem; color: var(--primary); }
++.lp-fact svg { width: 1.25rem; height: 1.25rem; flex: none; margin-top: 0.125rem; color: var(--muted-foreground); }
+ .lp-divider-top { border-top: 1px solid var(--border); }
+ 
+ /* ---------- meetings ---------- */
+@@ -133,12 +134,9 @@
+ 
+   @supports (animation-timeline: view()) {
+     .lp-reveal { animation: lp-enter linear both; animation-timeline: view(); animation-range: entry 0% cover 25%; }
+-    .lp-rule.lp-reveal { animation-name: lp-draw-x; }
+     /* LM-07: the gold line between the steps draws with scroll progress */
+     .lp-steps::before { animation: lp-draw-y linear both; animation-timeline: view(); animation-range: entry 10% cover 55%; }
+     @media (min-width: 900px) { .lp-steps::before { animation-name: lp-draw-x; } }
+-    /* LM-05: the back wave drifts a little as the hero scrolls away */
+-    .lp-wave .w-back { animation: lp-drift linear both; animation-timeline: view(); animation-range: entry 0% exit 100%; }
+   }
+   @supports (animation-timeline: scroll()) {
+     /* LM-03: header edge appears once the page scrolls */
+@@ -152,7 +150,6 @@
+ @keyframes lp-enter { from { opacity: 0; transform: translateY(var(--shift)); } }
+ @keyframes lp-draw-x { from { transform: scaleX(0); } }
+ @keyframes lp-draw-y { from { transform: scaleY(0); } }
+-@keyframes lp-drift { from { transform: translateX(-30px); } to { transform: translateX(30px); } }
+ @keyframes lp-edge { to { border-bottom-color: var(--border); } }
+ 
+ /* muted text inside the white demo panel (the navy band overrides .lp-muted, so the panel has its own) */
+diff -ruN '--exclude=node_modules' ./src/components/landing/private-by-design.tsx ../../MINISTRY-REPORT-main/src/components/landing/private-by-design.tsx
+--- a/src/components/landing/private-by-design.tsx	2026-10-31 19:47:20.000000000 +0000
++++ b/src/components/landing/private-by-design.tsx	2026-10-31 20:03:58.665674125 +0000
+@@ -12,14 +12,14 @@
+   return (
+     <section aria-labelledby="private-title" className="lp-section lp-divider-top bg-surface">
+       <div className="lp-wrap lp-private">
+-        <div className="lp-reveal">
+-          <span className="lp-rule lp-reveal" aria-hidden="true" style={{ display: "block", marginBottom: "1rem" }} />
++        <div>
++          <span className="lp-rule" aria-hidden="true" />
+           <h2 id="private-title" className="lp-h2">{t("privacyTitle")}</h2>
+         </div>
+         <ul className="lp-facts">
+           {facts.map(({ Icon, text }) => (
+-            <li key={text} className="lp-fact lp-reveal">
+-              <Icon aria-hidden="true" />
++            <li key={text} className="lp-fact">
++              <Icon aria-hidden="true" strokeWidth={1.5} />
+               <p>{text}</p>
+             </li>
+           ))}
+diff -ruN '--exclude=node_modules' ./src/components/landing.tsx ../../MINISTRY-REPORT-main/src/components/landing.tsx
+--- a/src/components/landing.tsx	2026-10-31 19:47:20.000000000 +0000
++++ b/src/components/landing.tsx	2026-10-31 20:03:58.665358700 +0000
+@@ -50,7 +50,7 @@
+             <div className="lp-reveal">
+               <h2 id="demo-title" className="lp-h2">{t("demoTitle")}</h2>
+               <p className="lp-muted mt-3 max-w-md text-lg">{t("demoLead")}</p>
+-              <p className="lp-pill mt-5">{t("demoSample")}</p>
++              <p className="lp-sample lp-muted mt-4">{t("demoSample")}</p>
+             </div>
+             <div className="lp-reveal"><RibbonDemo /></div>
+           </div>
+@@ -63,17 +63,17 @@
+           <section aria-labelledby="meetings-title" className="lp-divider-top">
+             <div className="lp-wrap lp-meet lp-section">
+               {meetings.length > 0 && (
+-                <div className="lp-reveal">
++                <div>
+                   <h2 id="meetings-title" className="text-xl">{t("meetings")}</h2>
+                   <dl className="mt-3 space-y-2">
+                     {meetings.map((x) => (
+-                      <div key={x.label} className="flex gap-3"><dt className="w-24 font-semibold">{x.label}</dt><dd>{x.m?.day}, {x.m?.time}</dd></div>
++                      <div key={x.label} className="flex gap-3"><dt className="w-24 text-muted-foreground">{x.label}</dt><dd>{x.m?.day}, {x.m?.time}</dd></div>
+                     ))}
+                   </dl>
+                 </div>
+               )}
+               {address.length > 0 && (
+-                <div className="lp-reveal">
++                <div>
+                   <h2 className="text-xl">{t("hall")}</h2>
+                   <address className="mt-3 not-italic">{address.map((a) => <div key={a}>{a}</div>)}</address>
+                   {l.map_url ? <a href={l.map_url} rel="noopener noreferrer" target="_blank" className={cn(buttonVariants({ variant: "link" }), "mt-2 inline-flex min-h-11 items-center")}>{t("map")}</a> : null}
+@@ -83,7 +83,7 @@
+           </section>
+         )}
+ 
+-        <section className="lp-wrap py-8 lp-reveal"><InstallCard /></section>
++        <section className="lp-wrap py-8"><InstallCard /></section>
+       </main>
+       <PublicFooter prefix={prefix} />
+       <RevealObserver />
+diff -ruN '--exclude=node_modules' ./src/components/settings/groups-manager.tsx ../../MINISTRY-REPORT-main/src/components/settings/groups-manager.tsx
+--- a/src/components/settings/groups-manager.tsx	2026-10-31 19:47:20.000000000 +0000
++++ b/src/components/settings/groups-manager.tsx	2026-10-31 20:03:58.667319638 +0000
+@@ -71,7 +71,7 @@
+             disabled={isPending}
+             aria-label="Save name"
+           >
+-            <Check className="h-[18px] w-[18px]" strokeWidth={1.75} />
++            <Check className="size-5" strokeWidth={1.75} />
+           </Button>
+           <Button
+             type="button"
+@@ -85,7 +85,7 @@
+             }}
+             aria-label="Cancel rename"
+           >
+-            <X className="h-[18px] w-[18px]" strokeWidth={1.75} />
++            <X className="size-5" strokeWidth={1.75} />
+           </Button>
+         </div>
+       ) : (
+@@ -105,7 +105,7 @@
+             onClick={() => setEditing(true)}
+             aria-label={`Rename ${group.name}`}
+           >
+-            <Pencil className="h-[18px] w-[18px]" strokeWidth={1.75} />
++            <Pencil className="size-5" strokeWidth={1.75} />
+           </Button>
+           <Button
+             type="button"
+@@ -117,9 +117,9 @@
+             aria-label={group.retired ? `Reactivate ${group.name}` : `Retire ${group.name}`}
+           >
+             {group.retired ? (
+-              <RotateCcw className="h-[18px] w-[18px]" strokeWidth={1.75} />
++              <RotateCcw className="size-5" strokeWidth={1.75} />
+             ) : (
+-              <Archive className="h-[18px] w-[18px]" strokeWidth={1.75} />
++              <Archive className="size-5" strokeWidth={1.75} />
+             )}
+           </Button>
+         </div>
+diff -ruN '--exclude=node_modules' ./src/components/settings/settings-nav.tsx ../../MINISTRY-REPORT-main/src/components/settings/settings-nav.tsx
+--- a/src/components/settings/settings-nav.tsx	2026-10-31 19:47:20.000000000 +0000
++++ b/src/components/settings/settings-nav.tsx	2026-10-31 20:03:58.667143142 +0000
+@@ -50,7 +50,7 @@
+                 : "text-muted-foreground hover:bg-primary/5 hover:text-foreground",
+             ].join(" ")}
+           >
+-            <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} aria-hidden="true" />
++            <Icon className="size-5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+             {label}
+           </Link>
+         );
+diff -ruN '--exclude=node_modules' ./src/components/shell/sidebar-shell.tsx ../../MINISTRY-REPORT-main/src/components/shell/sidebar-shell.tsx
+--- a/src/components/shell/sidebar-shell.tsx	2026-10-31 19:47:20.000000000 +0000
++++ b/src/components/shell/sidebar-shell.tsx	2026-10-31 20:03:58.666763008 +0000
+@@ -23,7 +23,7 @@
+       <div
+         className={cn(
+           "group/rail absolute inset-y-0 left-0 z-40 flex h-dvh flex-col gap-6 overflow-x-hidden border-r border-border bg-surface p-3 pt-safe transition-[width] duration-150",
+-          collapsed ? "w-[4.5rem] hover:w-64 hover:shadow-xl" : "w-64 p-4",
++          collapsed ? "w-[4.5rem] hover:w-64 hover:shadow-float" : "w-64 p-4",
+         )}
+       >
+         <div className="flex-1 overflow-y-auto">{children}</div>
+diff -ruN '--exclude=node_modules' ./src/components/ui/badge.tsx ../../MINISTRY-REPORT-main/src/components/ui/badge.tsx
+--- a/src/components/ui/badge.tsx	2026-10-31 19:47:20.000000000 +0000
++++ b/src/components/ui/badge.tsx	2026-10-31 20:03:58.666332018 +0000
+@@ -10,7 +10,7 @@
+       success: "border-success text-success",
+       warning: "border-warning text-warning",
+       danger: "border-danger text-danger",
+-      gold: "border-accent bg-accent text-[#0B2E6B]",
++      gold: "border-accent bg-accent text-on-accent",
+     },
+   },
+   defaultVariants: { tone: "neutral" },
+diff -ruN '--exclude=node_modules' ./src/components/ui/dialog.tsx ../../MINISTRY-REPORT-main/src/components/ui/dialog.tsx
+--- a/src/components/ui/dialog.tsx	2026-10-31 19:47:20.000000000 +0000
++++ b/src/components/ui/dialog.tsx	2026-10-31 20:03:58.666933219 +0000
+@@ -16,7 +16,7 @@
+     <DialogPrimitive.Portal>
+       <DialogPrimitive.Overlay data-overlay className="fixed inset-0 z-50 bg-scrim" />
+       <DialogPrimitive.Content data-sheet {...(description ? {} : { "aria-describedby": undefined })}
+-        className={cn("fixed inset-x-0 bottom-0 z-50 max-h-[92dvh] overflow-y-auto rounded-t-lg border border-border bg-surface-raised p-5 shadow-2xl md:inset-x-auto md:bottom-auto md:left-1/2 md:top-1/2 md:w-full md:max-w-lg md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-lg", className)}>
++        className={cn("fixed inset-x-0 bottom-0 z-50 max-h-[92dvh] overflow-y-auto rounded-t-lg border border-border bg-surface-raised p-5 shadow-float md:inset-x-auto md:bottom-auto md:left-1/2 md:top-1/2 md:w-full md:max-w-lg md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-lg", className)}>
+         <div className="mb-4 flex items-start justify-between gap-4">
+           <div>
+             <DialogPrimitive.Title className="text-xl font-semibold">{title}</DialogPrimitive.Title>
+diff -ruN '--exclude=node_modules' ./src/messages/en.json ../../MINISTRY-REPORT-main/src/messages/en.json
+--- a/src/messages/en.json	2026-10-31 19:47:20.000000000 +0000
++++ b/src/messages/en.json	2026-10-31 20:03:48.351128452 +0000
+@@ -95,7 +95,7 @@
+     "fallbackName": "Nyamira congregation of Jehovah's Witnesses",
+     "metaTitle": "Monthly ministry report: JW Nyamira",
+     "metaDescription": "Report your ministry each month, keep your own record, and sign in or ask for access.",
+-    "headline": "Your ministry report, done in a minute.",
++    "headline": "Your ministry report, done in a minute",
+     "lead": "Log your hours, send your report and keep your own record. Private to our congregation.",
+     "tagline": "A people for Jehovah's Name",
+     "signIn": "Sign in",
+@@ -116,16 +116,16 @@
+     "demoValue": "{current} of {goal} hours, {percent} percent",
+     "stepsTitle": "How it works",
+     "step1Title": "Log as you serve",
+-    "step1Body": "Add hours in two taps, even with no signal.",
++    "step1Body": "Add hours in two taps, even with no signal",
+     "step1Chip": "+ 1 hour",
+     "step2Title": "Report at month end",
+-    "step2Body": "Yes or No, or your hours and studies.",
++    "step2Body": "Yes or No, or your hours and studies",
+     "step3Title": "Keep your report card",
+-    "step3Body": "Download a square card for your records.",
++    "step3Body": "Download a square card for your records",
+     "privacyTitle": "Private by design",
+     "privacy1": "Only you can see your daily log and return visits. Elders cannot.",
+     "privacy2": "Works offline. Your hours and visits save on your phone and send when you are back online.",
+-    "privacy3": "No ads and no tracking."
++    "privacy3": "No ads and no tracking"
+   },
+   "legal": {
+     "privacyDescription": "What Ministry Report collects, who can see it, and what you can ask us to do.",
+diff -ruN '--exclude=node_modules' ./src/messages/sw.json ../../MINISTRY-REPORT-main/src/messages/sw.json
+--- a/src/messages/sw.json	2026-10-31 19:47:20.000000000 +0000
++++ b/src/messages/sw.json	2026-10-31 20:03:48.351796266 +0000
+@@ -95,7 +95,7 @@
+     "fallbackName": "Kutaniko la Nyamira la Mashahidi wa Yehova",
+     "metaTitle": "Ripoti ya huduma ya kila mwezi: JW Nyamira",
+     "metaDescription": "Ripoti huduma yako kila mwezi, hifadhi kumbukumbu yako, na uingie au uombe kuingia.",
+-    "headline": "Ripoti yako ya huduma, kwa dakika moja.",
++    "headline": "Ripoti yako ya huduma, kwa dakika moja",
+     "lead": "Rekodi saa zako, wasilisha ripoti yako na uhifadhi rekodi yako. Ni ya faragha kwa kutaniko letu.",
+     "tagline": "Watu wa Jina la Yehova",
+     "signIn": "Ingia",
+@@ -116,16 +116,16 @@
+     "demoValue": "Saa {current} kati ya {goal}, asilimia {percent}",
+     "stepsTitle": "Inavyofanya kazi",
+     "step1Title": "Rekodi unapohudumu",
+-    "step1Body": "Ongeza saa kwa kugusa mara mbili, hata bila mtandao.",
++    "step1Body": "Ongeza saa kwa kugusa mara mbili, hata bila mtandao",
+     "step1Chip": "+ saa 1",
+     "step2Title": "Ripoti mwisho wa mwezi",
+-    "step2Body": "Ndiyo au Hapana, au saa na mafunzo yako.",
++    "step2Body": "Ndiyo au Hapana, au saa na mafunzo yako",
+     "step3Title": "Hifadhi kadi yako ya ripoti",
+-    "step3Body": "Pakua kadi ya mraba kwa kumbukumbu yako.",
++    "step3Body": "Pakua kadi ya mraba kwa kumbukumbu yako",
+     "privacyTitle": "Faragha tangu mwanzo",
+     "privacy1": "Ni wewe tu unayeweza kuona rekodi yako ya kila siku na ziara za kurudia. Wazee hawawezi.",
+     "privacy2": "Inafanya kazi bila mtandao. Saa na ziara zako huhifadhiwa kwenye simu na kutumwa ukipata mtandao.",
+-    "privacy3": "Hakuna matangazo wala ufuatiliaji."
++    "privacy3": "Hakuna matangazo wala ufuatiliaji"
+   },
+   "legal": {
+     "privacyDescription": "Ripoti ya Huduma inakusanya nini, nani anaweza kukiona, na unachoweza kutuomba.",
