@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { CloseMonthDialog, OnBehalfDialog } from "@/components/admin/report-dialogs";
+import { MonthFade } from "@/components/admin/month-fade";
 import { MonthPicker } from "@/components/admin/month-picker";
-import { WhatsAppLink } from "@/components/admin/whatsapp-link";
-import { Avatar } from "@/components/ui/avatar";
+import { NotReportedList } from "@/components/admin/not-reported-list";
+import { EmptyState } from "@/components/ui/empty-state";
 import { requireRole } from "@/lib/auth/session";
 import { signedAvatarUrls } from "@/lib/auth/avatars";
 import { getMonthRows, parseMonthParam } from "@/lib/admin-data";
@@ -30,23 +30,13 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
     <div className="flex flex-col gap-6">
       <h1>{t("notReportedTitle", { month: formatMonth(month, locale) })}</h1>
       <MonthPicker month={month} />
-      {rows.length === 0 ? <p className="rounded-lg border border-border bg-surface p-5">{t("everyoneReported")}</p> : (
-        <ul className="divide-y divide-border rounded-lg border border-border bg-surface">
-          {rows.map((r) => (
-            <li key={r.member_id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-3">
-                <Avatar name={r.full_name} src={r.avatar_path ? avatars[r.avatar_path] : null} size={44} alt={t("photoOf", { name: r.full_name })} />
-                <div><p className="font-semibold">{r.full_name}</p><p className="text-sm text-muted-foreground">{r.group_name ?? ""} · {daysLeft >= 0 ? t("daysLeft", { count: daysLeft }) : t("daysOverdue", { count: -daysLeft })}</p></div>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <WhatsAppLink phone={r.phone} firstName={r.full_name.split(" ")[0] ?? r.full_name} month={month} dueIso={new Date(w.onTimeUntil.getTime() - 60_000).toISOString()} siteUrl={publicEnv.siteUrl} />
-                <OnBehalfDialog memberId={r.member_id} name={r.full_name} month={month} label={t("submitOnBehalf")} />
-                <CloseMonthDialog memberId={r.member_id} name={r.full_name} month={month} label={t("closeMonth")} />
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
+      <MonthFade month={month}>
+        {rows.length === 0 ? <EmptyState>{t("everyoneReported")}</EmptyState> : (
+          <NotReportedList
+            rows={rows.map((r) => ({ memberId: r.member_id, fullName: r.full_name, groupName: r.group_name, phone: r.phone, avatarUrl: r.avatar_path ? avatars[r.avatar_path] ?? null : null }))}
+            month={month} dueIso={new Date(w.onTimeUntil.getTime() - 60_000).toISOString()} siteUrl={publicEnv.siteUrl} daysLeft={daysLeft} />
+        )}
+      </MonthFade>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
+import { MonthFade } from "@/components/admin/month-fade";
 import { MonthPicker } from "@/components/admin/month-picker";
 import { ReportsTable } from "@/components/admin/reports-table";
 import { requireRole } from "@/lib/auth/session";
@@ -23,7 +24,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
     <div className="flex flex-col gap-6">
       <h1>{t("reportsTitle", { month: formatMonth(month, locale) })}</h1>
       <MonthPicker month={month} />
-      <ReportsTable rows={rows} groups={groups} month={month} avatars={avatars} />
+      <MonthFade month={month}><ReportsTable rows={rows} groups={groups} month={month} avatars={avatars} /></MonthFade>
     </div>
   );
 }

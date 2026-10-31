@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased: leftover motion
+
+- Month picker changes the month in place and the page content fades; no more full reload.
+- Not-reported list: tick people (or everyone) and a bar slides up with "Message next on WhatsApp", progress and Clear.
+- Exports page and backup dialog use the same ring-then-check download behaviour as the Reports page.
+- Photo cropper: the picture fades in, arrow buttons ease the photo, the save button shows a ring.
+
 ## Unreleased: remaining motion
 
 - Pages ease in when you move around the app (member app rises 4px; Elder console fades). Language change crossfades.

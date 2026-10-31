@@ -4,6 +4,8 @@ import Cropper, { type Area } from "react-easy-crop";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ImagePlus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { Ring } from "@/components/ui/ring";
+import { prefersReducedMotion } from "@/lib/motion";
 import { createClient } from "@/lib/supabase/browser";
 import { setAvatarAction } from "@/lib/actions/profile";
 import type { ActionResult } from "@/lib/actions/rpc";
@@ -54,6 +56,9 @@ export function PhotoCropper({ memberId, name, onSaved, onSave = (path: string) 
   const [error, setError] = React.useState<string | null>(null);
   const [busy, setBusy] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const frame = React.useRef<HTMLDivElement>(null);
+  const nudgeTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  React.useEffect(() => () => { if (nudgeTimer.current) clearTimeout(nudgeTimer.current); }, []);
 
   function pick(file: File | undefined) {
     setError(null);
@@ -86,7 +91,17 @@ export function PhotoCropper({ memberId, name, onSaved, onSave = (path: string) 
     }
   }
 
-  const nudge = (dx: number, dy: number) => setCrop((c) => ({ x: c.x + dx, y: c.y + dy }));
+  // The picture fades in (opacity only: a scale would make the cropper measure itself too small). The arrow buttons move the photo with a short ease (PRD v1.1 AM-19). Dragging and the zoom slider never get one, so the
+  // round preview stays exactly under the finger. The ease is a CSS transition switched on for 160ms by a data attribute.
+  const nudge = (dx: number, dy: number) => {
+    const el = frame.current;
+    if (el && !prefersReducedMotion()) {
+      el.dataset.nudging = "true";
+      if (nudgeTimer.current) clearTimeout(nudgeTimer.current);
+      nudgeTimer.current = setTimeout(() => { delete el.dataset.nudging; }, 160);
+    }
+    setCrop((c) => ({ x: c.x + dx, y: c.y + dy }));
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -95,8 +110,8 @@ export function PhotoCropper({ memberId, name, onSaved, onSave = (path: string) 
         <Button variant="secondary" onClick={() => inputRef.current?.click()}><ImagePlus aria-hidden="true" />{t("choose")}</Button>
       ) : (
         <>
-          <div className="relative h-72 w-full overflow-hidden rounded-lg bg-foreground/90 sm:h-80">
-            <Cropper image={src} crop={crop} zoom={zoom} aspect={1} cropShape="round" showGrid={false}
+          <div ref={frame} key={src} className="m-route-soft relative h-72 w-full overflow-hidden rounded-lg bg-foreground/90 sm:h-80">
+            <Cropper image={src} classes={{ mediaClassName: "m-crop-media" }} crop={crop} zoom={zoom} aspect={1} cropShape="round" showGrid={false}
               onCropChange={setCrop} onZoomChange={setZoom} onCropComplete={(_, px) => setArea(px)} />
           </div>
           <p className="text-sm text-muted-foreground">{t("gestureHelp")}</p>
@@ -111,7 +126,7 @@ export function PhotoCropper({ memberId, name, onSaved, onSave = (path: string) 
             <Button variant="secondary" size="icon" onClick={() => nudge(12, 0)} aria-label={t("right")}><ArrowRight aria-hidden="true" /></Button>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Button onClick={save} disabled={busy || !area}>{busy ? t("saving") : t("save")}</Button>
+            <Button onClick={save} disabled={busy || !area} aria-busy={busy}>{busy ? <Ring /> : null}{busy ? t("saving") : t("save")}</Button>
             <Button variant="ghost" onClick={() => inputRef.current?.click()} disabled={busy}>{t("chooseAnother")}</Button>
           </div>
         </>

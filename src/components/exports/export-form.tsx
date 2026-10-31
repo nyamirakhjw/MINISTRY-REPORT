@@ -2,7 +2,7 @@
 import * as React from "react";
 import { useTranslations } from "next-intl";
 import { Download } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { DownloadLink } from "@/components/ui/download-link";
 import { Input, Select } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -37,27 +37,27 @@ export function ExportForm({ defaultMonth, defaultServiceYear }: { defaultMonth:
           <label className="flex items-center gap-2"><Checkbox checked={notReported} onCheckedChange={(v) => setNotReported(!!v)} />{t("includeNotReported")}</label>
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
-          <Button asChild><a href={`/api/exports/congregation?${congregationParams}`}><Download className="size-5" aria-hidden="true" />{t("downloadPdf")}</a></Button>
-          <Button asChild variant="secondary"><a href={`/api/exports/congregation-excel?${congregationParams}`}><Download className="size-5" aria-hidden="true" />{t("downloadExcel")}</a></Button>
+          <DownloadLink variant="primary" size="md" href={`/api/exports/congregation?${congregationParams}`} icon={<Download className="size-5" aria-hidden="true" />}>{t("downloadPdf")}</DownloadLink>
+          <DownloadLink variant="secondary" size="md" href={`/api/exports/congregation-excel?${congregationParams}`} icon={<Download className="size-5" aria-hidden="true" />}>{t("downloadExcel")}</DownloadLink>
         </div>
       </section>
 
       <section className="rounded-lg border border-border bg-surface p-5">
         <h2 className="text-lg font-semibold">{t("serviceYearTitle")}</h2>
         <div className="mt-4"><Label htmlFor="ex-sy">{t("serviceYear")}</Label><Input id="ex-sy" value={serviceYear} onChange={(e) => setServiceYear(e.target.value)} placeholder="2026-2027" /></div>
-        <div className="mt-4"><Button asChild variant="secondary"><a href={`/api/exports/service-year?year=${encodeURIComponent(serviceYear)}`}><Download className="size-5" aria-hidden="true" />{t("downloadExcel")}</a></Button></div>
+        <div className="mt-4"><DownloadLink variant="secondary" size="md" href={`/api/exports/service-year?year=${encodeURIComponent(serviceYear)}`} icon={<Download className="size-5" aria-hidden="true" />}>{t("downloadExcel")}</DownloadLink></div>
       </section>
 
       <section className="rounded-lg border border-border bg-surface p-5">
         <h2 className="text-lg font-semibold">{t("individualTitle")}</h2>
         <p className="mt-1 text-sm text-muted-foreground">{t("individualHint")}</p>
         <div className="mt-4"><Label htmlFor="ex-member">{t("memberId")}</Label><Input id="ex-member" value={memberId} onChange={(e) => setMemberId(e.target.value)} placeholder={t("memberIdPlaceholder")} /></div>
-        <div className="mt-4"><Button asChild><a href={`/api/exports/individual?${individualParams}`}><Download className="size-5" aria-hidden="true" />{t("downloadPdf")}</a></Button></div>
+        <div className="mt-4"><DownloadLink variant="primary" size="md" href={`/api/exports/individual?${individualParams}`} icon={<Download className="size-5" aria-hidden="true" />}>{t("downloadPdf")}</DownloadLink></div>
       </section>
 
       <section className="rounded-lg border border-border bg-surface p-5">
         <h2 className="text-lg font-semibold">{t("auditLogTitle")}</h2>
-        <div className="mt-4"><Button asChild variant="secondary"><a href="/api/exports/audit-log"><Download className="size-5" aria-hidden="true" />{t("downloadExcel")}</a></Button></div>
+        <div className="mt-4"><DownloadLink variant="secondary" size="md" href="/api/exports/audit-log" icon={<Download className="size-5" aria-hidden="true" />}>{t("downloadExcel")}</DownloadLink></div>
       </section>
     </div>
   );

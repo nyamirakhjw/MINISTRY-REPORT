@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { ShieldCheck } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Ring } from "@/components/ui/ring";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -43,7 +44,7 @@ export function BackupDialog() {
           <div><Label htmlFor="bk-pass">{t("passphrase")}</Label><Input id="bk-pass" type="password" value={passphrase} onChange={(e) => setPassphrase(e.target.value)} autoComplete="new-password" /></div>
           <div><Label htmlFor="bk-confirm">{t("passphraseConfirm")}</Label><Input id="bk-confirm" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} autoComplete="new-password" /></div>
           <p className="text-sm text-muted-foreground">{t("passphraseHint")}</p>
-          <Button onClick={download} disabled={busy}>{busy ? t("preparing") : t("downloadBackup")}</Button>
+          <Button onClick={download} disabled={busy} aria-busy={busy}>{busy ? <Ring /> : null}{busy ? t("preparing") : t("downloadBackup")}</Button>
         </div>
       </DialogContent>
     </Dialog>

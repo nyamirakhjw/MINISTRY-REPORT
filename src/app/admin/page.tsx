@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
+import { MonthFade } from "@/components/admin/month-fade";
 import { MonthPicker } from "@/components/admin/month-picker";
 import { Table, TBody, TD, TH, THead, TR } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
         <Button asChild variant="secondary"><Link href="/admin/exports">{t("goToExports")}</Link></Button>
       </div>
       <MonthPicker month={month} />
+      <MonthFade month={month} className="flex flex-col gap-8">
       <dl className="grid grid-cols-2 gap-x-6 gap-y-4 border-y border-border py-4 md:grid-cols-3 lg:grid-cols-6">
         {kpis.map((k) => (<div key={k.label}><dt className="text-sm text-muted-foreground">{k.label}</dt><dd className="font-heading text-2xl tabular">{k.value}</dd></div>))}
       </dl>
@@ -84,6 +86,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
         <HoursByCategory byCategory={s.byCategory} />
         <CumulativeHours byCategoryMonths={syToDate} />
       </div>
+      </MonthFade>
     </div>
   );
 }

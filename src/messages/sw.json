@@ -757,7 +757,16 @@
     "downloadPdf": "Pakua PDF",
     "downloadExcel": "Pakua Excel",
     "downloadFullMonthNote": "Inapakua mwezi mzima, si vile vilivyochujwa hapo juu tu.",
-    "close": "Funga"
+    "close": "Funga",
+    "selectAll": "Chagua wote",
+    "selectPerson": "Chagua {name}",
+    "selectedCount": "{count, plural, =0 {Hakuna aliyechaguliwa} one {Mtu # amechaguliwa} other {Watu # wamechaguliwa}}",
+    "messageNext": "Tuma ujumbe unaofuata WhatsApp",
+    "messageProgress": "{done} kati ya {total} wamefunguliwa",
+    "noneHavePhone": "Hakuna mwenye namba ya simu",
+    "allOpened": "Wote wamefunguliwa",
+    "clearSelection": "Futa",
+    "opened": "Imefunguliwa"
   },
   "platform": {
     "title": "Jukwaa",
