@@ -7,7 +7,7 @@ import "@/components/hall/hall.css";
 
 type Meeting = { label: string; day?: string; time?: string };
 
-/** "Our Kingdom Hall": the garden photo carries the real meeting times and address on frosted glass; the interior follows. */
+/** "Our Kingdom Hall": the front-of-hall photo carries the real meeting times and address on frosted glass; the interior follows. */
 export async function HallShowcase({ meetings, address, mapUrl }: { meetings: Meeting[]; address: string[]; mapUrl?: string | null }) {
   const t = await getTranslations("landing");
   const hasFacts = meetings.length > 0 || address.length > 0;
@@ -18,7 +18,7 @@ export async function HallShowcase({ meetings, address, mapUrl }: { meetings: Me
 
         <figure className="hs-fig hs-main lp-reveal">
           <div className="hs-frame">
-            <Image src={HALL.garden} alt={t("photoGardenAlt")} fill sizes="(min-width: 1024px) 1008px, 100vw" placeholder="blur" quality={75} className="hs-img" />
+            <Image src={HALL.front} alt={t("photoFrontAlt")} fill sizes="(min-width: 1024px) 1008px, 100vw" placeholder="blur" quality={90} className="hs-img" />
           </div>
           {hasFacts ? (
             <figcaption className="hs-panel glass">

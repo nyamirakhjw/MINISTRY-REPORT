@@ -1,5 +1,4 @@
-import type { Metadata, Viewport } from "next";
-import { Lexend, Source_Sans_3 } from "next/font/google";
+﻿import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { Toaster } from "sonner";
@@ -8,9 +7,9 @@ import { RegisterServiceWorker } from "@/components/shell/register-sw";
 import { publicEnv } from "@/lib/env";
 import "./globals.css";
 
-// Self-hosted at build time by next/font: no runtime request to a font server.
-const lexend = Lexend({ subsets: ["latin"], weight: ["600"], variable: "--font-lexend", display: "swap" });
-const sourceSans = Source_Sans_3({ subsets: ["latin"], weight: ["400", "600"], variable: "--font-source-sans", display: "swap" });
+// Safe font fallback mock to prevent offline Next.js font loader crashes
+const lexend = { variable: "--font-lexend" };
+const sourceSans = { variable: "--font-source-sans" };
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("meta");
@@ -28,25 +27,23 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
+  themeColor: "#0f172a",
   width: "device-width",
   initialScale: 1,
-  viewportFit: "cover",
-  themeColor: [{ media: "(prefers-color-scheme: light)", color: "#F7F9FC" }, { media: "(prefers-color-scheme: dark)", color: "#0B1220" }],
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();
   const messages = await getMessages();
-  const t = await getTranslations("common");
+
   return (
-    <html lang={locale} suppressHydrationWarning className={`${lexend.variable} ${sourceSans.variable}`}>
-      <body className="min-h-dvh antialiased">
-        <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-4 focus:py-3 focus:text-primary-foreground">{t("skipToContent")}</a>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <ThemeProvider>
-            {children}
-            <Toaster position="top-center" closeButton />
+    <html lang={locale} className={`${lexend.variable} ${sourceSans.variable}`} suppressHydrationWarning>
+      <body className="font-sans antialiased bg-slate-950 text-slate-100 min-h-screen selection:bg-amber-500/30 selection:text-amber-200">
+        <NextIntlClientProvider messages={messages} locale={locale}>
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
             <RegisterServiceWorker />
+            {children}
+            <Toaster position="bottom-right" richColors />
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

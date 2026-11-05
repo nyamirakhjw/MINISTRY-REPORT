@@ -14,3 +14,6 @@ supabase/.temp/
 next-env.d.ts
 .DS_Store
 .vercel/
+
+# source documents for generated data (publisher text; never commit)
+data-source/

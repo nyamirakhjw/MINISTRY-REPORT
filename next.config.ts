@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   // Hall photos are served resized for each device, as AVIF or WebP, from our own address (CSP img-src 'self' already allows it).
-  images: { formats: ["image/avif", "image/webp"] },
+  images: { formats: ["image/avif", "image/webp"], qualities: [75, 90] },
   // Production source maps must never be published (checklist: technical cleanup).
   productionBrowserSourceMaps: false,
   // Tell Vercel to bypass strict TypeScript checks since the JS compilation succeeds

@@ -3,7 +3,7 @@
    Motion rules: transform and opacity only; the soft look is a crossfade to a pre-blurred copy
    (no filter animation on large areas); nothing animates for people who asked for less motion.
    ===================================================================== */
-.hf, .hs, .hb { --glass-bg: color-mix(in srgb, var(--surface) 82%, transparent); --glass-edge: color-mix(in srgb, var(--surface) 55%, white); }
+.hf, .hs { --glass-bg: color-mix(in srgb, var(--surface) 82%, transparent); --glass-edge: color-mix(in srgb, var(--surface) 55%, white); }
 
 /* ---- frosted glass (used only over photos) ---- */
 .glass { color: var(--foreground); background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 30px -12px rgb(11 18 32 / 0.5); }
@@ -14,7 +14,9 @@
 
 /* ---- landing face: the photo pins, content slides over it like a curtain ---- */
 .hf { --hf-h: 100svh; --hf-over: 45svh; position: relative; height: calc(var(--hf-h) + var(--hf-over)); }
-.hf-stage { position: sticky; top: 0; height: var(--hf-h); min-height: 30rem; overflow: hidden; background: var(--tint); }
+/* capped at 1448 px: the photo is 1448 px wide, so wider screens get a centred frame instead of a stretched, soft image */
+.hf-stage { position: sticky; top: 0; width: 100%; max-width: 1448px; margin-inline: auto; height: var(--hf-h); min-height: 30rem; overflow: hidden; background: var(--tint); }
+@media (min-width: 1024px) { .hf-stage { border-radius: 0 0 20px 20px; } }
 .hf-layer { position: absolute; inset: 0; }
 .hf-img { object-fit: cover; object-position: 50% 62%; }
 .hf-veil { background: var(--background); opacity: 0; }
@@ -37,14 +39,6 @@
 .hs-second { margin-top: 1.5rem; }
 @media (min-width: 768px) { .hs-second { margin-top: 2rem; } .hs-second .hs-frame { aspect-ratio: 21 / 9; } }
 
-/* ---- signed-in Home banner ---- */
-.hb { position: sticky; top: 0; z-index: 0; height: 11rem; margin-bottom: -1.5rem; }
-@media (min-width: 768px) { .hb { height: 13rem; } }
-.hb-frame { position: absolute; inset: 0; overflow: hidden; border-radius: 12px; background: var(--tint); }
-.hb-img { object-fit: cover; object-position: 50% 60%; }
-.hb-content { position: relative; z-index: 1; background: var(--background); border-radius: 16px 16px 0 0; padding-top: 1.5rem;
-  border-top: 2px solid color-mix(in srgb, var(--accent) 75%, transparent); }
-
 /* ---- motion (scroll-linked, compositor only) ---- */
 @media (prefers-reduced-motion: no-preference) {
   @supports (animation-timeline: scroll()) {
@@ -52,7 +46,6 @@
     .hf-soft   { opacity: 0; animation: hf-soft linear both; animation-timeline: scroll(nearest block); animation-range: 6svh 95svh; }
     .hf-veil   { animation: hf-veil linear both; animation-timeline: scroll(nearest block); animation-range: 25svh 100svh; }
     .hf-panel  { animation: hf-panel-out linear both; animation-timeline: scroll(nearest block); animation-range: 0svh 55svh; }
-    .hb-photo  { animation: hb-out linear both; animation-timeline: scroll(nearest block); animation-range: 0 12rem; transform-origin: 50% 30%; }
   }
   .hf-panel { animation: hf-panel-in var(--dur-slow) var(--ease-out) 120ms both; }
 }
@@ -61,4 +54,3 @@
 @keyframes hf-veil { to { opacity: 1; } }
 @keyframes hf-panel-out { to { opacity: 0; transform: translateY(-3rem); } }
 @keyframes hf-panel-in { from { opacity: 0; transform: translateY(0.75rem); } }
-@keyframes hb-out { to { opacity: 0; transform: scale(1.06); } }

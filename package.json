@@ -19,6 +19,7 @@
     "db:reset": "supabase db reset",
     "db:types": "supabase gen types typescript --local > src/lib/supabase/database.types.ts",
     "fn:serve": "supabase functions serve --env-file supabase/functions/.env --no-verify-jwt",
+    "daily-text": "node scripts/build-daily-text.mjs",
     "check:content": "node scripts/check-content.mjs",
     "check:i18n": "node scripts/check-i18n.mjs",
     "check:bundles": "node scripts/check-bundles.mjs",

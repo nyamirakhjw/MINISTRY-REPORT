@@ -6,7 +6,7 @@ import { buttonVariants } from "@/components/ui/button";
 import "@/components/hall/hall.css";
 
 /**
- * Landing face: the front-of-hall photo fills the first screen, with the headline and the two actions on a frosted
+ * Landing face: the hall photo (the brick hall seen over its hedge) fills the first screen, with the headline and the two actions on a frosted
  * glass panel. As the person scrolls, the sharp photo fades through a soft copy into the page background while the
  * rest of the page slides up over it. Without scroll-linked animation support the photo simply stays and gets covered.
  */
@@ -16,10 +16,10 @@ export async function HeroFace({ tagline }: { tagline: string }) {
     <section className="hf" aria-labelledby="hero-title">
       <div className="hf-stage">
         <div className="hf-layer hf-photo">
-          <Image src={HALL.front} alt={t("photoFrontAlt")} fill priority fetchPriority="high" sizes="100vw" placeholder="blur" quality={75} className="hf-img" />
+          <Image src={HALL.garden} alt={t("photoGardenAlt")} fill priority fetchPriority="high" sizes="(min-width: 1448px) 1448px, 100vw" placeholder="blur" quality={90} className="hf-img" />
         </div>
         <div className="hf-layer hf-soft" aria-hidden="true">
-          <Image src={HALL.frontSoft} alt="" fill unoptimized sizes="100vw" className="hf-img" />
+          <Image src={HALL.gardenSoft} alt="" fill unoptimized sizes="100vw" className="hf-img" />
         </div>
         <div className="hf-layer hf-veil" aria-hidden="true" />
         <div className="hf-panel glass">

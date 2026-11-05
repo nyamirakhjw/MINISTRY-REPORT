@@ -2,12 +2,13 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { HomeBanner } from "@/components/hall/home-banner";
+import { DailyBanner } from "@/components/home/daily-banner";
 import { Badge } from "@/components/ui/badge";
 import { InstallCard } from "@/components/shell/install-card";
 import { HoursRibbon } from "@/components/report/hours-ribbon";
 import { ReportStatusCard } from "@/components/report/status-card";
 import { UpcomingVisitsCard } from "@/components/visits/upcoming-visits-card";
+import { signedAvatarUrls } from "@/lib/auth/avatars";
 import { requireMember } from "@/lib/auth/session";
 import { monthOf } from "@/lib/domain/time";
 import { createClient } from "@/lib/supabase/server";
@@ -24,13 +25,14 @@ export default async function Page() {
   const cat = await getTranslations("categories");
   const supabase = await createClient();
   const month = monthOf(new Date());
-  const [reportStateRes, arrangementsRes, goalRes, logSecondsRes] = await Promise.all([
+  const [reportStateRes, arrangementsRes, goalRes, logSecondsRes, avatarUrls] = await Promise.all([
     supabase.rpc("my_report_state"),
     // Scoped to self (same fix as Settings): without this, an Elder/Owner's Home page showed
     // other members' pending or rejected arrangement requests as if they were their own.
     supabase.from("service_arrangements").select("*").eq("member_id", member.id).in("status", ["pending", "rejected"]).order("requested_at", { ascending: false }).limit(3),
     supabase.rpc("my_month_goal", { p_month: month }),
     supabase.rpc("my_log_seconds", { p_month: month }),
+    signedAvatarUrls([member.avatar_path]),
   ]);
   if (goalRes.error) console.error("my_month_goal failed:", goalRes.error.message);
   const state = reportStateRes.data;
@@ -39,10 +41,8 @@ export default async function Page() {
   const goalCategory = goalRes.error ? undefined : (goalRes.data as { category?: string } | null)?.category;
   const isPioneer = !!goalCategory && goalCategory !== "publisher";
   return (
-    <>
-    <HomeBanner />
-    <div className="hb-content flex flex-col gap-6">
-      <h1>{t("greeting", { name: member.full_name.split(" ")[0] ?? member.full_name })}</h1>
+    <div className="flex flex-col gap-6">
+      <DailyBanner name={member.full_name} avatarUrl={member.avatar_path ? avatarUrls[member.avatar_path] : undefined} />
       <ReportStatusCard state={(state ?? { state: "not_active" }) as ReportState} />
       {isPioneer && (
         // DSH-01: the monthly hours ribbon belongs on Home, not only on the Log page.
@@ -65,6 +65,5 @@ export default async function Page() {
       <InstallCard compact />
       <p><Link href="/app/history" className="inline-flex min-h-11 items-center underline underline-offset-4">{t("seeHistory")}</Link></p>
     </div>
-    </>
   );
 }
