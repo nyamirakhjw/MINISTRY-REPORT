@@ -1,6 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
-import { buttonVariants } from "@/components/ui/button";
-import { Hero } from "@/components/landing/hero";
+import { HeroFace } from "@/components/landing/hero-face";
+import { HallShowcase } from "@/components/landing/hall-showcase";
 import { PrivateByDesign } from "@/components/landing/private-by-design";
 import { RevealObserver } from "@/components/landing/reveal-observer";
 import { RibbonDemo } from "@/components/landing/ribbon-demo";
@@ -10,7 +10,6 @@ import { InstallCard } from "@/components/shell/install-card";
 import { PublicFooter, PublicHeader } from "@/components/shell/public-chrome";
 import { getPublicCongregation } from "@/lib/congregation";
 import { publicEnv } from "@/lib/env";
-import { cn } from "@/lib/utils";
 
 /**
  * Landing (PRD v1.1 §4, "The Open Door"): short, real content only. No stock photos, invented statistics or carousels.
@@ -35,6 +34,7 @@ export async function Landing() {
     ...(address.length > 0 ? [{
       "@context": "https://schema.org", "@type": "PlaceOfWorship", name,
       address: { "@type": "PostalAddress", streetAddress: address.join(", "), addressCountry: "KE" },
+      image: `${publicEnv.siteUrl}/hall/share.jpg`,
       ...(meetings.length ? { description: meetings.map((x) => `${x.label}: ${x.m?.day} ${x.m?.time}`).join("; ") } : {}),
     }] : []),
   ];
@@ -43,7 +43,9 @@ export async function Landing() {
     <div className="flex min-h-dvh flex-col">
       <PublicHeader path="/" scrollEdge />
       <main id="main" className="flex-1">
-        <Hero tagline={cong?.tagline ?? t("tagline")} />
+        <HeroFace tagline={cong?.tagline ?? t("tagline")} />
+
+        <div className="hf-after">
 
         <section aria-labelledby="demo-title" className="lp-band lp-section">
           <div className="lp-wrap lp-band-grid">
@@ -59,31 +61,14 @@ export async function Landing() {
         <Steps />
         <PrivateByDesign />
 
-        {(meetings.length > 0 || address.length > 0) && (
-          <section aria-labelledby="meetings-title" className="lp-divider-top">
-            <div className="lp-wrap lp-meet lp-section">
-              {meetings.length > 0 && (
-                <div className="lp-reveal">
-                  <h2 id="meetings-title" className="text-xl">{t("meetings")}</h2>
-                  <dl className="mt-3 space-y-2">
-                    {meetings.map((x) => (
-                      <div key={x.label} className="flex gap-3"><dt className="w-24 font-semibold">{x.label}</dt><dd>{x.m?.day}, {x.m?.time}</dd></div>
-                    ))}
-                  </dl>
-                </div>
-              )}
-              {address.length > 0 && (
-                <div className="lp-reveal">
-                  <h2 className="text-xl">{t("hall")}</h2>
-                  <address className="mt-3 not-italic">{address.map((a) => <div key={a}>{a}</div>)}</address>
-                  {l.map_url ? <a href={l.map_url} rel="noopener noreferrer" target="_blank" className={cn(buttonVariants({ variant: "link" }), "mt-2 inline-flex min-h-11 items-center")}>{t("map")}</a> : null}
-                </div>
-              )}
-            </div>
-          </section>
-        )}
+        <HallShowcase
+          meetings={meetings.map((x) => ({ label: x.label, day: x.m?.day, time: x.m?.time }))}
+          address={address}
+          mapUrl={l.map_url}
+        />
 
         <section className="lp-wrap py-8 lp-reveal"><InstallCard /></section>
+        </div>
       </main>
       <PublicFooter prefix={prefix} />
       <RevealObserver />

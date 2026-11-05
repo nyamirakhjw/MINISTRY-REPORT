@@ -18,6 +18,8 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ['pdfkit'],
   reactStrictMode: true,
   poweredByHeader: false,
+  // Hall photos are served resized for each device, as AVIF or WebP, from our own address (CSP img-src 'self' already allows it).
+  images: { formats: ["image/avif", "image/webp"] },
   // Production source maps must never be published (checklist: technical cleanup).
   productionBrowserSourceMaps: false,
   // Tell Vercel to bypass strict TypeScript checks since the JS compilation succeeds

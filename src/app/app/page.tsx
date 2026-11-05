@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { HomeBanner } from "@/components/hall/home-banner";
 import { Badge } from "@/components/ui/badge";
 import { InstallCard } from "@/components/shell/install-card";
 import { HoursRibbon } from "@/components/report/hours-ribbon";
@@ -38,7 +39,9 @@ export default async function Page() {
   const goalCategory = goalRes.error ? undefined : (goalRes.data as { category?: string } | null)?.category;
   const isPioneer = !!goalCategory && goalCategory !== "publisher";
   return (
-    <div className="flex flex-col gap-6">
+    <>
+    <HomeBanner />
+    <div className="hb-content flex flex-col gap-6">
       <h1>{t("greeting", { name: member.full_name.split(" ")[0] ?? member.full_name })}</h1>
       <ReportStatusCard state={(state ?? { state: "not_active" }) as ReportState} />
       {isPioneer && (
@@ -62,5 +65,6 @@ export default async function Page() {
       <InstallCard compact />
       <p><Link href="/app/history" className="inline-flex min-h-11 items-center underline underline-offset-4">{t("seeHistory")}</Link></p>
     </div>
+    </>
   );
 }

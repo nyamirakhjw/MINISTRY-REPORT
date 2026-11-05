@@ -5,7 +5,7 @@
  * cannot end up in a shared HTTP cache (PRD §14.7). Offline data (log, visits, drafts, sync queue) arrives in Phase 2
  * and will live in per-user IndexedDB, wiped on sign-out.
  */
-const VERSION = "v3"; // bumped so returning visitors get the redesigned landing page and the new /brand/ images
+const VERSION = "v4"; // bumped so returning visitors get the photo landing page and the Home banner
 const STATIC_CACHE = `mr-static-${VERSION}`;
 const PAGE_CACHE = `mr-pages-${VERSION}`;
 const PRECACHE = ["/offline", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/icon.svg"];
