@@ -1,3 +1,5 @@
+﻿'use client';
+import { useState, useEffect } from 'react';
 import { getLocale, getTranslations } from "next-intl/server";
 import { Avatar } from "@/components/ui/avatar";
 import { dailyTextFor, dayPart, nairobiNow, verseSize } from "@/lib/daily-text";
@@ -6,8 +8,8 @@ import { TodayDate } from "./today-date";
 import "./daily-banner.css";
 
 /**
- * Signed-in Home banner: today's date and (scripture || "") on a navy and gold card, a gold arrow pointing from the (scripture || "")
- * to the Bible, and the member's greeting and round photo on a frosted glass panel that rests over the Bible's lower edge. The (scripture || "") comes from the daily-text data for the current Nairobi date; if a day has no
+ * Signed-in Home banner: today's date and scripture on a navy and gold card, a gold arrow pointing from the scripture
+ * to the Bible, and the member's greeting and round photo on a frosted glass panel that rests over the Bible's lower edge. The scripture comes from the daily-text data for the current Nairobi date; if a day has no
  * entry the card simply shows the greeting.
  */
 export async function DailyBanner({ name, avatarUrl }: { name: string; avatarUrl?: string }) {
@@ -48,7 +50,7 @@ export async function DailyBanner({ name, avatarUrl }: { name: string; avatarUrl
           </figure>
         )}
 
-        {/* Decorative: the arrow leaves the (scripture || "") (reference || "") and lands on the Bible. The Bible has its own alt text. */}
+        {/* Decorative: the arrow leaves the scripture reference and lands on the Bible. The Bible has its own alt text. */}
         {verse && (
           <div className="db-stage">
             <svg className="db-arrow" viewBox="0 0 150 80" aria-hidden="true" focusable="false">
@@ -63,3 +65,4 @@ export async function DailyBanner({ name, avatarUrl }: { name: string; avatarUrl
     </section>
   );
 }
+
