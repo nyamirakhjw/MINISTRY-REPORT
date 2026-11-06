@@ -17,7 +17,7 @@ export function SidebarShell({ children, footer }: { children: React.ReactNode; 
 
   return (
     <div
-      className="relative hidden shrink-0 md:block"
+      className="relative hidden shrink-0 lg:block"
       style={{ width: collapsed ? "4.5rem" : "16rem", visibility: ready ? "visible" : "hidden" }}
     >
       <div

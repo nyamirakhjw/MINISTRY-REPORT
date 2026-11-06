@@ -1,0 +1,41 @@
+/* =====================================================================
+   FLOATING NAV (phones and tablets, below 1024 px).
+   A dark pill that floats above the content, always at the bottom of the screen, clear of the home indicator.
+   The current page grows into a light pill with its name; the others are icons. Brand artwork: same in both themes.
+   ===================================================================== */
+.fnav { --fnav-bg: rgb(11 20 40 / 0.94); --fnav-edge: rgb(255 255 255 / 0.12); --fnav-fg: #B4C0D6; --fnav-on-bg: #F7F9FC; --fnav-on-fg: #0B2E6B;
+  position: fixed; z-index: 50; left: 0; right: 0; margin-inline: auto; width: min(calc(100% - 1.5rem), 28rem);
+  bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px)); pointer-events: none; }
+.dark .fnav { --fnav-bg: rgb(23 36 59 / 0.95); }
+@media (min-width: 768px) { .fnav { width: min(calc(100% - 3rem), 32rem); } }
+@media (min-width: 1024px) { .fnav { display: none; } }
+@media (max-height: 28rem) { .fnav { bottom: calc(0.375rem + env(safe-area-inset-bottom, 0px)); } }
+
+.fnav-list { pointer-events: auto; display: flex; align-items: center; gap: 0.125rem; margin: 0; padding: 0.375rem; list-style: none; border-radius: 9999px;
+  background: var(--fnav-bg); border: 1px solid var(--fnav-edge); box-shadow: 0 12px 32px -10px rgb(2 8 24 / 0.6); }
+@supports (backdrop-filter: blur(1px)) {
+  .fnav-list { background: color-mix(in srgb, var(--fnav-bg) 82%, transparent); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); }
+}
+@media (prefers-reduced-transparency: reduce) { .fnav-list { background: var(--fnav-bg); backdrop-filter: none; -webkit-backdrop-filter: none; } }
+
+.fnav-item { display: flex; flex: 1 1 0; min-width: 0; }
+.fnav-item[data-active="true"] { flex: 0 0 auto; }
+.fnav-link { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; min-width: 2.75rem; min-height: 3rem; padding-inline: 0.5rem;
+  border-radius: 9999px; color: var(--fnav-fg); font-size: 0.875rem; font-weight: 600; white-space: nowrap; }
+@media (min-width: 768px) { .fnav-link { min-height: 3.25rem; font-size: 1rem; } }
+.fnav-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.fnav-item[data-active="true"] .fnav-link { padding-inline: 0.875rem 1.125rem; background: var(--fnav-on-bg); color: var(--fnav-on-fg); }
+
+.fnav-icon { position: relative; display: inline-flex; flex: none; }
+.fnav-icon svg { width: 1.5rem; height: 1.5rem; }
+.fnav-label { display: inline-block; max-width: 0; overflow: hidden; opacity: 0; }
+.fnav-item[data-active="true"] .fnav-label { max-width: 9rem; padding-left: 0.5rem; opacity: 1; }
+.fnav-badge { position: absolute; top: -0.5rem; right: -0.625rem; min-width: 1.125rem; padding-inline: 0.25rem; border-radius: 9999px; background: var(--accent); color: #0B2E6B; font-size: 0.6875rem; line-height: 1.125rem; text-align: center; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .fnav-link { transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out); }
+  .fnav-link:active { transform: scale(0.96); }
+  .fnav-label { transition: max-width var(--dur-base) var(--ease-out), padding-left var(--dur-base) var(--ease-out), opacity var(--dur-fast) var(--ease-out); }
+  .fnav-item[data-active="true"] .fnav-icon { animation: fnav-pop 320ms var(--ease-out); }
+}
+@keyframes fnav-pop { from { transform: scale(0.82); } }

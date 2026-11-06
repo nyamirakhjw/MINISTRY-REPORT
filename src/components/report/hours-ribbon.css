@@ -13,7 +13,7 @@
 .hr-chip { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.125rem 0.75rem; border-radius: 9999px; background: var(--tint); color: var(--primary); font-weight: 600; }
 .hr-sub { margin: 0; color: var(--muted-foreground); }
 
-.hr-track { position: relative; height: var(--hr-h); margin-block: 0.625rem 0.25rem; }
+.hr-track { position: relative; height: var(--hr-h); margin-block: 0.625rem 0.25rem; container-type: inline-size; }
 .hr-rail { position: absolute; inset: 0; overflow: hidden; border-radius: 9999px; background: var(--tint); border: 1px solid var(--border); }
 .hr-rail::after { content: ""; position: absolute; inset: 0; border-radius: inherit; border: 2px solid var(--accent); opacity: 0; pointer-events: none; }
 .hr[data-complete="true"] .hr-rail::after { opacity: 1; }
@@ -30,7 +30,8 @@
 .hr-dot[data-hit="true"] { background: var(--accent); border-color: var(--accent); }
 .hr[data-variant="service-year"] .hr-dot { display: none; }
 
-.hr-tipwrap { position: absolute; inset: 0; pointer-events: none; transform: translateX(calc(var(--p, 0) * 100%)); transition: transform 560ms var(--ease-spring); }
+/* zero-width anchor moved by container units, so it never reaches past the track and cannot widen the page */
+.hr-tipwrap { position: absolute; top: 0; bottom: 0; left: 0; width: 0; pointer-events: none; transform: translateX(calc(var(--p, 0) * 100cqw)); transition: transform 560ms var(--ease-spring); }
 .hr[data-complete="true"] .hr-tipwrap { opacity: 0; }
 .hr-tip { position: absolute; top: 50%; left: 0; width: var(--hr-knob); height: var(--hr-knob); margin: calc(var(--hr-knob) / -2) 0 0 calc(var(--hr-knob) / -2);
   border-radius: 9999px; background: var(--accent); border: 2px solid var(--surface); }

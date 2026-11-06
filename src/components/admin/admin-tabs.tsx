@@ -6,12 +6,12 @@ import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import type { NavItem } from "@/components/shell/nav-links";
 
-/** Phone: a scrolling top tab strip (PRD §8.3). Hidden from 768px, where the left rail takes over. */
+/** Phone: a scrolling top tab strip (PRD §8.3). Hidden from 1024px, where the left rail takes over. */
 export function AdminTabs({ items, label }: { items: NavItem[]; label: string }) {
   const t = useTranslations("nav");
   const path = usePathname();
   return (
-    <nav aria-label={label} className="border-b border-border bg-surface md:hidden">
+    <nav aria-label={label} className="border-b border-border bg-surface lg:hidden">
       <ul className="flex overflow-x-auto px-2">
         {items.map((i) => {
           const active = i.exact ? path === i.href : path === i.href || path.startsWith(`${i.href}/`);

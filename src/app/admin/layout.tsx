@@ -40,7 +40,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
     : [{ key: "approvals", href: "/admin/approvals", badge: counts.approvals || undefined }];
   return (
     <SidebarCollapseProvider>
-      <div className="min-h-dvh md:flex">
+      <div className="min-h-dvh lg:flex">
         <SidebarShell
           footer={
             <>
@@ -54,7 +54,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
           <NavLinks items={items} label={t("adminMenu")} orientation="side" />
         </SidebarShell>
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="flex items-center justify-between border-b border-border bg-surface px-4 py-2 pt-safe md:hidden">
+          <header className="flex items-center justify-between border-b border-border bg-surface px-4 py-2 pt-safe lg:hidden">
             <Link href="/app" className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4">{t("backToApp")}</Link>
             <div className="flex items-center gap-1">
               {isPlatformAdmin ? <Link href="/platform" className="inline-flex min-h-11 items-center font-semibold text-primary underline underline-offset-4">{t("platform")}</Link> : null}

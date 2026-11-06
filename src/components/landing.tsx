@@ -1,6 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { HeroFace } from "@/components/landing/hero-face";
 import { HallShowcase } from "@/components/landing/hall-showcase";
+import { HomePreview } from "@/components/landing/home-preview";
 import { PrivateByDesign } from "@/components/landing/private-by-design";
 import { RevealObserver } from "@/components/landing/reveal-observer";
 import { RibbonDemo } from "@/components/landing/ribbon-demo";
@@ -46,6 +47,8 @@ export async function Landing() {
         <HeroFace tagline={cong?.tagline ?? t("tagline")} />
 
         <div className="hf-after">
+
+        <HomePreview />
 
         <section aria-labelledby="demo-title" className="lp-band lp-section">
           <div className="lp-wrap lp-band-grid">

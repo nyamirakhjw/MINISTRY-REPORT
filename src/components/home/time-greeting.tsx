@@ -12,12 +12,12 @@ const subscribe = (onChange: () => void) => {
  * The greeting line. The server sends the Nairobi time of day so the first paint is right; once the page is in the
  * browser it follows the phone's own clock and changes by itself when the hour passes.
  */
-export function TimeGreeting({ name, labels, initial }: { name: string; labels: Record<DayPart, string>; initial: DayPart }) {
+export function TimeGreeting({ name, labels, initial, id = "db-greeting", as: Tag = "h1" }: { name: string; labels: Record<DayPart, string>; initial: DayPart; id?: string; as?: "h1" | "p" }) {
   const part = useSyncExternalStore(subscribe, () => dayPart(new Date().getHours()), () => initial);
   return (
-    <h1 id="db-greeting" className="db-greet">
+    <Tag id={id} className="db-greet">
       <span key={part} className="db-hi">{labels[part]}</span>
       <span className="db-name">{name}</span>
-    </h1>
+    </Tag>
   );
 }

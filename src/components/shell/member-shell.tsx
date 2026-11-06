@@ -25,7 +25,7 @@ export async function MemberShell({ member, avatarUrl, unread, isPioneer, childr
   return (
     <SidebarCollapseProvider>
       <WarmAppShell />
-      <div className="min-h-dvh md:flex">
+      <div className="min-h-dvh lg:flex">
         <SidebarShell
           footer={
             <>
@@ -40,11 +40,11 @@ export async function MemberShell({ member, avatarUrl, unread, isPioneer, childr
           <NavLinks items={[...items.filter((i) => i.key !== "more"), { key: "history", href: "/app/history" }, { key: "notifications", href: "/app/notifications", badge: unread || undefined }]} label={t("main")} orientation="side" />
         </SidebarShell>
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="flex items-center justify-between border-b border-border bg-surface px-4 py-2 pt-safe md:hidden">
+          <header className="flex items-center justify-between border-b border-border bg-surface px-4 py-2 pt-safe lg:hidden">
             <Link href="/app" aria-label={t("home")}><Logo name="JW NYAMIRA" /></Link>
             <div className="flex items-center gap-1">{publicEnv.enableSw ? <LocaleSwitch /> : null}<ThemeToggle /></div>
           </header>
-          <main id="main" className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 pb-28 md:pb-10">{children}</main>
+          <main id="main" className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 pb-[calc(7rem+env(safe-area-inset-bottom,0px))] lg:pb-10">{children}</main>
           <NavLinks items={items} label={t("main")} orientation="bottom" />
         </div>
       </div>
