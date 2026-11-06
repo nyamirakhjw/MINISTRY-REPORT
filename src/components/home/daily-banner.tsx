@@ -13,7 +13,7 @@ import "./daily-banner.css";
  * entry the card simply shows the greeting.
  */
 export async function DailyBanner({ name, avatarUrl }: { name: string; avatarUrl?: string }) {
-  const t = await getTranslations("home");
+  const t = useTranslations("home");
   const locale = await getLocale();
   const now = nairobiNow();
   const verse = dailyTextFor(now.date);
