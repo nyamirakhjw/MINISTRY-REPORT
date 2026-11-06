@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { CalendarDays } from "lucide-react";
-import { nairobiNow } from "@/lib/daily-text";
+import { nairobiNow } from '@/lib/nairobi';
 
 const subscribe = (onChange: () => void) => {
   const id = setInterval(onChange, 60_000);

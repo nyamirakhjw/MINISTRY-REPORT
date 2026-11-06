@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { getLocale, getTranslations } from "next-intl/server";
 import { Avatar } from "@/components/ui/avatar";
-import { dailyTextFor, dayPart, nairobiNow, verseSize } from "@/lib/daily-text";
+import { dailyTextFor, dayPart, nairobiNow, verseSize } from '@/lib/nairobi';
 import { TimeGreeting } from "./time-greeting";
 import { TodayDate } from "./today-date";
 import "./daily-banner.css";
