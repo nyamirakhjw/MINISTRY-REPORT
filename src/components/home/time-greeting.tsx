@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { dayPart, type DayPart } from "@/lib/daily-text";
+import { dayPart, type DayPart } from "@/lib/nairobi";
 
 const subscribe = (onChange: () => void) => {
   const id = setInterval(onChange, 60_000);

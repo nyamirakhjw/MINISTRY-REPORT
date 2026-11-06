@@ -1,16 +1,21 @@
-import { getTranslations } from "next-intl/server";
+import Image from "next/image";
+import { CalendarDays } from "lucide-react";
+import { getLocale, getTranslations } from "next-intl/server";
+import { HALL } from "@/components/hall/hall-photos";
 import { Avatar } from "@/components/ui/avatar";
-import { dailyTextFor, dayPart, nairobiNow, verseSize } from "@/lib/daily-text";
+import { dailyTextFor, verseSize } from "@/lib/daily-text";
+import { dayPart, formatLongDate, nairobiNow } from "@/lib/nairobi";
 import { TimeGreeting } from "./time-greeting";
 import "./daily-banner.css";
 
 /**
- * Signed-in Home banner: today's scripture on a navy and gold card, with the member's greeting and round photo on a
- * frosted glass panel. The scripture comes from the daily-text data for the current Nairobi date; if a day has no
- * entry the card simply shows the greeting.
+ * Signed-in Home banner: today's date and scripture on a navy and gold card, a New World Translation resting at the
+ * corner that the gold arrow points to, and a frosted glass panel with the member's greeting and round photo.
+ * The scripture comes from the daily-text data for the current Nairobi date; with no entry the card shows the
+ * date and greeting only.
  */
 export async function DailyBanner({ name, avatarUrl }: { name: string; avatarUrl?: string }) {
-  const t = await getTranslations("home");
+  const [t, locale] = await Promise.all([getTranslations("home"), getLocale()]);
   const now = nairobiNow();
   const verse = dailyTextFor(now.date);
 
@@ -34,17 +39,28 @@ export async function DailyBanner({ name, avatarUrl }: { name: string; avatarUrl
           </span>
         </div>
 
+        <time className="db-date" dateTime={now.date}>
+          <CalendarDays className="db-date-icon" aria-hidden="true" />
+          {formatLongDate(now.date, locale)}
+        </time>
+
         {verse && (
           <figure className="db-verse" data-size={verseSize(verse.text.length)}>
             <blockquote><p className="db-text">{verse.text}</p></blockquote>
             <figcaption className="db-ref">
               <span className="sr-only">{t("dailyTextTitle")}: </span>
               <cite>{verse.ref}</cite>
-              <svg className="db-arrow" viewBox="0 0 74 60" aria-hidden="true" focusable="false">
-                <path pathLength="1" d="M6 6 C 56 4, 66 30, 52 50 M52 50 L50 38 M52 50 L63 44" />
+              <svg className="db-arrow" viewBox="0 0 90 70" aria-hidden="true" focusable="false">
+                <path pathLength="1" d="M8 6 C 6 30, 28 44, 40 34 C 50 26, 42 14, 33 22 C 24 31, 46 58, 74 58 M74 58 L64 51 M74 58 L65 66" />
               </svg>
             </figcaption>
           </figure>
+        )}
+
+        {verse && (
+          <div className="db-stage" aria-hidden="true">
+            <Image src={HALL.bible} alt="" priority sizes="(min-width: 768px) 256px, 144px" quality={90} className="db-bible" />
+          </div>
         )}
       </div>
     </section>

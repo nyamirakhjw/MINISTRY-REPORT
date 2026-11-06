@@ -5,9 +5,8 @@
 .db { --db-bg: #0B2E6B; --db-fg: #FFFFFF; --db-gold: #F2C14E; }
 
 .db-card { position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; gap: 1.25rem;
-  min-height: 21rem; padding: 1.5rem 1.25rem 1rem; border-radius: 16px; color: var(--db-fg); background: var(--db-bg);
+  padding: 1.25rem 1.25rem 1rem; border-radius: 16px; color: var(--db-fg); background: var(--db-bg);
   border-top: 3px solid var(--db-gold); outline: 1px solid color-mix(in srgb, var(--border) 70%, transparent); }
-.db-card:not([data-has-verse]) { min-height: 0; padding-top: 1.25rem; }
 
 /* flat shapes: they give the glass something to frost, and echo the slanted stripe of the hours ribbon */
 .db-deco { position: absolute; z-index: -1; pointer-events: none; }
@@ -17,19 +16,29 @@
 .db-orb-a { width: 7rem; height: 7rem; left: 1.5rem; bottom: -2.5rem; border-radius: 9999px; background: var(--db-gold); opacity: 0.4; }
 .db-orb-b { width: 6rem; height: 6rem; right: 2.5rem; bottom: -2rem; border-radius: 9999px; background: #378ADD; opacity: 0.55; }
 
+/* date */
+.db-date { order: 1; align-self: flex-start; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.75rem 0.25rem 0.625rem;
+  border-radius: 9999px; border: 1px solid rgb(255 255 255 / 0.28); background: rgb(255 255 255 / 0.08); font-size: 0.9375rem; font-weight: 600; color: rgb(255 255 255 / 0.94); }
+.db-date-icon { width: 1rem; height: 1rem; color: var(--db-gold); flex: none; }
+
 /* scripture */
-.db-verse { order: 1; margin: 0; }
+.db-verse { order: 2; margin: 0; }
 .db-text { margin: 0; max-width: 36rem; font-family: var(--font-heading); font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; text-wrap: balance; }
 .db-verse[data-size="lg"] .db-text { font-size: clamp(1.625rem, 1.2rem + 2vw, 2.25rem); }
 .db-verse[data-size="md"] .db-text { font-size: clamp(1.375rem, 1.1rem + 1.4vw, 1.875rem); }
 .db-verse[data-size="sm"] .db-text { font-size: clamp(1.1875rem, 1rem + 1vw, 1.5rem); }
-.db-ref { display: flex; align-items: flex-start; gap: 0.5rem; margin-top: 0.75rem; }
+.db-ref { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; margin-top: 0.75rem; }
 .db-ref cite { padding-top: 0.25rem; font-size: 1.0625rem; font-style: italic; color: var(--db-gold); }
-.db-arrow { width: 4.5rem; height: 3.75rem; margin-left: auto; }
-.db-arrow path { fill: none; stroke: var(--db-gold); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 0; }
+/* the arrow ends pointing down and to the right, at the Bible resting below it */
+.db-arrow { width: 5.25rem; height: 4.125rem; flex: none; margin-right: 3.5rem; }
+.db-arrow path { fill: none; stroke: var(--db-gold); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 0; }
+
+/* the Bible: a cut-out photo that rests at the right and slips behind the glass panel */
+.db-stage { order: 3; position: relative; z-index: 1; height: 7.25rem; margin-top: -1.5rem; pointer-events: none; }
+.db-bible { position: absolute; right: -0.75rem; top: 0; width: 9rem; height: auto; filter: drop-shadow(0 10px 14px rgb(0 0 0 / 0.4)); }
 
 /* frosted glass: greeting and round photo. First in the page order (it holds the heading), shown last. */
-.db-glass { order: 2; margin-top: auto; display: flex; align-items: center; gap: 0.875rem; padding: 0.875rem 1rem; border-radius: 14px;
+.db-glass { order: 4; position: relative; z-index: 2; margin-top: auto; display: flex; align-items: center; gap: 0.875rem; padding: 0.875rem 1rem; border-radius: 14px;
   background: rgb(255 255 255 / 0.2); border: 1px solid rgb(255 255 255 / 0.3); }
 @supports (backdrop-filter: blur(1px)) {
   .db-glass { background: rgb(255 255 255 / 0.14); backdrop-filter: blur(16px) saturate(1.3); -webkit-backdrop-filter: blur(16px) saturate(1.3); }
@@ -42,11 +51,14 @@
 .db-avatar > * { border: 2px solid var(--db-bg); }
 
 @media (min-width: 768px) {
-  .db-card { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); align-items: end; gap: 1.5rem 2rem; min-height: 17rem; padding: 2rem; }
+  .db-card { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); grid-template-rows: auto 1fr auto; align-items: start; gap: 1.25rem 2rem; min-height: 20rem; padding: 2rem; }
   .db-card:not([data-has-verse]) { display: flex; min-height: 0; padding: 1.5rem 2rem; }
-  .db-verse { grid-column: 1; grid-row: 1; align-self: start; }
-  .db-glass { grid-column: 2; grid-row: 1; margin-top: 0; align-self: end; }
-  .db-ref .db-arrow { margin-left: 0.25rem; }
+  .db-date { grid-column: 1; grid-row: 1; }
+  .db-verse { grid-column: 1; grid-row: 2; }
+  .db-glass { grid-column: 1; grid-row: 3; margin-top: 0; max-width: 30rem; }
+  .db-stage { grid-column: 2; grid-row: 1 / 4; height: auto; margin-top: 0; align-self: stretch; }
+  .db-bible { right: -4.5rem; bottom: -5rem; top: auto; width: 17rem; }
+  .db-arrow { margin-right: 0; }
 }
 
 /* motion */
@@ -54,11 +66,14 @@
   .db-verse { animation: db-rise var(--dur-slow, 420ms) var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)) 60ms both; }
   .db-arrow path { animation: db-draw 700ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)) 360ms both; }
   .db-glass { animation: db-clear 600ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)) 320ms both; }
+  .db-date { animation: db-rise 380ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)) both; }
+  .db-bible { animation: db-bible 700ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)) 420ms both; }
   .db-avatar { animation: db-pop 450ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)) 620ms both; }
   .db-hi { animation: db-fade 220ms ease-out both; }
 }
 @keyframes db-rise { from { opacity: 0; transform: translateY(0.5rem); } }
 @keyframes db-draw { from { stroke-dashoffset: 1; } }
 @keyframes db-clear { from { opacity: 0; transform: translateY(0.625rem); filter: blur(8px); } }
+@keyframes db-bible { from { opacity: 0; transform: translateY(1.25rem) rotate(4deg); } }
 @keyframes db-pop { from { opacity: 0; transform: scale(0.88); } }
 @keyframes db-fade { from { opacity: 0; } }

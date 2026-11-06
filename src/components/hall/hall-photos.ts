@@ -4,6 +4,7 @@ import front from "@/assets/hall/front.webp";
 import gardenSoft from "@/assets/hall/garden-soft.webp";
 import garden from "@/assets/hall/garden.webp";
 import inside from "@/assets/hall/inside.webp";
+import bible from "@/assets/hall/bible.webp";
 
-export const HALL = { front, garden, gardenSoft, inside } as const;
+export const HALL = { front, garden, gardenSoft, inside, bible } as const;
 export type HallPhotoKey = "front" | "garden" | "inside";
