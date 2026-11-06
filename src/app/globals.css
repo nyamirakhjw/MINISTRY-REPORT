@@ -97,8 +97,7 @@
 }
 
 @layer base {
-  /* "only light" tells browsers not to force their own dark mode over the Light theme (which turned the page dark but left cards white). */
-  html { color-scheme: only light; scroll-padding-top: 4rem; -webkit-text-size-adjust: 100%; }
+  html { color-scheme: light; scroll-padding-top: 4rem; -webkit-text-size-adjust: 100%; }
   html.dark { color-scheme: dark; }
   body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); font-size: 1rem; line-height: 1.5; }
   h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; line-height: 1.25; }
@@ -164,6 +163,8 @@
 .m-draw circle { animation: m-fade var(--dur-base) var(--ease-out) both; }
 @keyframes m-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 @keyframes m-fade { from { opacity: 0; } }
+
+/* Hours ribbon: see components/report/hours-ribbon.css (the living track). */
 
 /* Mini chart bars grow from the baseline, staggered; capped at twelve bars. */
 .m-bar { transform-origin: bottom; animation: m-grow var(--dur-slow) var(--ease-out) both; animation-delay: calc(var(--i, 0) * 30ms); }

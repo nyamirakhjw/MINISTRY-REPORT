@@ -285,7 +285,9 @@
     "overdueCount": "{count} overdue",
     "nothingInDays": "Nothing in the next {days} days.",
     "viewAllUpcoming": "View all upcoming",
-    "notScheduledYet": "Not scheduled yet"
+    "notScheduledYet": "Not scheduled yet",
+    "bibleAlt": "The New World Translation of the Holy Scriptures",
+    "todayDate": "Today"
   },
   "report": {
     "pageTitle": "Monthly report",
@@ -348,8 +350,6 @@
     "deleteEntry": "Delete this entry",
     "hoursToGo": "{count, plural, one {# hour to go} other {# hours to go}}",
     "goalReached": "Goal reached",
-    "paceHint": "About {hours, number} hours a day to finish",
-    "milestoneGoal": "Goal",
     "noGoal": "Hours logged",
     "progressValue": "{current} of {goal} hours, {percent} percent",
     "progressValueNoGoal": "{current} hours logged",
