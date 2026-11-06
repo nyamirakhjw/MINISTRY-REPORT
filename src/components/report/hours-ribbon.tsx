@@ -3,17 +3,17 @@ import * as React from "react";
 import { useTranslations } from "next-intl";
 import { formatHMS, ribbonState } from "@/lib/domain/log";
 import { prefersReducedMotion } from "@/lib/motion";
+import { daysLeftInMonth, nairobiNow, paceHoursPerDay } from "@/lib/nairobi";
 import "./hours-ribbon.css";
 
 const TICKS = [25, 50, 75];
-/** Bubble positions (percent across the track), size, duration and delay: fixed values, so server and browser render the same. */
-const BUBBLES = [[6, 3, 2.6, 0], [17, 5, 3.4, 0.9], [29, 4, 2.9, 1.7], [41, 3, 3.1, 0.4], [53, 5, 3.6, 2.1], [64, 4, 2.7, 1.2], [77, 3, 3.3, 0.2], [88, 5, 3, 1.5], [96, 4, 2.8, 2.4]] as const;
+const subscribeMinute = (onChange: () => void) => { const id = setInterval(onChange, 60_000); return () => clearInterval(id); };
 
 /**
- * The signature element (PRD §10.6, rewritten per PRD v1.1 §10.5), now a living track (hours-ribbon.css): a moving
- * window reveals a glossy fill with drifting stripes, a sweeping sheen and rising bubbles, led by a slanted gold tip that
- * breathes. All of it is driven by one CSS variable (--p) and a spring-shaped transition on transform, so nothing
- * animates a layout property. The numerals count up by writing straight to one DOM node, so React never
+ * The signature element (PRD §10.6, redesigned). The fill is a full-width layer slid into place and the gold knob a
+ * separate moved layer, both driven by one CSS variable (--p) and a spring-shaped transition, so nothing animates a
+ * layout property and the stripes never stretch. Stripes drift and the knob pings while the goal is open and the
+ * ribbon is on screen. The numerals count up by writing straight to one DOM node, so React never
  * re-renders per frame. A new value mid-animation continues from wherever the numerals are. Still a native progressbar
  * with a text alternative; it never relies on colour or motion.
  */
@@ -25,7 +25,10 @@ export function HoursRibbon({ currentSeconds, goalHours, variant = "monthly" }: 
   const prevSeconds = React.useRef(currentSeconds);
   const prevPercent = React.useRef(state.percent);
   const prevReached = React.useRef(state.goalReached);
-  const tickRefs = React.useRef<(HTMLSpanElement | null)[]>([]);
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  const shineRef = React.useRef<HTMLSpanElement>(null);
+  const dotRefs = React.useRef<(HTMLSpanElement | null)[]>([]);
+  const today = React.useSyncExternalStore(subscribeMinute, () => nairobiNow().date, () => "");
   const [justReached, setJustReached] = React.useState(false);
 
   const [initialText] = React.useState(() => (goalHours ? String(Math.floor(currentSeconds / 3600)) : formatHMS(Math.round(currentSeconds))));
@@ -53,14 +56,26 @@ export function HoursRibbon({ currentSeconds, goalHours, variant = "monthly" }: 
     return () => cancelAnimationFrame(frame);
   }, [currentSeconds, text]);
 
+  // The drifting stripes and the pinging knob run only while the ribbon is on screen.
+  React.useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === "undefined") { el.dataset.live = "true"; return; }
+    const io = new IntersectionObserver(([entry]) => { el.dataset.live = entry?.isIntersecting ? "true" : "false"; });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   // One quiet pulse on each tick the fill passes (25, 50, 75), and the goal check, only when the value rises after mount.
   React.useEffect(() => {
     const before = prevPercent.current;
     prevPercent.current = state.percent;
     if (state.percent > before && !prefersReducedMotion()) {
+      // a soft light sweeps along the fill, and each milestone dot passed pops once
+      shineRef.current?.animate([{ opacity: 0.9, transform: "translateX(-120%) skewX(-20deg)" }, { opacity: 0, transform: "translateX(420%) skewX(-20deg)" }], { duration: 900, easing: "cubic-bezier(0.23, 1, 0.32, 1)" });
       TICKS.forEach((tick, i) => {
         if (before < tick && state.percent >= tick) {
-          tickRefs.current[i]?.animate([{ transform: "scaleX(4)", background: "var(--accent)" }, { transform: "scaleX(1)" }], { duration: 520, easing: "cubic-bezier(0.23, 1, 0.32, 1)" });
+          dotRefs.current[i]?.animate([{ transform: "scale(2.4)" }, { transform: "scale(1)" }], { duration: 520, easing: "cubic-bezier(0.23, 1, 0.32, 1)" });
         }
       });
     }
@@ -79,40 +94,45 @@ export function HoursRibbon({ currentSeconds, goalHours, variant = "monthly" }: 
     ? t("progressValue", { current: currentHours, goal: goalHours, percent: state.percent })
     : t("progressValueNoGoal", { current: currentHours });
 
+  const pace = variant === "monthly" && goalHours && !state.goalReached && today
+    ? paceHoursPerDay(goalHours - currentSeconds / 3600, daysLeftInMonth(today))
+    : null;
+  const sub = pace ? `${label} · ${t("paceHint", { hours: pace })}` : label;
+
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-baseline gap-2">
-        <span className="font-heading text-3xl tabular text-foreground">
-          <span ref={numRef}>{initialText}</span>{goalHours ? ` / ${goalHours}` : ""}
+    <div ref={rootRef} className="hr" data-variant={variant} data-complete={state.percent >= 100 ? "true" : "false"}>
+      <div className="hr-head">
+        <span className="hr-num tabular">
+          <span ref={numRef}>{initialText}</span>{goalHours ? <span className="hr-goal"> / {goalHours}</span> : null}
         </span>
-        {state.goalReached ? (
-          <svg className={`size-6 self-center text-success ${justReached ? "m-draw" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
-            <circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" pathLength={1} />
-          </svg>
+        {goalHours ? (
+          state.goalReached ? (
+            <svg className={`size-7 text-success ${justReached ? "m-draw" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+              <circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" pathLength={1} />
+            </svg>
+          ) : (
+            <span aria-hidden="true" className="hr-chip tabular">{state.percent}%</span>
+          )
         ) : null}
-        {goalHours ? <span aria-hidden="true" data-complete={state.goalReached ? "true" : "false"} className="hr-pct ml-auto self-center">{state.percent}%</span> : null}
       </div>
-      <p aria-hidden="true" className="text-muted-foreground">{label}</p>
+      <p aria-hidden="true" className="hr-sub">{sub}</p>
       <p className="sr-only" aria-live="polite">{justReached ? t("goalReached") : ""}</p>
-      <div role="progressbar" aria-valuenow={state.percent} aria-valuemin={0} aria-valuemax={100} aria-valuetext={valueText}
-        data-complete={state.percent >= 100 ? "true" : "false"} data-size={variant === "monthly" ? "lg" : "sm"}
-        style={{ "--p": state.percent / 100 } as React.CSSProperties}
-        className="hr-track">
-        <div className="hr-reveal" aria-hidden="true">
-          <div className="hr-reveal-in">
-            <div className="hr-liquid" />
-            <div className="hr-stripes" />
-            <div className="hr-sheen" />
-            {BUBBLES.map(([x, size, dur, delay]) => (
-              <span key={x} className="hr-bubble" style={{ "--x": `${x}%`, "--s": `${size}px`, "--t": `${dur}s`, "--d": `${delay}s` } as React.CSSProperties} />
-            ))}
-          </div>
+      <div className="hr-track" role="progressbar" aria-valuenow={state.percent} aria-valuemin={0} aria-valuemax={100} aria-valuetext={valueText}
+        style={{ "--p": state.percent / 100 } as React.CSSProperties}>
+        <div className="hr-rail">
+          <div className="hr-fill" aria-hidden="true"><span className="hr-flow" /><span ref={shineRef} className="hr-shine" /></div>
+          {state.tickPositions.map((p, i) => (
+            <span key={p} ref={(el) => { dotRefs.current[i] = el; }} aria-hidden="true" className="hr-dot" data-hit={state.percent >= p ? "true" : "false"} style={{ left: `${p}%` }} />
+          ))}
         </div>
-        {state.percent > 0 ? <div className="hr-tipwrap" aria-hidden="true"><span className="hr-halo" /><span className="hr-tip" /></div> : null}
-        {state.tickPositions.map((p, i) => (
-          <span key={p} ref={(el) => { tickRefs.current[i] = el; }} aria-hidden="true" className="hr-tick" data-passed={state.percent >= p ? "true" : "false"} style={{ left: `${p}%` }} />
-        ))}
+        {state.percent > 0 ? <div className="hr-tipwrap" aria-hidden="true"><span className="hr-tip" /></div> : null}
       </div>
+      {goalHours && variant === "monthly" ? (
+        <div className="hr-marks" aria-hidden="true">
+          {state.tickPositions.map((p) => <span key={p} className="hr-mark" data-hit={state.percent >= p ? "true" : "false"} style={{ left: `${p}%` }}>{p}%</span>)}
+          <span className="hr-mark" data-hit={state.goalReached ? "true" : "false"} style={{ left: "100%" }}>{t("milestoneGoal")}</span>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -285,9 +285,7 @@
     "overdueCount": "{count} zimechelewa",
     "nothingInDays": "Hakuna chochote ndani ya siku {days} zijazo.",
     "viewAllUpcoming": "Ona zote zijazo",
-    "notScheduledYet": "Bado haijapangwa",
-    "bibleAlt": "Tafsiri ya Ulimwengu Mpya ya Maandiko Matakatifu",
-    "todayDate": "Leo"
+    "notScheduledYet": "Bado haijapangwa"
   },
   "report": {
     "pageTitle": "Ripoti ya kila mwezi",
@@ -350,6 +348,8 @@
     "deleteEntry": "Futa kipengele hiki",
     "hoursToGo": "{count, plural, one {saa # imesalia} other {saa # zimesalia}}",
     "goalReached": "Lengo limefikiwa",
+    "paceHint": "Takriban saa {hours, number} kwa siku ili ukamilishe",
+    "milestoneGoal": "Lengo",
     "noGoal": "Saa zilizowekwa",
     "progressValue": "Saa {current} kati ya {goal}, asilimia {percent}",
     "progressValueNoGoal": "Saa {current} zimewekwa",

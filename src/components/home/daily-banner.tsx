@@ -1,20 +1,21 @@
-﻿'use client';
-import { useState, useEffect } from 'react';
+import Image from "next/image";
+import { CalendarDays } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
+import { HALL } from "@/components/hall/hall-photos";
 import { Avatar } from "@/components/ui/avatar";
-import { dailyTextFor, dayPart, nairobiNow, verseSize } from '@/lib/nairobi';
+import { dailyTextFor, verseSize } from "@/lib/daily-text";
+import { dayPart, formatLongDate, nairobiNow } from "@/lib/nairobi";
 import { TimeGreeting } from "./time-greeting";
-import { TodayDate } from "./today-date";
 import "./daily-banner.css";
 
 /**
- * Signed-in Home banner: today's date and scripture on a navy and gold card, a gold arrow pointing from the scripture
- * to the Bible, and the member's greeting and round photo on a frosted glass panel that rests over the Bible's lower edge. The scripture comes from the daily-text data for the current Nairobi date; if a day has no
- * entry the card simply shows the greeting.
+ * Signed-in Home banner: today's date and scripture on a navy and gold card, a New World Translation resting at the
+ * corner that the gold arrow points to, and a frosted glass panel with the member's greeting and round photo.
+ * The scripture comes from the daily-text data for the current Nairobi date; with no entry the card shows the
+ * date and greeting only.
  */
 export async function DailyBanner({ name, avatarUrl }: { name: string; avatarUrl?: string }) {
-  const t = useTranslations("home");
-  const locale = await getLocale();
+  const [t, locale] = await Promise.all([getTranslations("home"), getLocale()]);
   const now = nairobiNow();
   const verse = dailyTextFor(now.date);
 
@@ -27,8 +28,6 @@ export async function DailyBanner({ name, avatarUrl }: { name: string; avatarUrl
         <span className="db-deco db-orb-a" aria-hidden="true" />
         <span className="db-deco db-orb-b" aria-hidden="true" />
 
-        <TodayDate initial={now.date} locale={locale} label={t("todayDate")} />
-
         <div className="db-glass">
           <TimeGreeting
             name={name}
@@ -40,29 +39,30 @@ export async function DailyBanner({ name, avatarUrl }: { name: string; avatarUrl
           </span>
         </div>
 
+        <time className="db-date" dateTime={now.date}>
+          <CalendarDays className="db-date-icon" aria-hidden="true" />
+          {formatLongDate(now.date, locale)}
+        </time>
+
         {verse && (
           <figure className="db-verse" data-size={verseSize(verse.text.length)}>
             <blockquote><p className="db-text">{verse.text}</p></blockquote>
             <figcaption className="db-ref">
               <span className="sr-only">{t("dailyTextTitle")}: </span>
               <cite>{verse.ref}</cite>
+              <svg className="db-arrow" viewBox="0 0 90 70" aria-hidden="true" focusable="false">
+                <path pathLength="1" d="M8 6 C 6 30, 28 44, 40 34 C 50 26, 42 14, 33 22 C 24 31, 46 58, 74 58 M74 58 L64 51 M74 58 L65 66" />
+              </svg>
             </figcaption>
           </figure>
         )}
 
-        {/* Decorative: the arrow leaves the scripture reference and lands on the Bible. The Bible has its own alt text. */}
         {verse && (
-          <div className="db-stage">
-            <svg className="db-arrow" viewBox="0 0 150 80" aria-hidden="true" focusable="false">
-              <path pathLength="1" d="M6 8 C 58 2, 70 46, 40 40 C 22 36, 30 14, 52 24 C 80 38, 100 52, 122 56" />
-              <path className="db-arrow-head" pathLength="1" d="M107 45 L124 57 L105 66" />
-            </svg>
-            {/* eslint-disable-next-line @next/next/no-img-element -- a fixed local cut-out (public/brand), already optimised WebP */}
-            <img className="db-bible" src="/brand/bible.webp" width={352} height={520} alt={t("bibleAlt")} decoding="async" />
+          <div className="db-stage" aria-hidden="true">
+            <Image src={HALL.bible} alt="" priority sizes="(min-width: 768px) 256px, 144px" quality={90} className="db-bible" />
           </div>
         )}
       </div>
     </section>
   );
 }
-
