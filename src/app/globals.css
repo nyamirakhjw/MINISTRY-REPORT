@@ -96,6 +96,13 @@
   --radius-lg: 10px;
 }
 
+/* Every Tailwind `transition-*` utility in the app (colors, transform, width) now uses the product curve instead of Tailwind's
+   default ease: strong ease-out, 160ms. One line, so no component needs its own timing for a plain hover or toggle. */
+@theme {
+  --default-transition-duration: 160ms;
+  --default-transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
 @layer base {
   /* "only light" tells browsers not to force their own dark mode over the Light theme (which turned the page dark but left cards white). */
   html { color-scheme: only light; scroll-padding-top: 4rem; -webkit-text-size-adjust: 100%; }
@@ -195,10 +202,14 @@ tr[data-flash] > td { position: relative; }
 .m-ring { animation: m-spin 900ms linear infinite; transform-origin: center; }
 @keyframes m-spin { to { transform: rotate(360deg); } }
 
-/* Moving between pages inside the app (PRD v1.1 AM-01). The member app rises 4px as it fades; the Elder console only fades, because it is used all day. */
-.m-route { animation: m-route var(--dur-base) var(--ease-out) both; }
+/* Moving between pages inside the app is core navigation, used tens of times a day: a 160ms fade, no travel (animation-master frequency gate). */
+.m-route { animation: m-fade 160ms var(--ease-out) both; }
 .m-route-soft { animation: m-fade 150ms var(--ease-out) both; }
-@keyframes m-route { from { opacity: 0; transform: translateY(4px); } }
+
+/* A ticked checkbox pops its tick in (Radix unmounts the indicator when unticked, so only the tick-on direction animates). */
+.m-check-in { animation: m-check-in var(--dur-fast) var(--ease-out) both; }
+@keyframes m-check-in { from { opacity: 0; transform: scale(0.85); } }
+
 
 /* Empty states draw a small door line by line (PRD v1.1 AM-22). */
 .m-line path, .m-line circle { stroke-dasharray: 1; animation: m-draw 500ms var(--ease-out) both; animation-delay: calc(var(--k, 0) * 90ms); }

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-const field = "w-full min-h-12 rounded-md border border-input-border bg-surface px-3 text-base text-foreground placeholder:text-muted-foreground disabled:opacity-60 aria-[invalid=true]:border-danger";
+const field = "w-full min-h-12 rounded-md transition-colors border border-input-border bg-surface px-3 text-base text-foreground placeholder:text-muted-foreground disabled:opacity-60 aria-[invalid=true]:border-danger";
 
 export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(({ className, type = "text", ...props }, ref) => (
   <input ref={ref} type={type} className={cn(field, className)} {...props} />

@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased: animation-master pass
+
+- Every Tailwind `transition-*` class (hovers, switches, tabs, rail) now uses the product curve (strong ease-out, 160ms) through two theme variables, instead of Tailwind's default ease.
+- Checkboxes pop their tick in; inputs, selects and text areas ease their border colour (the focus ring stays instant on purpose).
+- Field errors and the error summary ease in with a small rise; the sign-in, request-access, reset and 2FA pages stagger in (title, lead, form).
+- Report status card cross-fades when it changes while the page is open (window opens, report reopened). Nothing extra on first load.
+- Notifications stagger in (first six rows). Install card eases in and folds away when dismissed, leaving no gap.
+- Daily log: a new entry eases in; deleting fades the row out before the list closes up, and a failed delete brings it back.
+- Moving between pages in the member app is now a 160ms fade with no travel: it is core navigation, so it must not slow people down.
+- Collapsible side rail uses the motion tokens.
+
 ## Unreleased: leftover motion
 
 - Month picker changes the month in place and the page content fades; no more full reload.

@@ -7,7 +7,7 @@ export interface SummaryItem { id: string; message: string }
 export const ErrorSummary = React.forwardRef<HTMLDivElement, { title: string; items: SummaryItem[] }>(({ title, items }, ref) => {
   if (items.length === 0) return null;
   return (
-    <div ref={ref} role="alert" tabIndex={-1} aria-labelledby="error-summary-title" className="rounded-md border-2 border-danger bg-surface p-4">
+    <div ref={ref} role="alert" tabIndex={-1} aria-labelledby="error-summary-title" className="m-enter rounded-md border-2 border-danger bg-surface p-4">
       <h2 id="error-summary-title" className="text-lg text-danger">{title}</h2>
       <ul className="mt-2 list-disc pl-5">
         {items.map((i) => <li key={i.id}><a href={`#${i.id}`} className="font-semibold underline">{i.message}</a></li>)}

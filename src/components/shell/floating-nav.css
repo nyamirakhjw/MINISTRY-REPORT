@@ -35,6 +35,7 @@
 @media (prefers-reduced-motion: no-preference) {
   .fnav-link { transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out); }
   .fnav-link:active { transform: scale(0.96); }
+  /* Accepted exception to "no layout properties": the active pill must grow to fit its word, and there is no transform equivalent. It is at most five elements, 260ms, ease-out. */
   .fnav-label { transition: max-width var(--dur-base) var(--ease-out), padding-left var(--dur-base) var(--ease-out), opacity var(--dur-fast) var(--ease-out); }
   .fnav-item[data-active="true"] .fnav-icon { animation: fnav-pop 320ms var(--ease-out); }
 }

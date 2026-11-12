@@ -29,8 +29,8 @@ export function NotificationList({ items }: { items: NotificationRow[] }) {
     <div className="flex flex-col gap-4">
       {unread.length > 0 && <div><Button variant="secondary" disabled={pending} onClick={() => start(async () => { await markNotificationsReadAction(unread); router.refresh(); })}>{t("markAllRead")}</Button></div>}
       <ul className="divide-y divide-border rounded-lg border border-border bg-surface">
-        {items.map((n) => (
-          <li key={n.id} className="flex flex-col gap-1 p-4">
+        {items.map((n, idx) => (
+          <li key={n.id} className="m-enter flex flex-col gap-1 p-4" style={{ "--i": Math.min(idx, 6) } as React.CSSProperties}>
             <p className={n.read_at ? "" : "font-semibold"}>{!n.read_at ? <span className="mr-2 inline-block rounded-sm bg-accent px-1.5 text-sm text-[#0B2E6B]">{t("new")}</span> : null}{text(n)}</p>
             <p className="text-sm text-muted-foreground">{formatDateTime(n.created_at, locale)}</p>
           </li>

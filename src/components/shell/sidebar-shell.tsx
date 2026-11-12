@@ -22,7 +22,7 @@ export function SidebarShell({ children, footer }: { children: React.ReactNode; 
     >
       <div
         className={cn(
-          "group/rail absolute inset-y-0 left-0 z-40 flex h-dvh flex-col gap-6 overflow-x-hidden border-r border-border bg-surface p-3 pt-safe transition-[width] duration-150",
+          "group/rail absolute inset-y-0 left-0 z-40 flex h-dvh flex-col gap-6 overflow-x-hidden border-r border-border bg-surface p-3 pt-safe transition-[width] duration-[var(--dur-fast)] ease-[var(--ease-out)]",
           collapsed ? "w-[4.5rem] hover:w-64 hover:shadow-xl" : "w-64 p-4",
         )}
       >

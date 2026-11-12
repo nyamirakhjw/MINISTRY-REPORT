@@ -1,3 +1,4 @@
+import type * as React from "react";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Logo } from "@/components/brand/emblem";
@@ -15,9 +16,9 @@ export async function AuthShell({ title, lead, children, wide }: { title: string
         </div>
       </header>
       <main id="main" className={`mx-auto w-full flex-1 px-4 py-8 ${wide ? "max-w-2xl" : "max-w-md"}`}>
-        <h1>{title}</h1>
-        {lead ? <p className="mt-2 text-lg text-muted-foreground">{lead}</p> : null}
-        <div className="mt-6">{children}</div>
+        <h1 className="m-enter">{title}</h1>
+        {lead ? <p className="m-enter mt-2 text-lg text-muted-foreground" style={{ "--i": 1 } as React.CSSProperties}>{lead}</p> : null}
+        <div className="m-enter mt-6" style={{ "--i": 2 } as React.CSSProperties}>{children}</div>
       </main>
     </div>
   );

@@ -3,6 +3,7 @@ import * as React from "react";
 import { Download, Share } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { Collapse } from "@/components/ui/collapse";
 
 interface InstallPromptEvent extends Event { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> }
 
@@ -13,6 +14,7 @@ export function InstallCard({ compact = false }: { compact?: boolean }) {
   const [ios, setIos] = React.useState(false);
   const [standalone, setStandalone] = React.useState(true);
   const [hidden, setHidden] = React.useState(false);
+  const [closing, setClosing] = React.useState(false);
 
   React.useEffect(() => {
     setStandalone(window.matchMedia("(display-mode: standalone)").matches || (navigator as Navigator & { standalone?: boolean }).standalone === true);
@@ -24,8 +26,10 @@ export function InstallCard({ compact = false }: { compact?: boolean }) {
   }, [compact]);
 
   if (standalone || hidden) return null;
+  // Dismissing folds the card away instead of snapping it off, then unmounts it so no gap is left behind.
   return (
-    <section aria-labelledby="install-title" className="rounded-lg border border-border bg-surface p-4">
+    <Collapse open={!closing}>
+    <section aria-labelledby="install-title" className="m-enter rounded-lg border border-border bg-surface p-4">
       <h2 id="install-title" className="text-lg">{t("title")}</h2>
       <p className="mt-1 text-muted-foreground">{t("intro")}</p>
       {ios ? (
@@ -35,8 +39,9 @@ export function InstallCard({ compact = false }: { compact?: boolean }) {
       )}
       <div className="mt-4 flex flex-wrap gap-3">
         {evt ? <Button onClick={async () => { await evt.prompt(); setEvt(null); }}><Download aria-hidden="true" />{t("installButton")}</Button> : null}
-        {compact ? <Button variant="ghost" onClick={() => { localStorage.setItem("install-dismissed", "1"); setHidden(true); }}>{t("dismiss")}</Button> : null}
+        {compact ? <Button variant="ghost" onClick={() => { localStorage.setItem("install-dismissed", "1"); setClosing(true); setTimeout(() => setHidden(true), 240); }}>{t("dismiss")}</Button> : null}
       </div>
     </section>
+    </Collapse>
   );
 }

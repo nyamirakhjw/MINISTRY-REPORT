@@ -12,7 +12,7 @@ export function Field({ id, label, hint, error, optional, optionalLabel, childre
       <Label htmlFor={id}>{label}{optional ? <span className="ml-2 font-normal text-muted-foreground">{optionalLabel}</span> : null}</Label>
       {children}
       {hint ? <p id={`${id}-hint`} className="text-sm text-muted-foreground">{hint}</p> : null}
-      {error ? <p id={`${id}-error`} role="alert" className="text-sm font-semibold text-danger">{error}</p> : null}
+      {error ? <p id={`${id}-error`} role="alert" className="m-enter text-sm font-semibold text-danger">{error}</p> : null}
     </div>
   );
 }

@@ -2,11 +2,16 @@ import Link from "next/link";
 import { CheckCircle2, Clock, Lock, RotateCcw } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { buttonVariants } from "@/components/ui/button";
+import { SwapOnChange } from "@/components/shell/swap-on-change";
 import { formatDate, formatEnd, formatMonth } from "@/lib/format";
 import type { ReportState } from "@/lib/types";
 
 /** The single status card with the primary action (DSH-01). Plain language; late is factual, never alarming. */
 export async function ReportStatusCard({ state, action = true }: { state: ReportState; action?: boolean }) {
+  return <SwapOnChange k={`${state.state}:${state.month ?? ""}`}><StatusCardBody state={state} action={action} /></SwapOnChange>;
+}
+
+async function StatusCardBody({ state, action }: { state: ReportState; action: boolean }) {
   const t = await getTranslations("report");
   const locale = await getLocale();
   const month = state.month ? formatMonth(state.month, locale) : "";
